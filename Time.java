@@ -1,22 +1,27 @@
-import java.util.*;
-import java.lang.*;
-import java.io.*;
+import java.util.Calendar;
+
 public class Time{
    
-    private boolean isM;
-    private boolean isW;
-    private boolean isF;
-    private boolean isT;
-    private boolean isTH;
-     
-    
-    private int startTime;
-    private int endTime;
+    private Calendar eventTime;
+	private boolean isStartTime;
 
-    public Time(){
+    public Time(String s){
 
-	
     }
    
+    public Calendar getEventTime() {
+		return eventTime;
+	}
 
+	public void setEventTime(Calendar eventTime) {
+		this.eventTime = eventTime;
+	}
+
+	public boolean isStartTime() {
+		return isStartTime;
+	}
+
+	public void setStartTime(boolean isStartTime) {
+		this.isStartTime = isStartTime;
+	}
 }
