@@ -3,13 +3,15 @@ import java.lang.*;
 import java.io.*;
 public class Room{
 	
-	private int roomNumber;
+	private String roomNumber; //this cant be an int because there's a room 17A
+	//private String nickname; //should this be a thing for "Blackbox "Buckley Recital Hall" etc?
 	private int capacity;
 	private String building;
 	private boolean isAccessible;
 	private String type;
 
     private class Technology{
+    	//28-10: I dont think we should touch this yet 
     	private boolean isSmall;
     	private boolean hasProj;
     	private boolean hasCassette;
@@ -29,7 +31,7 @@ public class Room{
     }
 
     
-    public Room(int capacity, String building, int roomNumber, boolean accessible, String type){
+    public Room(boolean accessible, String building, int capacity, String roomNumber, String type){
     	this.capacity=capacity;
     	this.building=building;
     	this.roomNumber=roomNumber;
@@ -37,4 +39,47 @@ public class Room{
     	this.type=type.toLowerCase();
     }
 
+    public boolean inSameBuilding(Room r){
+    	return this.building==r.getBuilding();
+    }
+
+	public String getRoomNumber() {
+		return roomNumber;
+	}
+
+	public void setRoomNumber(String roomNumber) {
+		this.roomNumber = roomNumber;
+	}
+
+	public int getCapacity() {
+		return capacity;
+	}
+
+	public void setCapacity(int capacity) {
+		this.capacity = capacity;
+	}
+
+	public String getBuilding() {
+		return building;
+	}
+
+	public void setBuilding(String building) {
+		this.building = building;
+	}
+
+	public boolean isAccessible() {
+		return isAccessible;
+	}
+
+	public void setAccessible(boolean isAccessible) {
+		this.isAccessible = isAccessible;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
 }

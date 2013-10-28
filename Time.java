@@ -5,8 +5,9 @@ public class Time{
     private Calendar eventTime;
 	private boolean isStartTime;
 
-    public Time(String s){
-
+    public Time(String s, boolean isStartTime){
+    	this.isStartTime=isStartTime;
+    	//parse the shit out of s to turn it into a Calendar
     }
    
     public Calendar getEventTime() {
