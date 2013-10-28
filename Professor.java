@@ -8,8 +8,6 @@ public class Professor{
     private boolean stairs;
     private List<Course> courses;
     
-
-
     public Professor(){}
 
 }
