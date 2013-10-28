@@ -10,6 +10,6 @@ public class Professor{
     
 
 
-    Public Professor(){}
+    public Professor(){}
 
 }

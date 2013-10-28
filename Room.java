@@ -25,7 +25,7 @@ public class Room{
     private boolean isMultiformat;
 
     
-    Public Room(){
+    public Room(){
 	
 	
     }

@@ -13,7 +13,7 @@ public class Time{
     private int startTime;
     private int endTime;
 
-    Public Time(){
+    public Time(){
 
 	
     }

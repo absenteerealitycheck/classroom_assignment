@@ -1,8 +1,8 @@
-Public class Course{
+public class Course{
     private Time[] preferedTimes;
     private int capacity;
     
-    Public Course(){
+    public Course(){
     }
     
 
