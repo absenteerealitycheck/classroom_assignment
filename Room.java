@@ -8,7 +8,7 @@ public class Room{
 	private int capacity;
 	private String building;
 	private boolean isAccessible;
-	private String type;
+    private String type; //lab,seminar,lecture,small,studio
 
     private class Technology{
     	//28-10: I dont think we should touch this yet 
@@ -31,7 +31,7 @@ public class Room{
     }
 
     
-    public Room(boolean accessible, String building, int capacity, String roomNumber, String type){
+    public Room(boolean accessible,String building,int capacity,String roomNumber,String type){
     	this.capacity=capacity;
     	this.building=building;
     	this.roomNumber=roomNumber;
