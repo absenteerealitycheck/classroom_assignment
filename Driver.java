@@ -5,11 +5,12 @@ public class Driver{
 	
 	public static void main(String args[]){
 		String[][] roomSpreadsheet = new String[100][20];
+		String[][] courseSpreadsheet = new String[642][16];
 		//Read csv file into spreadsheet cell by cell
 		//probably need to sanitize data as we read it in, i.e. use String currentBuilding
 		//does it make sense to store nulls?
 		ArrayList<Room> rooms= generateRooms(roomSpreadsheet);
-		
+		ArrayList<Course> courses= generateCourses();
 		
 	}
 	
@@ -70,5 +71,29 @@ public class Driver{
 	
 	public static <T> T coalesce(T a, T b, T c) {
 	    return a != null ? a : (b != null ? b : c);
+	}
+	public static String[][] makeSpreadsheet(File file, String[][] strings) throws IOException{
+		String[][] csv=strings;
+		try {
+			BufferedReader readIn = new BufferedReader(new FileReader(file));
+			String line="";
+			String[] row=new String[csv[0].length];
+			int count=0;
+			while((line=readIn.readLine())!=null){
+				String [] temp= line.split(", ",row.length);
+				int n = Math.min(temp.length, row.length);
+				for(int i=0;i<n;i++){
+					csv[count][i]=temp[i];
+				}
+				count++;
+				
+			}
+			readIn.close();
+		} 
+		catch (FileNotFoundException e) {
+			System.out.println("You Done Goofed");
+			e.printStackTrace();
+		}
+		return csv;
 	}
 }
