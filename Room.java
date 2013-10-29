@@ -4,6 +4,14 @@ import java.io.*;
 public class Room{
 	
 	private String roomNumber; //this cant be an int because there's a room 17A
+							   /*
+							    *  How about we just make it either an int that turns the letter into a hex form 
+							    *  i.e 17A -> 1709 while 17 -> 17/1700 depending on preference
+							    *  
+							    * Or a double that uses the decimal of the letter value if there is an issue
+							    *  i.e. 17A -> 17.1 since 17 will automatically go to 17.00
+							    * -cbb
+							    */
 	//private String nickname; //should this be a thing for "Blackbox "Buckley Recital Hall" etc?
 	private int capacity;
 	private String building;
