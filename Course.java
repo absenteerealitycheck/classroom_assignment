@@ -25,6 +25,7 @@ public class Course{
     	this.noncurrent = new ArrayList<Course>(10);
     	
       	this.preferredRooms= new ArrayList<Room>(50);
+      	this.shortName=new ArrayList<String>(3);
       	this.preferredTimes = new ArrayList<Tuple<Time,Time>>(10);
       	this.professors = new ArrayList<Professor>(2);
             	
@@ -38,10 +39,21 @@ public class Course{
 	public ArrayList<Tuple<Time, Time>> getPreferredTimes() {
 		return preferredTimes;
 	}
-
 	public void addPreferredTimes(Tuple<Time, Time> preferredTime) {
 		this.preferredTimes.add(preferredTime);
 	}
+	public void getCourseByName(Course c){
+		
+	}
+	public ArrayList<Room> getPreferredRooms() {
+		return preferredRooms;
+	}
+
+	public void addPreferredRooms(Room preferredRoom) {
+		this.preferredRooms.add(preferredRoom);
+	}
+
+	
 
 	public ArrayList<Course> getConcurrent() {
 		return concurrent;

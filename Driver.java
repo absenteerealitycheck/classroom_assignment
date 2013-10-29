@@ -3,20 +3,30 @@ import java.lang.*;
 import java.io.*;
 public class Driver{
 	
-	public static void main(String args[]){
+	public static void main(String args[]) throws IOException{
 		new Driver().go();
 		
 	}
 	
-	public void go(){
-		String[][] roomSpreadsheet = new String[100][20];
+	public void go() throws IOException{
+		String[][] roomSpreadsheet = new String[81][5];
 		String[][] courseSpreadsheet = new String[642][16];
+		//String[][] profSpreadsheet=new String[338][3];
 		//Read csv file into spreadsheet cell by cell
+		courseSpreadsheet=makeSpreadsheet(new File("proto-courselist.csv"),courseSpreadsheet);
+		//print2D(courseSpreadsheet);
+		roomSpreadsheet=makeSpreadsheet(new File("proto-roomslist.csv"),roomSpreadsheet);
+		print2D(roomSpreadsheet);
+		//profSpreadsheet=makeSpreadsheet(new File("proto-professorlist.csv"),profSpreadsheet);
+		//print2D(profSpreadsheet);
+		
 		//probably need to sanitize data as we read it in, i.e. use String currentBuilding
-		//does it make sense to store nulls?
+		//does it make sense to store nulls? 
+		//NOTE: I stored nulls because I haven't sanitized the data in any meaningful way yet
 		ArrayList<Room> rooms= generateRooms(roomSpreadsheet);
-		ArrayList<Course> courses= generateCourses();
-	
+		ArrayList<Course> courses= generateCourses(courseSpreadsheet);
+		System.out.println("Success!");
+		//ArrayList<Professor> professors= generateProfessors(profSpreadsheet);
 		/*
 		 * after generating each room, we need to either generate all the professors or all the courses.
 		 * it should be noted that the order we do these in determines greatly what constructors we need for each class
@@ -28,22 +38,24 @@ public class Driver{
 		/*However we construct rS, write a visual representation of it below
 		 * 
 		 * rS:
-		 * [BuildingName|...]
+		 * [BuildingName|RoomNumber|Capacity|RoomType|Accessible]
 		 * [BuildingName|...]
 		 * ...
 		 * 
 		*/
 		//after this is just pseudocode. change it to make it work.
 		int numberOfRooms=rS.length;
-		numberOfRooms=100;
+		//numberOfRooms=100;
 		ArrayList<Room> rooms= new ArrayList<Room>(numberOfRooms);
-		for(int row=0; row<rS.length; row++){
-			String type=coalesce(rS[row][2],rS[row][3],rS[row][4]);
+		for(int row=1; row<rS.length; row++){
+			//String type=coalesce(rS[row][2],rS[row][3],rS[row][4]);
+			String type=rS[row][3];
 			//the above is just a guess, assuming rS is formatted [Building|Room|Seminar|SmallClassrm|Lecture|Seats...] 
 			//it might make more sense to sanitize and construct rS as [Building|Room|Type|Capacity|...]
-			Boolean accessible=Boolean.valueOf(rS[row][6]);
+			Boolean accessible=Boolean.valueOf(rS[row][4]);
 			String buildingName=rS[row][0];
-			Integer capacity= Integer.valueOf(rS[row][5]);
+			
+			Integer capacity= Integer.valueOf(rS[row][2]);
 			String roomNumber=rS[row][1];
 			//these guys can change too. depends how we constuct rS
 			//the next two lines should be ok 
@@ -53,6 +65,7 @@ public class Driver{
 			rooms.add(r);
 		}		
 		rooms.trimToSize();
+		System.out.println("WOOT WOOT");
 		return rooms;
 	}
 	
@@ -60,9 +73,10 @@ public class Driver{
 		ArrayList<Professor> profList=new ArrayList<Professor>();
 		int allProfs=profs.length;
 		int eachProf=profs[0].length;
-		for(int i=0;i<allProfs;i++){
-			for(int j=0;j<eachProf;j++){
+		for(int row=0;row<allProfs;row++){
+			for(int col=0;col<eachProf;row++){
 				//break things up and send everything out.
+				
 			}
 		}
 		profList.trimToSize();
@@ -73,10 +87,62 @@ public class Driver{
 		ArrayList<Course> courseList=new ArrayList<Course>();
 		int allProfs=cl.length;
 		int eachProf=cl[0].length;
-		for(int i=0;i<allProfs;i++){
-			for(int j=0;j<eachProf;j++){
-				//break things up and send everything out.
+		Course temp;
+		for(int row=1;row<allProfs;row++){//start at 1 because first row is headings of columns
+			String shortname=cl[row][0];
+			String longname=cl[row][1];
+			//cl[row][ 2 ]is the professor teaching the course
+			//String prof=cl[row][2];
+			
+			int capacity;
+			if(cl[row][3].isEmpty()){
+				capacity=10;
 			}
+			else{
+				capacity=Integer.parseInt(cl[row][3]);
+			}
+			
+			//These are the preferred rooms stored in the sheet
+			String building=cl[row][6];
+			String roomnum=cl[row][7];
+			Room pref=new Room(building,roomnum);
+			//type of class
+			String type=cl[row][8];
+			temp= new Course(capacity,longname,type);
+		
+			temp.addShortName(shortname);
+			temp.addPreferredRooms(pref);
+			//Making preferred Times
+			String daysOfWeek=cl[row][4];
+			String time=cl[row][5];
+			String[] times=time.split("-",2);
+			char[] dow=daysOfWeek.toCharArray();
+			Time start;
+			Time end;
+			if(times[0].isEmpty()){
+				times=new String[2];
+				times[0]="12:00PM";
+				times[1]="12:50PM";
+			}
+			if(daysOfWeek.isEmpty()){
+				daysOfWeek="MWF";
+			}
+			
+			for(int i=0;i<dow.length;i++){
+				if(dow[i]=='T' && i!=dow.length-1 && dow[i+1]=='H'){
+					char[] th={'T','H'};
+					 start=new Time(th,times[0],true);
+					 end=new Time(th, times[1],false);
+					 temp.addPreferredTimes(new Tuple<Time,Time>(start,end));
+				}
+				else{
+					
+					 start=new Time(dow[i],times[0],true);
+					 end=new Time(dow[i], times[1],false);
+					 temp.addPreferredTimes(new Tuple<Time,Time>(start,end));
+				}
+			}
+			
 		}
 		courseList.trimToSize();
 		return courseList;
@@ -104,7 +170,7 @@ public class Driver{
 			String[] row=new String[csv[0].length];
 			int count=0;
 			while((line=readIn.readLine())!=null){
-				String [] temp= line.split(", ",row.length);
+				String [] temp= line.split(";",row.length);
 				int n = Math.min(temp.length, row.length);
 				for(int i=0;i<n;i++){
 					csv[count][i]=temp[i];
@@ -119,5 +185,14 @@ public class Driver{
 			e.printStackTrace();
 		}
 		return csv;
+	}
+	public static void print2D(String[][] s){
+		for(int row=0;row<s.length;row++){
+			for(int col=0;col<s[0].length;col++){
+				if(s[row][col]!=null){System.out.print(s[row][col]);}
+				else continue;
+			}
+			System.out.print("\n");
+		}
 	}
 }

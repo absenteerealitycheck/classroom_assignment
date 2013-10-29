@@ -46,7 +46,10 @@ public class Room{
     	this.isAccessible=accessible;
     	this.type=type.toLowerCase();
     }
-
+    public Room (String building, String roomNumber){//Secondary constructor for use in generateCourses method
+    	this.building=building;
+    	this.roomNumber=roomNumber;
+    }
     public boolean inSameBuilding(Room r){
     	return this.building==r.getBuilding();
     }
