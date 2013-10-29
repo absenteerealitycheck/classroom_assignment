@@ -4,20 +4,25 @@ import java.io.*;
 public class Driver{
 	
 	public static void main(String args[]){
+		new Driver().go();
+		
+	}
+	
+	public void go(){
 		String[][] roomSpreadsheet = new String[100][20];
 		//Read csv file into spreadsheet cell by cell
 		//probably need to sanitize data as we read it in, i.e. use String currentBuilding
 		//does it make sense to store nulls?
+		
 		ArrayList<Room> rooms= generateRooms(roomSpreadsheet);
-		
+		/*
+		 * after generating each room, we need to either generate all the professors or all the courses.
+		 * it should be noted that the order we do these in determines greatly what constructors we need for each class
+		 */
 		
 	}
 	
-	public Driver(){
-		
-	}
-	
-	public static ArrayList<Room> generateRooms(String[][] rS){
+	public ArrayList<Room> generateRooms(String[][] rS){
 		/*However we construct rS, write a visual representation of it below
 		 * 
 		 * rS:
@@ -49,15 +54,33 @@ public class Driver{
 		return rooms;
 	}
 	
-	public static ArrayList<Professor> generateProfessors(){
-		
+	public ArrayList<Professor> generateProfessors(String[][] profs){//just some speculative code for now on how we should break stuff up		
+		ArrayList<Professor> profList=new ArrayList<Professor>();
+		int allProfs=profs.length;
+		int eachProf=profs[0].length;
+		for(int i=0;i<allProfs;i++){
+			for(int j=0;j<eachProf;j++){
+				//break things up and send everything out.
+			}
+		}
+		profList.trimToSize();
+		return profList;
 	}
 	
-	public static ArrayList<Course> generateCourses(){
-		
+	public ArrayList<Course> generateCourses(String[][] cl){
+		ArrayList<Course> courseList=new ArrayList<Course>();
+		int allProfs=cl.length;
+		int eachProf=cl[0].length;
+		for(int i=0;i<allProfs;i++){
+			for(int j=0;j<eachProf;j++){
+				//break things up and send everything out.
+			}
+		}
+		courseList.trimToSize();
+		return courseList;
 	}
 	
-	public static void linkProfessorsAndCourses(ArrayList<Professor> professors, ArrayList<Course> courses, ArrayList<Tuple<Course,Professor>> pairs){
+	public void linkProfessorsAndCourses(ArrayList<Professor> professors, ArrayList<Course> courses, ArrayList<Tuple<Course,Professor>> pairs){
 		//not exactly sure how to implement these loops at this point
 		//maybe take a list of <professorName,courseName> pairs and
 		for(Tuple t: pairs){
@@ -68,7 +91,7 @@ public class Driver{
 		}
 	}
 	
-	public static <T> T coalesce(T a, T b, T c) {
+	public <T> T coalesce(T a, T b, T c) {
 	    return a != null ? a : (b != null ? b : c);
 	}
 }

@@ -2,14 +2,6 @@ import java.util.*;
 import java.lang.*;
 import java.io.*;
 
-/*
- * Updates: 
- * 10/28/13 -cbb
- *  Set prefTimes to an ArrayList instead of a single time
- *  Added new constructors
- *  Added the following methods: setDepartment, setCourse, set/add/getTime
- *  
- */
 public class Professor{
 	
 	private String name;
