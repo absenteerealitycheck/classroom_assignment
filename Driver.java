@@ -41,6 +41,7 @@ public class Driver{
 		 * [BuildingName|RoomNumber|Capacity|RoomType|Accessible]
 		 * [BuildingName|...]
 		 * ...
+		 * current columns are [buildingName|roomNumber|capacity|type|accessible] - jpham14:10/28
 		 * 
 		*/
 		//after this is just pseudocode. change it to make it work.
@@ -54,7 +55,6 @@ public class Driver{
 			//it might make more sense to sanitize and construct rS as [Building|Room|Type|Capacity|...]
 			Boolean accessible=Boolean.valueOf(rS[row][4]);
 			String buildingName=rS[row][0];
-			
 			Integer capacity= Integer.valueOf(rS[row][2]);
 			String roomNumber=rS[row][1];
 			//these guys can change too. depends how we constuct rS
@@ -83,6 +83,7 @@ public class Driver{
 		return profList;
 	}
 	
+	     
 	public ArrayList<Course> generateCourses(String[][] cl){
 		ArrayList<Course> courseList=new ArrayList<Course>();
 		int allProfs=cl.length;
