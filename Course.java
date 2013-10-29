@@ -4,8 +4,8 @@ import java.lang.reflect.Array;
 import java.io.*;
 public class Course{
 	private String longName;
-	private ArrayList<String> shortName; //courses can be cross listed between departments but will have the same nameLong I think
-	private ArrayList<String> department;
+	private ArrayList<String> shortName; //courses can be cross listed between departments but will have the same longName I think
+	private ArrayList<String> department; // ^ for example, {CS321,MATH232}
     private ArrayList<Tuple<Time,Time>> preferredTimes;
     private int capacity;
     private ArrayList<Room> preferredRooms;
