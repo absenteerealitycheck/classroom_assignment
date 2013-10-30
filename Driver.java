@@ -38,6 +38,7 @@ public class Driver{
 	}
 	
 	public ArrayList<Room> generateRooms(String[][] rS){
+		System.out.println("Generating Rooms");
 		/*However we construct rS, write a visual representation of it below
 		 * 
 		 * rS:
@@ -73,6 +74,7 @@ public class Driver{
 	}
 	
 	public ArrayList<Professor> generateProfessors(String[][] profs){//just some speculative code for now on how we should break stuff up		
+		System.out.println("Generating Professors");
 		ArrayList<Professor> profList=new ArrayList<Professor>();
 		int allProfs=profs.length;
 		int eachProf=profs[0].length;
@@ -87,8 +89,10 @@ public class Driver{
 	}
 	
 	     
+
 	public ArrayList<Course> generateCourses(String[][] cl, Hashtable<String,Course> ch){
 		//need to make sure we only create cross listed classes once
+		System.out.println("Generating Courses");
 		ArrayList<Course> courseList=new ArrayList<Course>();
 		int allProfs=cl.length;
 		int eachProf=cl[0].length;
@@ -170,7 +174,9 @@ public class Driver{
 		return courseList;
 	}
 	
+
 	public void linkProfessorsAndCourses(ArrayList<Professor> professors, ArrayList<Course> courses, ArrayList<Tuple<String,String>> pairs){
+		System.out.println("Matching Professors and Courses");
 		//not exactly sure how to implement these loops at this point
 		//maybe take a list of <professorName,courseName> pairs and
 		
@@ -197,6 +203,7 @@ public class Driver{
 	    return a != null ? a : (b != null ? b : c);
 	}
 	public static String[][] makeSpreadsheet(File file, String[][] strings) throws IOException{
+		System.out.prinln("Reading Files");
 		String[][] csv=strings;
 		try {
 			BufferedReader readIn = new BufferedReader(new FileReader(file));
