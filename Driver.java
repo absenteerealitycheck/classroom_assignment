@@ -12,6 +12,7 @@ public class Driver{
 		//TODO: bug12: can we abstract this to the actual size of the uploaded file
 		String[][] roomSpreadsheet = new String[81][5];
 		String[][] courseSpreadsheet = new String[642][16];
+		Hashtable<String,Course> courseHash=new Hashtable<String,Course>(courseSpreadsheet.length);
 		//String[][] profSpreadsheet=new String[338][3];
 		//Read csv file into spreadsheet cell by cell
 		courseSpreadsheet=makeSpreadsheet(new File("proto-courselist.csv"),courseSpreadsheet);
@@ -25,9 +26,11 @@ public class Driver{
 		//does it make sense to store nulls? 
 		//NOTE: I stored nulls because I haven't sanitized the data in any meaningful way yet
 		ArrayList<Room> rooms= generateRooms(roomSpreadsheet);
-		ArrayList<Course> courses= generateCourses(courseSpreadsheet);
-		System.out.println("Done.");
+
 		//ArrayList<Professor> professors= generateProfessors(profSpreadsheet);
+		ArrayList<Course> courses= generateCourses(courseSpreadsheet,courseHash);
+		System.out.println("Success!");
+		
 		/*
 		 * after generating each room, we need to either generate all the professors or all the courses.
 		 * it should be noted that the order we do these in determines greatly what constructors we need for each class
@@ -87,21 +90,27 @@ public class Driver{
 	}
 	
 	     
-	public ArrayList<Course> generateCourses(String[][] cl){
+
+		public ArrayList<Course> generateCourses(String[][] cl, Hashtable<String,Course> ch){
 		/*
 		 * [Shortname|Longname|Time|Capacity||Building|RoomNumber|Type]
 		 */
+	
+		//need to make sure we only create cross listed classes once
+
 		System.out.println("Generating Courses");
 		ArrayList<Course> courseList=new ArrayList<Course>();
 		int allProfs=cl.length;
 		int eachProf=cl[0].length;
 		Course temp;
 		for(int row=1;row<allProfs;row++){//start at 1 because first row is headings of columns
+			//Names
 			String shortname=cl[row][0];
 			String longname=cl[row][1];
+			//Professor
 			//cl[row][ 2 ]is the professor teaching the course
 			//String prof=cl[row][2];
-			
+			//Capacity
 			int capacity;
 			if(cl[row][3].isEmpty()){
 				capacity=10;
@@ -110,17 +119,25 @@ public class Driver{
 				capacity=Integer.parseInt(cl[row][3]);
 			}
 			
-			//These are the preferred rooms stored in the sheet
-			String building=cl[row][6];
-			String roomnum=cl[row][7];
-			Room pref=new Room(building,roomnum);
+			
+			
 			//type of class
 			String type=cl[row][8];
+			//Checks for crosslisting
+			if(!ch.containsKey(longname)){
 			temp= new Course(capacity,longname,type);
-		
+			ch.put(longname, temp);
 			temp.addShortName(shortname);
-			temp.addPreferredRooms(pref);
-			//Making preferred Times
+			//Handling preferredRooms Begins
+			if (!cl[row][6].isEmpty()){
+				//Building
+				String building=cl[row][6];
+				//Room Number
+				String roomnum=cl[row][7];
+				Room pref=new Room(building,roomnum);
+				temp.addPreferredRooms(pref);}//Making preferredRooms Ends
+			
+			//Making preferred Times Begins
 			String daysOfWeek=cl[row][4];
 			String time=cl[row][5];
 			String[] times=time.split("-",2);
@@ -139,34 +156,42 @@ public class Driver{
 			for(int i=0;i<dow.length;i++){
 				if(dow[i]=='T' && i!=dow.length-1 && dow[i+1]=='H'){
 					char[] th={'T','H'};
-					 start=new Time(th,times[0],true);
-					 end=new Time(th, times[1],false);
-					 temp.addPreferredTimes(new Tuple<Time,Time>(start,end));
+					start=new Time(th,times[0],true);
+					end=new Time(th, times[1],false);
+					temp.addPreferredTimes(new Tuple<Time,Time>(start,end));
 				}
 				else{
 					
-					 start=new Time(dow[i],times[0],true);
-					 end=new Time(dow[i], times[1],false);
-					 temp.addPreferredTimes(new Tuple<Time,Time>(start,end));
+					start=new Time(dow[i],times[0],true);
+					end=new Time(dow[i], times[1],false);
+					temp.addPreferredTimes(new Tuple<Time,Time>(start,end));
 				}
+			}//End preferredTimes
+			
+			courseList.add(temp);
 			}
+			else{
+				ch.get(longname).addShortName(shortname);
+			}
+		
 			
 		}
 		courseList.trimToSize();
 		return courseList;
 	}
 	
-	public void linkProfessorsAndCourses(ArrayList<Professor> professors, String[][] cSS, Hashtable<String,Course> ch){
+
+	public void linkProfessorsAndCourses(ArrayList<Professor> professors, String[][] cSS, Hashtable<String,Course> cH, Hashtable<String,Professor> pH){
+
 		System.out.println("Matching Professors and Courses");
 		//not exactly sure how to implement these loops at this point
 		//maybe take a list of <professorName,courseName> pairs and
 		
-		ch.get(cSS[i][1]);
+		//assume we have courseSpreadSheet
 		
-		
-		for(Tuple t: pairs){
-			Course c=courses.getCourseByName(t.getFirst());
-			Professor p=professors.getProfessorByName(t.getSecond());
+		for (int i=0; i<cSS.length; i++){
+			Course c = cH.get(cSS[i][1]);
+			Professor p=pH.get(cSS[i][2]);
 			c.addProfessor(p);
 			p.addCourse(c);
 		}
@@ -176,7 +201,7 @@ public class Driver{
 	    return a != null ? a : (b != null ? b : c);
 	}
 	public static String[][] makeSpreadsheet(File file, String[][] strings) throws IOException{
-		System.out.prinln("Reading Files");
+		System.out.println("Reading Files");
 		String[][] csv=strings;
 		try {
 			BufferedReader readIn = new BufferedReader(new FileReader(file));
@@ -201,7 +226,7 @@ public class Driver{
 		return csv;
 	}
 	public static void print2D(String[][] s){
-		for(int row=0;row<s.length;row++){
+		for(int row=1;row<s.length;row++){
 			for(int col=0;col<s[0].length;col++){
 				if(s[row][col]!=null){System.out.print(s[row][col]);}
 				else continue;
