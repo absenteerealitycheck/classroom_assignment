@@ -163,6 +163,7 @@ public class Driver{
 		
 		ch.get(cSS[i][1]);
 		
+		
 		for(Tuple t: pairs){
 			Course c=courses.getCourseByName(t.getFirst());
 			Professor p=professors.getProfessorByName(t.getSecond());
