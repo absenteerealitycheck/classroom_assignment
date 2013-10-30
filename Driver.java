@@ -9,6 +9,7 @@ public class Driver{
 	}
 	
 	public void go() throws IOException{
+		//TODO: bug12: can we abstract this to the actual size of the uploaded file
 		String[][] roomSpreadsheet = new String[81][5];
 		String[][] courseSpreadsheet = new String[642][16];
 		//String[][] profSpreadsheet=new String[338][3];
@@ -25,7 +26,7 @@ public class Driver{
 		//NOTE: I stored nulls because I haven't sanitized the data in any meaningful way yet
 		ArrayList<Room> rooms= generateRooms(roomSpreadsheet);
 		ArrayList<Course> courses= generateCourses(courseSpreadsheet);
-		System.out.println("Success!");
+		System.out.println("Done.");
 		//ArrayList<Professor> professors= generateProfessors(profSpreadsheet);
 		/*
 		 * after generating each room, we need to either generate all the professors or all the courses.
@@ -87,6 +88,9 @@ public class Driver{
 	
 	     
 	public ArrayList<Course> generateCourses(String[][] cl){
+		/*
+		 * [Shortname|Longname|Time|Capacity||Building|RoomNumber|Type]
+		 */
 		System.out.println("Generating Courses");
 		ArrayList<Course> courseList=new ArrayList<Course>();
 		int allProfs=cl.length;
@@ -152,10 +156,13 @@ public class Driver{
 		return courseList;
 	}
 	
-	public void linkProfessorsAndCourses(ArrayList<Professor> professors, ArrayList<Course> courses, ArrayList<Tuple<Course,Professor>> pairs){
+	public void linkProfessorsAndCourses(ArrayList<Professor> professors, String[][] cSS, Hashtable<String,Course> ch){
 		System.out.println("Matching Professors and Courses");
 		//not exactly sure how to implement these loops at this point
 		//maybe take a list of <professorName,courseName> pairs and
+		
+		ch.get(cSS[i][1]);
+		
 		for(Tuple t: pairs){
 			Course c=courses.getCourseByName(t.getFirst());
 			Professor p=professors.getProfessorByName(t.getSecond());
