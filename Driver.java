@@ -16,7 +16,7 @@ public class Driver{
 		courseSpreadsheet=makeSpreadsheet(new File("proto-courselist.csv"),courseSpreadsheet);
 		//print2D(courseSpreadsheet);
 		roomSpreadsheet=makeSpreadsheet(new File("proto-roomslist.csv"),roomSpreadsheet);
-		print2D(roomSpreadsheet);
+		//print2D(roomSpreadsheet);
 		//profSpreadsheet=makeSpreadsheet(new File("proto-professorlist.csv"),profSpreadsheet);
 		//print2D(profSpreadsheet);
 		
@@ -26,11 +26,36 @@ public class Driver{
 		ArrayList<Room> rooms= generateRooms(roomSpreadsheet);
 		ArrayList<Course> courses= generateCourses(courseSpreadsheet);
 		System.out.println("Success!");
+		
+		
 		//ArrayList<Professor> professors= generateProfessors(profSpreadsheet);
 		/*
 		 * after generating each room, we need to either generate all the professors or all the courses.
 		 * it should be noted that the order we do these in determines greatly what constructors we need for each class
 		 */
+
+		/*make a graph of courses - courses that overlap share an edge.
+		 *this method will give us clusters of courses based on time
+		 *go through each cluster and color separately?
+		 *JP 10/29
+		 */
+	       
+		Tuple<Time,Time> courseTimes; 
+		Course c;
+		System.out.println(courses.size());
+		for(int i=0;i<courses.size();i++) {
+		    c = courses.get(i);
+		    System.out.println("Course: "+c.getLongName());
+		    if (c.getPreferredTimes().size()==0) System.out.println("TBA");
+		    else {
+		    courseTimes = c.getPreferredTimes().get(0);
+		    System.out.println("Start: "+courseTimes.getFirst().getHour()+":"+courseTimes.getFirst().getMinute());
+		    System.out.println("End: "+courseTimes.getSecond().getHour()+":"+courseTimes.getSecond().getMinute());
+		    
+		    
+		    }
+		}
+		
 		
 	}
 	
@@ -147,12 +172,14 @@ public class Driver{
 				}
 			}
 			
+			courseList.add(temp);
+			
 		}
 		courseList.trimToSize();
 		return courseList;
 	}
 	
-	public void linkProfessorsAndCourses(ArrayList<Professor> professors, ArrayList<Course> courses, ArrayList<Tuple<Course,Professor>> pairs){
+    /*	public void linkProfessorsAndCourses(ArrayList<Professor> professors, ArrayList<Course> courses, ArrayList<Tuple<Course,Professor>> pairs){
 		System.out.println("Matching Professors and Courses");
 		//not exactly sure how to implement these loops at this point
 		//maybe take a list of <professorName,courseName> pairs and
@@ -162,13 +189,13 @@ public class Driver{
 			c.addProfessor(p);
 			p.addCourse(c);
 		}
-	}
+	}*/
 	
 	public <T> T coalesce(T a, T b, T c) {
 	    return a != null ? a : (b != null ? b : c);
 	}
 	public static String[][] makeSpreadsheet(File file, String[][] strings) throws IOException{
-		System.out.prinln("Reading Files");
+		System.out.println("Reading Files");
 		String[][] csv=strings;
 		try {
 			BufferedReader readIn = new BufferedReader(new FileReader(file));
