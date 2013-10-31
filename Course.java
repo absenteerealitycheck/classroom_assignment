@@ -16,6 +16,8 @@ public class Course{
     private boolean seminarCourse;
     private ArrayList<Course> concurrent;
     private ArrayList<Course> noncurrent;
+    
+    private ArrayList<Course> edges;
 
     public Course(int capacity, String name, String type){
     	this.capacity=capacity;

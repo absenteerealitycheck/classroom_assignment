@@ -3,6 +3,7 @@ import java.lang.*;
 import java.io.*;
 public class Driver{
 	
+	public HashMap<String,ArrayList<Room>> allBuildings=new HashMap<String,ArrayList<Room>>(20);
 	public static void main(String args[]) throws IOException{
 		new Driver().go();
 		
@@ -19,9 +20,11 @@ public class Driver{
 		//Read csv file into spreadsheet cell by cell
 		//print2D(courseSpreadsheet);
 		roomSpreadsheet=makeSpreadsheet(new File("proto-roomslist.csv"),roomSpreadsheet);
+
 		professorSpreadsheet=makeSpreadsheet(new File("proto-profslist.csv"),professorSpreadsheet);
 		courseSpreadsheet=makeSpreadsheet(new File("proto-courselist.csv"),courseSpreadsheet);
-		print2D(roomSpreadsheet);
+		//print2D(roomSpreadsheet);
+
 		//profSpreadsheet=makeSpreadsheet(new File("proto-professorlist.csv"),profSpreadsheet);
 		//print2D(profSpreadsheet);
 		
@@ -30,11 +33,11 @@ public class Driver{
 		//NOTE: I stored nulls because I haven't sanitized the data in any meaningful way yet
 		ArrayList<Room> rooms= generateRooms(roomSpreadsheet);
 		ArrayList<Professor> professors= generateProfessors(professorSpreadsheet);
-		ArrayList<Course> courses= generateCourses(courseSpreadsheet,courseHash);
+		ArrayList<Course> courses= generateCourses(courseSpreadsheet,courseHash,allBuildings);
 		
-		linkProfessorsToRooms();
-		linkProfessorsToCourses();
-		linkCoursesToRooms();//this is where the magic happens
+		//linkProfessorsToRooms();
+		//linkProfessorsToCourses();
+		//linkCoursesToRooms();//this is where the magic happens
 		
 		System.out.println("Success!");
 		
@@ -42,6 +45,38 @@ public class Driver{
 		 * after generating each room, we need to either generate all the professors or all the courses.
 		 * it should be noted that the order we do these in determines greatly what constructors we need for each class
 		 */
+
+		/*make a graph of courses - courses that overlap share an edge.
+		 *this method will give us clusters of courses based on time
+		 *go through each cluster and color separately?
+		 *JP 10/29
+		 */
+		
+		boolean allTimesPresent = true;
+		
+		for (Course c: courses){
+			if (c.getPreferredTimes().size()==0) allTimesPresent=false; 
+		
+		}
+	       
+		/*Tuple<Time,Time> courseTimes; 
+		Course c;
+		System.out.println(courses.size());
+		for(int i=0;i<courses.size();i++) {
+		    c = courses.get(i);
+		    System.out.println("Course: "+c.getLongName());
+		    if (c.getPreferredTimes().size()==0) System.out.println("TBA");
+		    else {
+		    courseTimes = c.getPreferredTimes().get(0);
+		    System.out.println("Start: "+courseTimes.getFirst().getHour()+":"+courseTimes.getFirst().getMinute());
+		    System.out.println("End: "+courseTimes.getSecond().getHour()+":"+courseTimes.getSecond().getMinute());
+		    
+		    
+		    }
+		}*/ //for general debugging - jpham14:10/31
+		
+		System.out.println("No missing times?: "+allTimesPresent);
+		
 		
 	}
 	
@@ -75,12 +110,24 @@ public class Driver{
 			//eventually implement the following line
 			//r.setTech(...)			
 			rooms.add(r);
+			addToBuilding(r);
 		}		
 		rooms.trimToSize();
 		System.out.println("WOOT WOOT");
 		return rooms;
 	}
 	
+	public void addToBuilding(Room r) {
+		String b=r.getBuilding();
+		if(allBuildings.containsKey(b))
+			allBuildings.get(b).add(r);
+		else{
+			ArrayList<Room> a=new ArrayList<Room>();
+			a.add(r);
+			allBuildings.put(b,a);
+		}
+	}
+
 	public ArrayList<Professor> generateProfessors(String[][] profs){//just some speculative code for now on how we should break stuff up		
 		System.out.println("Generating Professors");
 		ArrayList<Professor> profList=new ArrayList<Professor>();
@@ -98,7 +145,7 @@ public class Driver{
 	
 	     
 
-		public ArrayList<Course> generateCourses(String[][] cl, Hashtable<String,Course> ch, Hashtable<String,ArrayList<Room>> roomHash){
+		public ArrayList<Course> generateCourses(String[][] cl, Hashtable<String,Course> ch, HashMap<String,ArrayList<Room>> roomHash){
 		/*
 		 * [Shortname|Longname|Professor|Capacity|Day|Time|Building|RoomNumber|Type|CP|DVD|VCR|Slides|OH|Concurrent|Noncurrent]
 		 */
@@ -192,14 +239,15 @@ public class Driver{
 					temp.addPreferredTimes(new Tuple<Time,Time>(start,end));
 				}
 			}//End preferredTimes
-			
 		}
 		courseList.trimToSize();
 		return courseList;
 	}
 	
 
+    /*	
 	public void linkProfessorsAndCourses(ArrayList<Professor> professors, String[][] cSS, Hashtable<String,Course> cH, Hashtable<String,Professor> pH){
+
 
 		System.out.println("Matching Professors and Courses");
 		//not exactly sure how to implement these loops at this point
@@ -213,7 +261,7 @@ public class Driver{
 			c.addProfessor(p);
 			p.addCourse(c);
 		}
-	}
+	}*/
 	
 	public <T> T coalesce(T a, T b, T c) {
 	    return a != null ? a : (b != null ? b : c);

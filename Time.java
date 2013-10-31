@@ -51,6 +51,18 @@ public class Time{
 		eventTime.set(Calendar.HOUR, Integer.parseInt(timepieces[0]));
 		eventTime.set(Calendar.MINUTE, Integer.parseInt(min));
 	}
+
+    public int getHour() {
+	int h = eventTime.get(Calendar.HOUR);
+	if (h==0) h=12;
+	return h;
+
+    }
+
+    public int getMinute() {
+	int m = eventTime.get(Calendar.MINUTE);
+      	return m;
+    }
 	public void setDayThurs(char[]c){
 		eventTime.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
 	}
