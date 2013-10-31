@@ -44,7 +44,7 @@ public class Course{
 	public void addPreferredTimes(Tuple<Time, Time> preferredTime) {
 		this.preferredTimes.add(preferredTime);
 	}
-	public void getCourseByName(Course c){
+	public void getCourseByName(String t){
 		
 	}
 	public ArrayList<Room> getPreferredRooms() {
