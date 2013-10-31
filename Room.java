@@ -69,6 +69,10 @@ public class Room{
 	public void setCapacity(int capacity) {
 		this.capacity = capacity;
 	}
+	
+	public boolean inBuilding(String building){
+		return this.getBuilding().equals(building);
+	}
 
 	public String getBuilding() {
 		return building;
