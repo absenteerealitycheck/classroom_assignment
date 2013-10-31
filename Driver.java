@@ -3,6 +3,7 @@ import java.lang.*;
 import java.io.*;
 public class Driver{
 	
+	public HashMap<String,ArrayList<Room>> allBuildings=new HashMap<String,ArrayList<Room>>(20);
 	public static void main(String args[]) throws IOException{
 		new Driver().go();
 		
@@ -101,12 +102,24 @@ public class Driver{
 			//eventually implement the following line
 			//r.setTech(...)			
 			rooms.add(r);
+			addToBuilding(r);
 		}		
 		rooms.trimToSize();
 		System.out.println("WOOT WOOT");
 		return rooms;
 	}
 	
+	public void addToBuilding(Room r) {
+		String b=r.getBuilding();
+		if(allBuildings.containsKey(b))
+			allBuildings.get(b).add(r);
+		else{
+			ArrayList<Room> a=new ArrayList<Room>();
+			a.add(r);
+			allBuildings.put(b,a);
+		}
+	}
+
 	public ArrayList<Professor> generateProfessors(String[][] profs){//just some speculative code for now on how we should break stuff up		
 		System.out.println("Generating Professors");
 		ArrayList<Professor> profList=new ArrayList<Professor>();
