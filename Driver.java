@@ -11,13 +11,16 @@ public class Driver{
 	public void go() throws IOException{
 		//TODO: bug12: can we abstract this to the actual size of the uploaded file
 		String[][] roomSpreadsheet = new String[81][5];
+		String[][] professorSpreadsheet = new String[4][4];
 		String[][] courseSpreadsheet = new String[642][16];
 		Hashtable<String,Course> courseHash=new Hashtable<String,Course>(courseSpreadsheet.length);
+		Hashtable<String,Professor> professorHash=new Hashtable<String,Professor>(professorSpreadsheet.length);
 		//String[][] profSpreadsheet=new String[338][3];
 		//Read csv file into spreadsheet cell by cell
-		courseSpreadsheet=makeSpreadsheet(new File("proto-courselist.csv"),courseSpreadsheet);
 		//print2D(courseSpreadsheet);
 		roomSpreadsheet=makeSpreadsheet(new File("proto-roomslist.csv"),roomSpreadsheet);
+		professorSpreadsheet=makeSpreadsheet(new File("proto-profslist.csv"),professorSpreadsheet);
+		courseSpreadsheet=makeSpreadsheet(new File("proto-courselist.csv"),courseSpreadsheet);
 		print2D(roomSpreadsheet);
 		//profSpreadsheet=makeSpreadsheet(new File("proto-professorlist.csv"),profSpreadsheet);
 		//print2D(profSpreadsheet);
@@ -26,9 +29,13 @@ public class Driver{
 		//does it make sense to store nulls? 
 		//NOTE: I stored nulls because I haven't sanitized the data in any meaningful way yet
 		ArrayList<Room> rooms= generateRooms(roomSpreadsheet);
-
-		//ArrayList<Professor> professors= generateProfessors(profSpreadsheet);
+		ArrayList<Professor> professors= generateProfessors(professorSpreadsheet);
 		ArrayList<Course> courses= generateCourses(courseSpreadsheet,courseHash);
+		
+		linkProfessorsToRooms();
+		linkProfessorsToCourses();
+		linkCoursesToRooms();//this is where the magic happens
+		
 		System.out.println("Success!");
 		
 		/*
@@ -91,51 +98,69 @@ public class Driver{
 	
 	     
 
-		public ArrayList<Course> generateCourses(String[][] cl, Hashtable<String,Course> ch){
+		public ArrayList<Course> generateCourses(String[][] cl, Hashtable<String,Course> ch, Hashtable<String,ArrayList<Room>> roomHash){
 		/*
-		 * [Shortname|Longname|Time|Capacity||Building|RoomNumber|Type]
+		 * [Shortname|Longname|Professor|Capacity|Day|Time|Building|RoomNumber|Type|CP|DVD|VCR|Slides|OH|Concurrent|Noncurrent]
 		 */
 	
 		//need to make sure we only create cross listed classes once
 
 		System.out.println("Generating Courses");
 		ArrayList<Course> courseList=new ArrayList<Course>();
-		int allProfs=cl.length;
-		int eachProf=cl[0].length;
+		int allCourses=cl.length;
+		int eachCourse=cl[0].length;
 		Course temp;
-		for(int row=1;row<allProfs;row++){//start at 1 because first row is headings of columns
+		for(int row=1;row<allCourses;row++){//start at 1 because first row is headings of columns
+			
+			/*
+			 * Create all local variables
+			 */
+			
 			//Names
 			String shortname=cl[row][0];
 			String longname=cl[row][1];
+			//Check for crosslisting
+			if(ch.containsKey(longname)){
+				ch.get(longname).addShortName(shortname);
+				continue;
+			}
 			//Professor
-			//cl[row][ 2 ]is the professor teaching the course
-			//String prof=cl[row][2];
+			String prof=(cl[row][2].isEmpty())?"Scott Kaplan":cl[row][2];
 			//Capacity
-			int capacity;
-			if(cl[row][3].isEmpty()){
-				capacity=10;
-			}
-			else{
-				capacity=Integer.parseInt(cl[row][3]);
-			}
-			
-			
+			int capacity = (cl[row][3].isEmpty())?10:Integer.parseInt(cl[row][3]);
 			
 			//type of class
 			String type=cl[row][8];
-			//Checks for crosslisting
-			if(!ch.containsKey(longname)){
+
 			temp= new Course(capacity,longname,type);
+			courseList.add(temp);
 			ch.put(longname, temp);
 			temp.addShortName(shortname);
 			//Handling preferredRooms Begins
 			if (!cl[row][6].isEmpty()){
 				//Building
 				String building=cl[row][6];
+				ArrayList<Room> roomsInBuilding = roomHash.get(building);
 				//Room Number
-				String roomnum=cl[row][7];
-				Room pref=new Room(building,roomnum);
-				temp.addPreferredRooms(pref);}//Making preferredRooms Ends
+				
+				/* TODO:bug13: modify this code so roomnum can be a comma seperated list of rooms
+				 * 
+				 * 
+				 String roomnum=cl[row][7];
+					 if (!roomnum.equals("")){
+						 for (Room r:roomsInBuilding){
+							 if(!r.isRoomNumber(roomnum){
+							 roomsInBuilding.remove(r);
+						 }
+					 }
+				 }
+				 *
+				 * 
+				*/
+				
+				temp.addPreferredRoomsList(roomsInBuilding);
+				
+			}//Making preferredRooms Ends
 			
 			//Making preferred Times Begins
 			String daysOfWeek=cl[row][4];
@@ -167,13 +192,6 @@ public class Driver{
 					temp.addPreferredTimes(new Tuple<Time,Time>(start,end));
 				}
 			}//End preferredTimes
-			
-			courseList.add(temp);
-			}
-			else{
-				ch.get(longname).addShortName(shortname);
-			}
-		
 			
 		}
 		courseList.trimToSize();

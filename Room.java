@@ -53,6 +53,10 @@ public class Room{
     public boolean inSameBuilding(Room r){
     	return this.building==r.getBuilding();
     }
+    
+    public boolean isRoomNumber(String rN){
+    	return this.roomNumber.equals("rN");
+    }
 
 	public String getRoomNumber() {
 		return roomNumber;
@@ -71,7 +75,7 @@ public class Room{
 	}
 	
 	public boolean inBuilding(String building){
-		return this.getBuilding().equals(building);
+		return this.building.equals(building);
 	}
 
 	public String getBuilding() {
