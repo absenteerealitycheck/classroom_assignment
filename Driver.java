@@ -27,10 +27,7 @@ public class Driver{
 		//NOTE: I stored nulls because I haven't sanitized the data in any meaningful way yet
 		ArrayList<Room> rooms= generateRooms(roomSpreadsheet);
 
-		ArrayList<Course> courses= generateCourses(courseSpreadsheet);
-		System.out.println("Success!");
-		
-		
+				
 		//ArrayList<Professor> professors= generateProfessors(profSpreadsheet);
 		ArrayList<Course> courses= generateCourses(courseSpreadsheet,courseHash);
 		System.out.println("Success!");
@@ -45,8 +42,15 @@ public class Driver{
 		 *go through each cluster and color separately?
 		 *JP 10/29
 		 */
+		
+		boolean allTimesPresent = true;
+		
+		for (Course c: courses){
+			if (c.getPreferredTimes().size()==0) allTimesPresent=false; 
+		
+		}
 	       
-		Tuple<Time,Time> courseTimes; 
+		/*Tuple<Time,Time> courseTimes; 
 		Course c;
 		System.out.println(courses.size());
 		for(int i=0;i<courses.size();i++) {
@@ -60,7 +64,9 @@ public class Driver{
 		    
 		    
 		    }
-		}
+		}*/ //for general debugging - jpham14:10/31
+		
+		System.out.println("No missing times?: "+allTimesPresent);
 		
 		
 	}
@@ -201,8 +207,7 @@ public class Driver{
 				ch.get(longname).addShortName(shortname);
 			}
 		
-			
-			courseList.add(temp);
+		
 			
 		}
 		courseList.trimToSize();
