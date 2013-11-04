@@ -84,4 +84,7 @@ public class Time{
 			}
 		
 	}
+	public String toString(){
+		return eventTime.toString();
+	}
 }

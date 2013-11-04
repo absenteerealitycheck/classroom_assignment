@@ -17,4 +17,7 @@ public class Tuple<F,S> {
 	public void setSecond(S second) {
 		this.second = second;
 	} 
+	public String toString(){
+		return this.first.toString()+" , "+this.second.toString();
+	}
 } 

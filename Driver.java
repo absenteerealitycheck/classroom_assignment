@@ -3,7 +3,9 @@ import java.util.*;
 import java.lang.*;
 import java.io.*;
 public class Driver{
-	
+	//As of 1:30 on Nov 4th we have Courses, Professors(a dummy list of Kaplan) and Rooms reading in.
+	//We have Professors linked to courses. We have Courses linked to Professors. 
+	//We have preferredTimes implemented and preferredRooms. We literally just have to write the loops that assign hard times and rooms.-LGS
 	public HashMap<String,ArrayList<Room>> buildingMap=new HashMap<String,ArrayList<Room>>(40);
 	public static void main(String args[]) throws IOException{
 		new Driver().go();
@@ -13,7 +15,7 @@ public class Driver{
 	public void go() throws IOException{
 		//TODO: bug12: can we abstract this to the actual size of the uploaded file
 		String[][] roomSpreadsheet = new String[81][5];
-		String[][] professorSpreadsheet = new String[2][3];
+		String[][] professorSpreadsheet = new String[3][3];
 		String[][] courseSpreadsheet = new String[642][16];
 		Hashtable<String,Course> courseHash=new Hashtable<String,Course>(courseSpreadsheet.length*2);
 		Hashtable<String,Professor> professorHash=new Hashtable<String,Professor>(professorSpreadsheet.length*2);
@@ -31,16 +33,20 @@ public class Driver{
 		ArrayList<Professor> professors= generateProfessors(professorSpreadsheet,professorHash);
 		ArrayList<Course> courses= generateCourses(courseSpreadsheet,courseHash,buildingMap, professorHash);
 		
-		for(Course c: courses){
+	/*	for(Course c: courses){
 			System.out.println(c.toString());
 			for (Room r: c.getPreferredRooms()){
 				System.out.print("\t\t"+r.toString());
 			}
 			System.out.println();
-		}
+		}	
 		
-		//linkProfessorsToRooms();
-		//linkProfessorsToCourses();
+		for(Course c:courses){
+			System.out.println(c.toString());
+			for(Professor p:c.getProfessors()){
+				System.out.println("\t\t"+p.toString());
+			}
+		}*/
 		//linkCoursesToRooms();//this is where the magic happens
 		
 		System.out.println("Success!");
@@ -59,6 +65,7 @@ public class Driver{
 		boolean allTimesPresent = true;
 		
 		for (Course c: courses){
+			
 			if (c.getPreferredTimes().size()==0) allTimesPresent=false; 
 		
 		}
@@ -105,13 +112,11 @@ public class Driver{
 			String buildingName=rS[row][0];
 			Integer capacity= Integer.valueOf(rS[row][2]);
 			String roomNumber=rS[row][1];
-			//these guys can change too. depends how we constuct rS
-			//the next two lines should be ok 
 			Room r = new Room(accessible,buildingName,capacity,roomNumber,type);
 			//eventually implement the following line
 			//r.setTech(...)			
 			rooms.add(r);
-			//need to make the string for buildingName the shortName not longName
+			//Changed the buildingNames in the csv to the shortNames as that seems to be how the course scheduler stores them so there is no reason to have a building long name.
 			addToBuilding(r);
 		}		
 		rooms.trimToSize();
@@ -138,10 +143,10 @@ public class Driver{
 			System.out.println(name);
 			Professor p=new Professor(name);
 			if (pH.containsKey(name)){//we should "probably" write our own exception. 
+				//System.out.println("checking nameness!");
 				try {
-					throw new AlreadyBoundException();
-				} catch (AlreadyBoundException e) {
-					System.out.println("This professor name already exists! What are you doing?");
+					throw new AlreadyExistingException("This professor name already exists! What are you doing?");
+				} catch (AlreadyExistingException e) {
 					e.printStackTrace();
 				}
 			}
@@ -160,7 +165,7 @@ public class Driver{
 		 * [Shortname|Longname|Professor|Capacity|Day|Time|Building|RoomNumber|Type|CP|DVD|VCR|Slides|OH|Concurrent|Noncurrent]
 		 */
 	
-		//need to make sure we only create cross listed classes once
+		
 
 		System.out.println("Generating Courses");
 		ArrayList<Course> courseList=new ArrayList<Course>();
@@ -198,16 +203,16 @@ public class Driver{
 			//fix this so that it adds all rooms if cl[row][6].isEmpty()
 			if (!cl[row][6].isEmpty()){
 				//Building
-				String building=cl[row][6];
-				System.out.println(building);
+				String building=cl[row][6];// We should probably check for typos or errors in the building names...-LGS
+				
 				//for (Enumeration<ArrayList<Room>> room = rH.elements(); room.hasMoreElements();)
 				       //System.out.println(room.nextElement());
-				for(String s:rH.keySet()){
-					System.out.println(s);
+				/*for(String s:rH.keySet()){
+					System.out.println("s is "+s);
 				}
-				System.out.println(rH.values());
+				System.out.println("RH vals "+rH.values());*/
 				ArrayList<Room> roomsInBuilding = rH.get(building);
-				System.out.println(roomsInBuilding);
+				//System.out.println("ribs "+roomsInBuilding);
 				//Room Number
 				
 				/* TODO:bug13: modify this code so roomnum can be a comma seperated list of rooms
@@ -239,12 +244,15 @@ public class Driver{
 			Time start;
 			Time end;
 			if(times[0].isEmpty()){
+				
 				times=new String[2];
 				times[0]="12:00PM";
 				times[1]="12:50PM";
 			}
-			if(daysOfWeek.isEmpty()){
+			
+			if(cl[row][4].isEmpty()){
 				daysOfWeek="MWF";
+				dow=daysOfWeek.toCharArray();
 			}
 			
 			for(int i=0;i<dow.length;i++){
@@ -309,7 +317,11 @@ public class Driver{
 				String [] temp= line.split(";",row.length);
 				int n = Math.min(temp.length, row.length);
 				for(int i=0;i<n;i++){
+					//System.out.println("count is "+count+" i is "+i+" temp. length "+temp.length+ "  th"+csv.length);
+					if(count<csv.length){
 					csv[count][i]=temp[i];
+					}
+					else break;
 				}
 				count++;
 				

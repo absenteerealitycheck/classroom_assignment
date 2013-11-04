@@ -76,6 +76,8 @@ public class Professor{
 		prefTimes=t;
 	}
 	
-	
+	public String toString(){
+		return this.getName();
+	}
 	//Accessors and Modifiers End
 }
