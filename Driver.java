@@ -1,9 +1,10 @@
+import java.rmi.AlreadyBoundException;
 import java.util.*;
 import java.lang.*;
 import java.io.*;
 public class Driver{
 	
-	public HashMap<String,ArrayList<Room>> allBuildings=new HashMap<String,ArrayList<Room>>(20);
+	public HashMap<String,ArrayList<Room>> buildingMap=new HashMap<String,ArrayList<Room>>(40);
 	public static void main(String args[]) throws IOException{
 		new Driver().go();
 		
@@ -12,28 +13,31 @@ public class Driver{
 	public void go() throws IOException{
 		//TODO: bug12: can we abstract this to the actual size of the uploaded file
 		String[][] roomSpreadsheet = new String[81][5];
-		String[][] professorSpreadsheet = new String[4][4];
+		String[][] professorSpreadsheet = new String[2][3];
 		String[][] courseSpreadsheet = new String[642][16];
-		Hashtable<String,Course> courseHash=new Hashtable<String,Course>(courseSpreadsheet.length);
-		Hashtable<String,Professor> professorHash=new Hashtable<String,Professor>(professorSpreadsheet.length);
+		Hashtable<String,Course> courseHash=new Hashtable<String,Course>(courseSpreadsheet.length*2);
+		Hashtable<String,Professor> professorHash=new Hashtable<String,Professor>(professorSpreadsheet.length*2);
 		//String[][] profSpreadsheet=new String[338][3];
 		//Read csv file into spreadsheet cell by cell
 		//print2D(courseSpreadsheet);
 		roomSpreadsheet=makeSpreadsheet(new File("proto-roomslist.csv"),roomSpreadsheet);
-
 		professorSpreadsheet=makeSpreadsheet(new File("proto-profslist.csv"),professorSpreadsheet);
 		courseSpreadsheet=makeSpreadsheet(new File("proto-courselist.csv"),courseSpreadsheet);
 		//print2D(roomSpreadsheet);
-
-		//profSpreadsheet=makeSpreadsheet(new File("proto-professorlist.csv"),profSpreadsheet);
-		//print2D(profSpreadsheet);
+		print2D(professorSpreadsheet);
 		
-		//probably need to sanitize data as we read it in, i.e. use String currentBuilding
-		//does it make sense to store nulls? 
 		//NOTE: I stored nulls because I haven't sanitized the data in any meaningful way yet
 		ArrayList<Room> rooms= generateRooms(roomSpreadsheet);
-		ArrayList<Professor> professors= generateProfessors(professorSpreadsheet);
-		ArrayList<Course> courses= generateCourses(courseSpreadsheet,courseHash,allBuildings);
+		ArrayList<Professor> professors= generateProfessors(professorSpreadsheet,professorHash);
+		ArrayList<Course> courses= generateCourses(courseSpreadsheet,courseHash,buildingMap, professorHash);
+		
+		for(Course c: courses){
+			System.out.println(c.toString());
+			for (Room r: c.getPreferredRooms()){
+				System.out.print("\t\t"+r.toString());
+			}
+			System.out.println();
+		}
 		
 		//linkProfessorsToRooms();
 		//linkProfessorsToCourses();
@@ -91,15 +95,12 @@ public class Driver{
 		 * current columns are [buildingName|roomNumber|capacity|type|accessible] - jpham14:10/28
 		 * 
 		*/
-		//after this is just pseudocode. change it to make it work.
 		int numberOfRooms=rS.length;
 		//numberOfRooms=100;
 		ArrayList<Room> rooms= new ArrayList<Room>(numberOfRooms);
 		for(int row=1; row<rS.length; row++){
 			//String type=coalesce(rS[row][2],rS[row][3],rS[row][4]);
 			String type=rS[row][3];
-			//the above is just a guess, assuming rS is formatted [Building|Room|Seminar|SmallClassrm|Lecture|Seats...] 
-			//it might make more sense to sanitize and construct rS as [Building|Room|Type|Capacity|...]
 			Boolean accessible=Boolean.valueOf(rS[row][4]);
 			String buildingName=rS[row][0];
 			Integer capacity= Integer.valueOf(rS[row][2]);
@@ -110,6 +111,7 @@ public class Driver{
 			//eventually implement the following line
 			//r.setTech(...)			
 			rooms.add(r);
+			//need to make the string for buildingName the shortName not longName
 			addToBuilding(r);
 		}		
 		rooms.trimToSize();
@@ -119,33 +121,41 @@ public class Driver{
 	
 	public void addToBuilding(Room r) {
 		String b=r.getBuilding();
-		if(allBuildings.containsKey(b))
-			allBuildings.get(b).add(r);
+		if(buildingMap.containsKey(b))
+			buildingMap.get(b).add(r);
 		else{
 			ArrayList<Room> a=new ArrayList<Room>();
 			a.add(r);
-			allBuildings.put(b,a);
+			buildingMap.put(b,a);
 		}
 	}
 
-	public ArrayList<Professor> generateProfessors(String[][] profs){//just some speculative code for now on how we should break stuff up		
+	public ArrayList<Professor> generateProfessors(String[][] profs, Hashtable<String,Professor> pH){//just some speculative code for now on how we should break stuff up		
 		System.out.println("Generating Professors");
 		ArrayList<Professor> profList=new ArrayList<Professor>();
-		int allProfs=profs.length;
-		int eachProf=profs[0].length;
-		for(int row=0;row<allProfs;row++){
-			for(int col=0;col<eachProf;row++){
-				//break things up and send everything out.
-				
+		for(int row=1;row<profs.length;row++){
+			String name=profs[row][0];
+			System.out.println(name);
+			Professor p=new Professor(name);
+			if (pH.containsKey(name)){//we should "probably" write our own exception. 
+				try {
+					throw new AlreadyBoundException();
+				} catch (AlreadyBoundException e) {
+					System.out.println("This professor name already exists! What are you doing?");
+					e.printStackTrace();
+				}
 			}
+			profList.add(p);
+			pH.put(name,p);
 		}
+		System.out.println("Help");
 		profList.trimToSize();
 		return profList;
 	}
 	
 	     
 
-		public ArrayList<Course> generateCourses(String[][] cl, Hashtable<String,Course> ch, HashMap<String,ArrayList<Room>> roomHash){
+	public ArrayList<Course> generateCourses(String[][] cl, Hashtable<String,Course> ch, HashMap<String,ArrayList<Room>> rH, Hashtable<String,Professor> pH){
 		/*
 		 * [Shortname|Longname|Professor|Capacity|Day|Time|Building|RoomNumber|Type|CP|DVD|VCR|Slides|OH|Concurrent|Noncurrent]
 		 */
@@ -163,7 +173,6 @@ public class Driver{
 			 * Create all local variables
 			 */
 			
-			//Names
 			String shortname=cl[row][0];
 			String longname=cl[row][1];
 			//Check for crosslisting
@@ -171,23 +180,34 @@ public class Driver{
 				ch.get(longname).addShortName(shortname);
 				continue;
 			}
-			//Professor
-			String prof=(cl[row][2].isEmpty())?"Scott Kaplan":cl[row][2];
-			//Capacity
-			int capacity = (cl[row][3].isEmpty())?10:Integer.parseInt(cl[row][3]);
 			
-			//type of class
+			int capacity = (cl[row][3].isEmpty())?10:Integer.parseInt(cl[row][3]);
 			String type=cl[row][8];
 
 			temp= new Course(capacity,longname,type);
+			temp.addShortName(shortname);
+
+			String prof=(cl[row][2].isEmpty())?"Scott Kaplan":cl[row][2];
+			Professor p = pH.get(prof);
+			temp.addProfessor(p);
+			p.addCourse(temp);
+			
 			courseList.add(temp);
 			ch.put(longname, temp);
-			temp.addShortName(shortname);
 			//Handling preferredRooms Begins
+			//fix this so that it adds all rooms if cl[row][6].isEmpty()
 			if (!cl[row][6].isEmpty()){
 				//Building
 				String building=cl[row][6];
-				ArrayList<Room> roomsInBuilding = roomHash.get(building);
+				System.out.println(building);
+				//for (Enumeration<ArrayList<Room>> room = rH.elements(); room.hasMoreElements();)
+				       //System.out.println(room.nextElement());
+				for(String s:rH.keySet()){
+					System.out.println(s);
+				}
+				System.out.println(rH.values());
+				ArrayList<Room> roomsInBuilding = rH.get(building);
+				System.out.println(roomsInBuilding);
 				//Room Number
 				
 				/* TODO:bug13: modify this code so roomnum can be a comma seperated list of rooms
@@ -205,6 +225,8 @@ public class Driver{
 				 * 
 				*/
 				
+				//ok to add here because we're generating rooms
+				//after this will will only remove rooms from preferredRooms
 				temp.addPreferredRoomsList(roomsInBuilding);
 				
 			}//Making preferredRooms Ends
@@ -245,11 +267,18 @@ public class Driver{
 	}
 	
 
-    /*	
-	public void linkProfessorsAndCourses(ArrayList<Professor> professors, String[][] cSS, Hashtable<String,Course> cH, Hashtable<String,Professor> pH){
+		/*public void linkProfessorsAndCourses(ArrayList<Professor> professors, String[][] cSS, Hashtable<String,Course> cH, Hashtable<String,Professor> pH){
 
 
 		System.out.println("Matching Professors and Courses");
+		
+		for (Enumeration<Course> courseList = cH.elements(); courseList.hasMoreElements();){
+			Course c =courseList.nextElement();
+			ArrayList<String> professorName=c.getProfessors();
+			Professor p = pH.
+		}
+		
+		
 		//not exactly sure how to implement these loops at this point
 		//maybe take a list of <professorName,courseName> pairs and
 		
@@ -261,7 +290,9 @@ public class Driver{
 			c.addProfessor(p);
 			p.addCourse(c);
 		}
-	}*/
+	}
+		
+	 */
 	
 	public <T> T coalesce(T a, T b, T c) {
 	    return a != null ? a : (b != null ? b : c);

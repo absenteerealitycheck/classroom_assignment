@@ -101,4 +101,8 @@ public class Room{
 	public void setType(String type) {
 		this.type = type;
 	}
+	
+	public String toString(){
+		return this.building+this.roomNumber;
+	}
 }

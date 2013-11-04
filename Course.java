@@ -156,4 +156,8 @@ public class Course{
 		if (isSeminarCourse()){return "Seminar";}
 		return "Unlisted";
 	}
+	
+	public String toString(){
+		return this.longName+" ("+this.shortName+")";
+	}
 }

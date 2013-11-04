@@ -16,21 +16,22 @@ public class Professor{
     //private boolean stairs; //I don't think we need this, we can probably roll it into preferredRooms
     private ArrayList<Course> courses;
     
-    public Professor(){}
-    public Professor(String s, ArrayList<Room> r, ArrayList<String> d, ArrayList<Time> t, ArrayList<Course> c){
-    	name=s;
-    	offices=r;
-    	department=d;
-    	prefTimes=t;
-    	courses=c;
-    }
     public Professor(String s){
     	name=s;
+    	this.offices=new ArrayList<Room>(5); //not actually going to build each room, just going to embed building in fake room
+    	this.department=new ArrayList<String>(5);
+    	this.prefTimes=new ArrayList<Time>(10);
+    	this.courses= new ArrayList<Course>(5);
     }
-    public Professor(String s, ArrayList<Room> r, ArrayList<String> d){
-    	name=s;
+    public Professor(String s, ArrayList<Room> r, ArrayList<String> d){    	
+    	this(s);
     	offices=r;
     	department=d;
+    }
+    public Professor(String s, ArrayList<Room> r, ArrayList<String> d, ArrayList<Time> t, ArrayList<Course> c){
+    	this(s,r,d);
+    	prefTimes=t;
+    	courses=c;
     }
     //Accessors and Modifiers Start
     public String getName() {
