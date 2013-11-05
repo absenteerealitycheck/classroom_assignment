@@ -49,14 +49,17 @@ public class Course{
 	public ArrayList<Tuple<Time, Time>> getPreferredTimes() {
 		return preferredTimes;
 	}
+	
+	public int getNumberOfPreferredTimes(){
+		return this.preferredTimes.size();
+	}
+	
 	public void addPreferredTimes(Tuple<Time, Time> preferredTime) {
 		this.preferredTimes.add(preferredTime);
 	}
-	public void getCourseByName(String t){
-		
-	}
+	
 	public ArrayList<Room> getPreferredRooms() {
-		return preferredRooms;
+		return this.preferredRooms;
 	}
 
 	public void addPreferredRoom(Room preferredRoom) {
@@ -163,6 +166,14 @@ public class Course{
 		if (isLectureCourse()){return "Lecture";}
 		if (isSeminarCourse()){return "Seminar";}
 		return "Unlisted";
+	}
+	
+	public int getTypeCode(){
+		if (isDiscussionCourse()){return -4;}
+		if (isLabCourse()){return -1;}
+		if (isLectureCourse()){return -2;}
+		if (isSeminarCourse()){return -3;}
+		return -5;
 	}
 	
 	public String toString(){

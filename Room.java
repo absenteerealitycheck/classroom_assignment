@@ -18,7 +18,11 @@ public class Room{
 	private String buildingShort;
 	private boolean isAccessible;
     private String type; //lab,seminar,lecture,small,studio
+
     private boolean[][] timeTable = new boolean[48][5]; //boolean[day][half-hour]
+
+    private ArrayList<Course> courses;
+    
 
     private class Technology{
     	//28-10: I dont think we should touch this yet 
@@ -115,8 +119,15 @@ public class Room{
 		this.type = type;
 	}
 	
+	public ArrayList<Course> getCourses() {
+		return courses;
+	}
+	public void addCourse(Course course) {
+		this.courses.add(course);
+		//TODO:update3:make call to setTimeTable here
+	}
 	public String toString(){
-		return this.building+this.roomNumber;
+		return this.building+" "+this.roomNumber;
 	}
 	
 	public void startTimeTable() {
@@ -141,31 +152,38 @@ public class Room{
 			start = (Time) t.getFirst();
 			end = (Time) t.getSecond();
 			dayStart = start.getDay()-2;
-			hourStart = start.getHour();
+			hourStart = start.getMilitaryTime();
 			minStart = start.getMinute();
-			hourEnd = end.getHour();
+			hourEnd = end.getMilitaryTime();
 			minEnd = end.getMinute();
 			i = hourStart*2;
 			j = hourEnd*2;
-			if (minStart > 30) i++;
-			if (minEnd > 30) j++;
-			if (i > j) System.out.println("something's wrong, check for military time"); //debugging
-			j=27;
-			System.out.println("i: "+i+" j: "+j);
+			if (i > j) {
+				System.out.println("something's wrong, check for military time: "+
+						i+" "+j); //debugging
+				j=2*(hourEnd+12);
+			}
+			if (minStart > 29) i++;
+			if (minEnd > 29) j++;
 			while (i < j) {
 				timeTable[i][dayStart] = true;
 				i++;
 			}
 					
 		}
-		System.out.println("You made it this far.");
-		
+			
 	}	
 	
 	public void printTimeTable() {
+		int k = 0;
 		for (int j =0;j<48;j++) {
+			k=j/2;
+			if(j%2==0){
+				System.out.print(k+":00 ");
+			}
+			else System.out.print(k+":30 ");
 			for (int i=0;i<5;i++) {
-				System.out.print(timeTable[i][j]+" ");
+				System.out.print("	"+timeTable[i][j]+"	");
 			}
 			System.out.println(" ");
 		}
