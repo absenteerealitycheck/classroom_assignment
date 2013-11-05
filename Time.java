@@ -1,5 +1,6 @@
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 public class Time{
    
@@ -91,7 +92,30 @@ public class Time{
 			}
 		
 	}
+	public int getMilitaryTime(){
+		return this.eventTime.get(Calendar.HOUR_OF_DAY);
+	}
 	public String toString(){
-		return eventTime.toString();
+		int h=this.eventTime.get(Calendar.HOUR);
+		int m=this.eventTime.get(Calendar.MINUTE);
+		String min="";
+		String hour="";
+		if(h==0){
+			hour="12";
+		}
+		else{
+			hour=Integer.toString(h);
+		}
+		if(m==0){
+			min="00";
+		}
+		else{
+			min=Integer.toString(m);
+		}
+		if(this.isStartTime){
+			
+		return this.eventTime.getDisplayName(Calendar.DAY_OF_WEEK,Calendar.SHORT, Locale.US)+" "+hour+":"+min;}
+		else
+			return hour+":"+min;
 	}
 }

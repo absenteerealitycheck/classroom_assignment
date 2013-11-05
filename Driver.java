@@ -32,7 +32,7 @@ public class Driver{
 		ArrayList<Professor> professors= generateProfessors(professorSpreadsheet,professorHash);
 		ArrayList<Course> courses= generateCourses(courseSpreadsheet,courseHash,buildingMap, professorHash);
 		
-		for(Course c: courses){
+		/*for(Course c: courses){
 			System.out.println(c.toString());
 			for(Professor p:c.getProfessors()){
 				System.out.println("\t"+p.toString());
@@ -41,7 +41,7 @@ public class Driver{
 				System.out.print("\t"+r.toString());
 			}
 			System.out.println();
-		}	
+		}	*/
 		
 		//linkCoursesToRooms();//this is where the magic happens
 		
@@ -61,7 +61,7 @@ public class Driver{
 		boolean allTimesPresent = true;
 		
 		for (Course c: courses){
-			//System.out.println("Time for "+ c.getShortName()+ " is "+c.getPreferredTimes().get(0).toString());
+			//System.out.println("Time for "+ c.getShortName()+ " is "+c.getPreferredTimes().get(0).first.toString()+"-"+c.getPreferredTimes().get(0).second.toString());
 			if (c.getPreferredTimes().size()==0) allTimesPresent=false; 
 		
 		}
@@ -119,6 +119,15 @@ public class Driver{
 		 * 
 		 * Assign classes we can't handle to badClasses
 		 * }*/
+	}
+	
+	private boolean canMove(Course c){
+		for(Room r : c.getPreferredRooms()){
+			for(Tuple<Time,Time> t:c.getPreferredTimes()){
+				if(r.isNotAssigned(t)) return true;
+			}
+		}
+		return false;
 	}
 	
 	public ArrayList<Room> generateRooms(String[][] rS){
