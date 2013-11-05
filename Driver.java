@@ -84,6 +84,7 @@ public class Driver{
 		
 		System.out.println("No missing times?: "+allTimesPresent);
 		
+
 		
 		/*ArrayList<Tuple<Time,Time>> testTimes = null;
 		for (int i = 0;i<5;i++) {
