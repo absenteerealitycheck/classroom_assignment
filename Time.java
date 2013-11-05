@@ -104,7 +104,7 @@ public class Time{
 		}
 		else System.out.println("You dun fucked up");
 		return t;
-
+	}
 	
 	public String toString(){
 		int h=this.eventTime.get(Calendar.HOUR);
