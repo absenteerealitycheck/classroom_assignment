@@ -92,7 +92,7 @@ public class Time{
 			}
 		
 	}
-	public int getMilitaryTime(){
+	public int getMilitaryTime(){//gives hours in military time
 		return this.eventTime.get(Calendar.HOUR_OF_DAY);
 	}
 	public String toString(){
