@@ -63,7 +63,14 @@ public class Time{
 	int m = eventTime.get(Calendar.MINUTE);
       	return m;
     }
-	public void setDayThurs(char[]c){
+    
+    public int getDay() {
+    int d = eventTime.get(Calendar.DAY_OF_WEEK);
+    return d;
+    
+    }
+    
+    public void setDayThurs(char[]c){
 		eventTime.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
 	}
 	public void setDayOfWeek(char c){

@@ -84,6 +84,10 @@ public class Driver{
 		
 		System.out.println("No missing times?: "+allTimesPresent);
 		
+		/*ArrayList<Tuple<Time,Time>> testTimes = courses.get(0).getPreferredTimes();
+		*rooms.get(0).setTimeTable(testTimes);
+		*rooms.get(0).printTimeTable();
+		*/ //in case you're wondering how the timeTable works in Room
 		
 	}
 	public void linkRoomsToCourses(ArrayList<Course> courses, ArrayList<Room> rooms){
@@ -172,7 +176,7 @@ public class Driver{
 			//Don't forget that we're setting the size of profList by hand up in go()
 			if (pH.containsKey(name)){//we should "probably" write our own exception. 
 				try {
-					throw new AlreadyExistingException("This professor name already exists! What are you doing?");
+					throw new Exception("This professor name already exists! What are you doing?");
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

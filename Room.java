@@ -18,6 +18,7 @@ public class Room{
 	private String buildingShort;
 	private boolean isAccessible;
     private String type; //lab,seminar,lecture,small,studio
+    private boolean[][] timeTable = new boolean[5][48]; //boolean[day][half-hour]
 
     private class Technology{
     	//28-10: I dont think we should touch this yet 
@@ -47,10 +48,12 @@ public class Room{
     	this.roomNumber=roomNumber;
     	this.isAccessible=accessible;
     	this.type=type.toLowerCase();
+    	this.startTimeTable();
     }
     public Room (String building, String roomNumber){//Secondary constructor for use in generateCourses method
     	this.building=building;
     	this.roomNumber=roomNumber;
+    	this.startTimeTable();
     }
     public boolean inSameBuilding(Room r){
     	return this.building==r.getBuilding();
@@ -115,4 +118,56 @@ public class Room{
 	public String toString(){
 		return this.building+this.roomNumber;
 	}
+	
+	public void startTimeTable() {
+		for (int i=0;i<5;i++) {
+			for (int j=0;j<48;j++) {
+				timeTable[i][j]=false;
+			}
+		}
+	}
+		
+	public void setTimeTable(ArrayList<Tuple<Time,Time>> times){
+		int dayStart;
+		int hourStart;
+		int minStart;
+		int hourEnd;
+		int minEnd;
+		Time start;
+		Time end;
+		int i; //while start
+		int j; //while end
+		for (Tuple t: times) {
+			start = (Time) t.getFirst();
+			end = (Time) t.getSecond();
+			dayStart = start.getDay();
+			hourStart = start.getHour();
+			minStart = start.getMinute();
+			hourEnd = end.getHour();
+			minEnd = end.getMinute();
+			i = hourStart*2;
+			j = hourEnd*2;
+			if (minStart > 30) i++;
+			if (minEnd > 30) j++;
+			if (i > j) System.out.println("something's wrong, check for military time"); //debugging
+			System.out.println("i: "+i+" j: "+j);
+			while (i < j) {
+				timeTable[dayStart][i] = true;
+				i++;
+			}
+					
+		}
+		System.out.println("You made it this far.");
+		
+	}	
+	
+	public void printTimeTable() {
+		for (int j =0;j<48;j++) {
+			for (int i=0;i<5;i++) {
+				System.out.print(timeTable[i][j]+" ");
+			}
+			System.out.println(" ");
+		}
+	}	
+	
 }
