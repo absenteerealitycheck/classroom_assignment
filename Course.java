@@ -16,7 +16,7 @@ public class Course{
     private boolean seminarCourse;
     private ArrayList<Course> concurrent;
     private ArrayList<Course> noncurrent;
-    
+    private Room assignment;
     private ArrayList<Course> edges;
 
     public Course(int capacity, String name, String type){
@@ -37,6 +37,14 @@ public class Course{
     	if (type.equals("lecture")){lectureCourse=true;}
     	if (type.equals("seminar")){seminarCourse=true;}
     }
+
+	public Room getAssignment() {
+		return assignment;
+	}
+
+	public void setAssignment(Room assignment) {
+		this.assignment = assignment;
+	}
 
 	public ArrayList<Tuple<Time, Time>> getPreferredTimes() {
 		return preferredTimes;

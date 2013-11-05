@@ -5,7 +5,8 @@ import java.io.*;
 public class Driver{
 	
 	public HashMap<String,ArrayList<Room>> buildingMap=new HashMap<String,ArrayList<Room>>(40);
-	public static void main(String args[]) throws IOException{
+	public ArrayList<Course> badCourses;
+	public static void main (String args[]) throws IOException{
 		new Driver().go();
 		
 	}
@@ -86,7 +87,34 @@ public class Driver{
 		
 	}
 	public void linkRoomsToCourses(ArrayList<Course> courses, ArrayList<Room> rooms){
-		
+		/*courses.shuffle
+		 * courses.sort(courses.getPrefRoom.length)
+		 * courses.sort(courses.getType)
+		 * courses.sort(courses.getCapacity)
+		 * for(Course c: courses){
+		 * 	for(Room r:c.getPreferredRooms){
+		 * 		if(r.isNotAssigned()){
+		 * 			c.setRoom(r);
+		 * 			break;
+		 * 		}
+		 * 		
+		 * 	}
+		 * 	if(c.getAssignment==null){
+		 * 		for(Room r:c.getPreferredRooms){
+		 * 			if(r.canMove(r.getCourse()){
+		 * 			r.getCourse.move;
+		 * 			r.setCourse(c);
+		 * 			break;}
+		 * 			
+		 * 		}
+		 * 	}
+			 * if(c.getAssignment==null){
+			 * badClasses.put(c);
+			 * }
+		 * }
+		 * 
+		 * Assign classes we can't handle to badClasses
+		 * }*/
 	}
 	
 	public ArrayList<Room> generateRooms(String[][] rS){
