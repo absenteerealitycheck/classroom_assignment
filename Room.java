@@ -171,4 +171,19 @@ public class Room{
 		}
 	}	
 	
+	public boolean isNotAssigned(Tuple<Time, Time> t) {
+		Time start = t.getFirst();
+		Time end = t.getSecond();
+		int sh=start.getHour()*2;
+		if(start.getMinute()==30)sh++;
+		int eh=end.getHour()*2;
+		if(end.getMinute()==20)eh++;
+		else if(end.getMinute()==50)eh+=2;
+		int day=t.getFirst().getEventTime().DAY_OF_WEEK-2;
+		for(int k=sh;k<eh;k++){
+			if(timeTable[k][day]) return false;
+		}
+		
+		return true;
+	}
 }
