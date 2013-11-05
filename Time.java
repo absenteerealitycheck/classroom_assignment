@@ -40,14 +40,15 @@ public class Time{
 	}
 	public void setTime(String time){
 		String[] timepieces=time.split(":",2);
-		
 		String ampm=timepieces[1].substring(timepieces[1].length()-2);
 		String min= timepieces[1].substring(0, 2);
-		if(ampm=="PM"){
+		if(ampm.equals("PM")){
 		eventTime.set(Calendar.AM_PM, Calendar.PM);
+		
 		}
 		else{
 			eventTime.set(Calendar.AM_PM, Calendar.AM);
+		
 		}
 		eventTime.set(Calendar.HOUR, Integer.parseInt(timepieces[0]));
 		eventTime.set(Calendar.MINUTE, Integer.parseInt(min));
@@ -93,8 +94,17 @@ public class Time{
 		
 	}
 	public int getMilitaryTime(){
-		return this.eventTime.get(Calendar.HOUR_OF_DAY);
+		int t = this.eventTime.get(Calendar.HOUR);
+		if(this.eventTime.get(Calendar.AM_PM)==1) {
+			if(t<12) t=t+12;
+		}
+		else if (this.eventTime.get(Calendar.AM_PM)==0){
+			if(t==0)t=t+12;
+		}
+		else System.out.println("You dun fucked up");
+		return t;
 	}
+	
 	public String toString(){
 		int h=this.eventTime.get(Calendar.HOUR);
 		int m=this.eventTime.get(Calendar.MINUTE);

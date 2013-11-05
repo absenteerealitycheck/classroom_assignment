@@ -141,31 +141,38 @@ public class Room{
 			start = (Time) t.getFirst();
 			end = (Time) t.getSecond();
 			dayStart = start.getDay()-2;
-			hourStart = start.getHour();
+			hourStart = start.getMilitaryTime();
 			minStart = start.getMinute();
-			hourEnd = end.getHour();
+			hourEnd = end.getMilitaryTime();
 			minEnd = end.getMinute();
 			i = hourStart*2;
 			j = hourEnd*2;
-			if (minStart > 30) i++;
-			if (minEnd > 30) j++;
-			if (i > j) System.out.println("something's wrong, check for military time"); //debugging
-			j=27;
-			System.out.println("i: "+i+" j: "+j);
+			if (i > j) {
+				System.out.println("something's wrong, check for military time: "+
+						i+" "+j); //debugging
+				j=2*(hourEnd+12);
+			}
+			if (minStart > 29) i++;
+			if (minEnd > 29) j++;
 			while (i < j) {
 				timeTable[dayStart][i] = true;
 				i++;
 			}
 					
 		}
-		System.out.println("You made it this far.");
-		
+			
 	}	
 	
 	public void printTimeTable() {
+		int k = 0;
 		for (int j =0;j<48;j++) {
+			k=j/2;
+			if(j%2==0){
+				System.out.print(k+":00 ");
+			}
+			else System.out.print(k+":30 ");
 			for (int i=0;i<5;i++) {
-				System.out.print(timeTable[i][j]+" ");
+				System.out.print("	"+timeTable[i][j]+"	");
 			}
 			System.out.println(" ");
 		}
