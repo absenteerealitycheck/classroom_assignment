@@ -1,6 +1,7 @@
 import java.rmi.AlreadyBoundException;
 import java.util.*;
 import java.lang.*;
+import java.lang.reflect.*;
 import java.io.*;
 public class Driver{
 	
@@ -31,19 +32,22 @@ public class Driver{
 		ArrayList<Room> rooms= generateRooms(roomSpreadsheet);
 		ArrayList<Professor> professors= generateProfessors(professorSpreadsheet,professorHash);
 		ArrayList<Course> courses= generateCourses(courseSpreadsheet,courseHash,buildingMap, professorHash);
+		//shuffle because maybe it will help
+		Collections.shuffle(courses);
 		
+		linkRoomsToCourses(courses,rooms);//this is where the magic happens
 		for(Course c: courses){
-			System.out.println(c.toString());
+			//System.out.println(c.toString()+": "+c.getCapacity()+": "+c.getPreferredTimes().size());
+			System.out.println(c.getPreferredTimes().size()+": "+c.getCapacity()+": "+c.getType());
 			for(Professor p:c.getProfessors()){
-				System.out.println("\t"+p.toString());
+				//System.out.println("\t"+p.toString());
 			}
 			for (Room r: c.getPreferredRooms()){
-				System.out.print("\t"+r.toString());
+				//System.out.print("\t"+r.toString());
 			}
-			System.out.println();
+			//System.out.println();
 		}	
 		
-		//linkCoursesToRooms();//this is where the magic happens
 		
 		System.out.println("Success!");
 		
@@ -87,7 +91,16 @@ public class Driver{
 		
 	}
 	public void linkRoomsToCourses(ArrayList<Course> courses, ArrayList<Room> rooms){
-		/*courses.shuffle
+		
+		//OH GOD DONT TOUCH IT
+		sort(courses,"getTypeCode",-1);
+		sort(courses,"getCapacity",1);
+		sort(courses,"getNumberOfPreferredTimes",1);
+		
+		/*
+		 * 
+		 * 
+		 * 
 		 * courses.sort(courses.getPrefRoom.length)
 		 * courses.sort(courses.getType)
 		 * courses.sort(courses.getCapacity)
@@ -115,6 +128,48 @@ public class Driver{
 		 * 
 		 * Assign classes we can't handle to badClasses
 		 * }*/
+	}
+	
+	public <T> void sort(ArrayList<Course> list, String getterName, final int order){//help order makes no sense. please document how it works.
+		
+		try {
+			//String getterName="get"+fieldName.substring(0,1).toUpperCase()+fieldName.substring(1);
+			final Method getter=Course.class.getMethod(getterName, (Class<?>[]) null);
+			if (getter == null){
+				//Do Nothing
+			} else{
+				Collections.sort(list, new Comparator<Course>(){
+					public int compare(Course c1, Course c2){
+						try {
+							if((Integer)getter.invoke(c1, (Object[]) null) == (Integer)getter.invoke(c2, (Object[]) null)){
+								return 0;
+							}
+							return ((Integer) getter.invoke(c1, (Object[]) null))<((Integer) getter.invoke(c2, (Object[]) null))?(-1*order):(1*order);
+							
+						} catch (IllegalArgumentException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (IllegalAccessException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (InvocationTargetException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						return -2;
+					}
+				});
+				
+				
+			}
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 	
 	public ArrayList<Room> generateRooms(String[][] rS){
@@ -295,37 +350,10 @@ public class Driver{
 		return courseList;
 	}
 	
-//NOTE: Do we still need this method????-LGS
-		/*public void linkProfessorsAndCourses(ArrayList<Professor> professors, String[][] cSS, Hashtable<String,Course> cH, Hashtable<String,Professor> pH){
-
-
-		System.out.println("Matching Professors and Courses");
-		
-		for (Enumeration<Course> courseList = cH.elements(); courseList.hasMoreElements();){
-			Course c =courseList.nextElement();
-			ArrayList<String> professorName=c.getProfessors();
-			Professor p = pH.
-		}
-		
-		
-		//not exactly sure how to implement these loops at this point
-		//maybe take a list of <professorName,courseName> pairs and
-		
-		//assume we have courseSpreadSheet
-		
-		for (int i=0; i<cSS.length; i++){
-			Course c = cH.get(cSS[i][1]);
-			Professor p=pH.get(cSS[i][2]);
-			c.addProfessor(p);
-			p.addCourse(c);
-		}
-	}
-		
-	 */
-	
 	public <T> T coalesce(T a, T b, T c) {
 	    return a != null ? a : (b != null ? b : c);
 	}
+
 	public static String[][] makeSpreadsheet(File file, String[][] strings) throws IOException{
 		System.out.println("Reading Files");
 		String[][] csv=strings;

@@ -18,6 +18,7 @@ public class Room{
 	private String buildingShort;
 	private boolean isAccessible;
     private String type; //lab,seminar,lecture,small,studio
+    private ArrayList<Course> courses;
 
     private class Technology{
     	//28-10: I dont think we should touch this yet 
