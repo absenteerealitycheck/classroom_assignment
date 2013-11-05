@@ -15,7 +15,7 @@ public class Driver{
 	public void go() throws IOException{
 		//TODO: bug12: can we abstract this to the actual size of the uploaded file
 		String[][] roomSpreadsheet = new String[81][5];
-		String[][] professorSpreadsheet = new String[3][3];
+		String[][] professorSpreadsheet = new String[2][3];
 		String[][] courseSpreadsheet = new String[642][16];
 		Hashtable<String,Course> courseHash=new Hashtable<String,Course>(courseSpreadsheet.length*2);
 		Hashtable<String,Professor> professorHash=new Hashtable<String,Professor>(professorSpreadsheet.length*2);
@@ -142,11 +142,11 @@ public class Driver{
 			String name=profs[row][0];
 			System.out.println(name);
 			Professor p=new Professor(name);
+			//Don't forget that we're setting the size of profList by hand up in go()
 			if (pH.containsKey(name)){//we should "probably" write our own exception. 
-				//System.out.println("checking nameness!");
 				try {
 					throw new AlreadyExistingException("This professor name already exists! What are you doing?");
-				} catch (AlreadyExistingException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -229,6 +229,8 @@ public class Driver{
 				 *
 				 * 
 				*/
+				System.out.println(rH);
+				System.out.println(roomsInBuilding);
 				
 				//ok to add here because we're generating rooms
 				//after this will will only remove rooms from preferredRooms

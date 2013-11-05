@@ -1,81 +1,81 @@
-building;number;capacity;type;accessible
-Barrett;102;32;lecture;TRUE
-Barrett;105;18;seminar;FALSE
-Chapin;101;37;seminar;FALSE
-Chapin;103;16;seminar;TRUE
-Chapin;119;16;seminar;TRUE
-Chapin;201;51;lecture;FALSE
-Chapin;203;27;lecture;FALSE
-Chapin;204;20;lecture;FALSE
-Chapin;205;18;lecture;FALSE
-Chapin;210;16;lecture;FALSE
-Clark;100;16;lecture;FALSE
-Converse;108;137;lecture;TRUE
-Converse;207;35;small;FALSE
-Converse;208;16;small;FALSE
-Converse;209;35;small;FALSE
-Converse;302;20;small;FALSE
-Converse;304;20;small;FALSE
-Converse;308;20;lecture;FALSE
-Cooper;101;10;seminar;FALSE
-Cooper;201;10;seminar;FALSE
-Earth Sciences;107;56;lecture;FALSE
-Earth Sciences;100;99;lab;TRUE
-Earth Sciences;203;99;lab;TRUE
-Earth Sciences;211;99;lab;FALSE
-Earth Sciences;300;99;lab;FALSE
-Earth Sciences;303;99;lab;FALSE
-Earth Sciences;311;99;lab;FALSE
-Fayerweather;1;99;studio;TRUE
-Fayerweather;17B;99;studio;FALSE
-Fayerweather;101;99;studio;FALSE
-Fayerweather;113;31;seminar;FALSE
-Fayerweather;115;80;lecture;FALSE
-Fayerweather;117;33;small;FALSE
-Fayerweather;201;99;lab;FALSE
-Fayerweather;205;99;lab;TRUE
-Fayerweather;217A;19;small;TRUE
-Fayerweather;303;99;lab;TRUE
-Johnson Chapel;21;40;lab;FALSE
-Kirby;theater;99;studio;FALSE
-Life Science;230;16;seminar;FALSE
-Life Science;428;16;seminar;FALSE
-Mead;115;188;lecture;FALSE
-Merrill;1;168;lecture;TRUE
-Merrill;2;145;lecture;TRUE
-Merrill;3;70;lecture;FALSE
-Merrill;4;76;lecture;FALSE
-Merrill;131;46;semnar;TRUE
-Merrill;209;15;seminar;FALSE
-Merrill;211;15;seminar;FALSE
-Merrill;220;33;small;FALSE
-Merrill;314;16;small;FALSE
-Merrill;315;32;small;FALSE
-Merrill;401;27;small;TRUE
-Merrill;403;35;small;FALSE
-Merrill;430;16;small;TRUE
-Morgan;111;99;small;FALSE
-Music;3;120;lecture;FALSE
-Music;7;50;small;FALSE
-Music;102;27;studio;TRUE
-Music;105;450;studio;FALSE
-Music;212;47;studio;TRUE
-Newport;100;20;small;FALSE
-Octagon;201;33;small;FALSE
-Seeley Mudd;202;12;small;FALSE
-Seeley Mudd;203;12;small;FALSE
-Seeley Mudd;204;36;small;FALSE
-Seeley Mudd;205;36;small;TRUE
-Seeley Mudd;206;56;small;FALSE
-Seeley Mudd;207;36;small;TRUE
-Webster;8;99;lab;TRUE
-Webster;19;99;lab;TRUE
-Webster;101;22;small;FALSE
-Webster;102;20;small;FALSE
-Webster;115;10;small;FALSE
-Webster;117;99;lab;TRUE
-Webster;122;99;lab;FALSE
-Webster;215;99;lab;FALSE
-Webster;217;32;seminar;TRUE
-Webster;219;15;seminar;TRUE
-Webster;220;35;small;TRUE
+building;number;capacity;type;accessible;buildingShort
+Barrett;102;32;lecture;TRUE;BARR
+Barrett;105;18;seminar;FALSE;BARR
+Chapin;101;37;seminar;FALSE;CHAP
+Chapin;103;16;seminar;TRUE;CHAP
+Chapin;119;16;seminar;TRUE;CHAP
+Chapin;201;51;lecture;FALSE;CHAP
+Chapin;203;27;lecture;FALSE;CHAP
+Chapin;204;20;lecture;FALSE;CHAP
+Chapin;205;18;lecture;FALSE;CHAP
+Chapin;210;16;lecture;FALSE;CHAP
+Clark;100;16;lecture;FALSE;CXXX
+Converse;108;137;lecture;TRUE;CONV
+Converse;207;35;small;FALSE;CONV
+Converse;208;16;small;FALSE;CONV
+Converse;209;35;small;FALSE;CONV
+Converse;302;20;small;FALSE;CONV
+Converse;304;20;small;FALSE;CONV
+Converse;308;20;lecture;FALSE;CONV
+Cooper;101;10;seminar;FALSE;COOP
+Cooper;201;10;seminar;FALSE;COOP
+Earth Sciences;107;56;lecture;FALSE;ESXX
+Earth Sciences;100;99;lab;TRUE;ESXX
+Earth Sciences;203;99;lab;TRUE;ESXX
+Earth Sciences;211;99;lab;FALSE;ESXX
+Earth Sciences;300;99;lab;FALSE;ESXX
+Earth Sciences;303;99;lab;FALSE;ESXX
+Earth Sciences;311;99;lab;FALSE;ESXX
+Fayerweather;1;99;studio;TRUE;FAYE
+Fayerweather;17B;99;studio;FALSE;FAYE
+Fayerweather;101;99;studio;FALSE;FAYE
+Fayerweather;113;31;seminar;FALSE;FAYE
+Fayerweather;115;80;lecture;FALSE;FAYE
+Fayerweather;117;33;small;FALSE;FAYE
+Fayerweather;201;99;lab;FALSE;FAYE
+Fayerweather;205;99;lab;TRUE;FAYE
+Fayerweather;217A;19;small;TRUE;FAYE
+Fayerweather;303;99;lab;TRUE;FAYE
+Johnson Chapel;21;40;lab;FALSE;JOCH
+Kirby;theater;99;studio;FALSE;KXXX
+Life Science;230;16;seminar;FALSE;MCLS
+Life Science;428;16;seminar;FALSE;MCLS
+Mead;115;188;lecture;FALSE;MEAD
+Merrill;1;168;lecture;TRUE;MERR
+Merrill;2;145;lecture;TRUE;MERR
+Merrill;3;70;lecture;FALSE;MERR
+Merrill;4;76;lecture;FALSE;MERR
+Merrill;131;46;semnar;TRUE;MERR
+Merrill;209;15;seminar;FALSE;MERR
+Merrill;211;15;seminar;FALSE;MERR
+Merrill;220;33;small;FALSE;MERR
+Merrill;314;16;small;FALSE;MERR
+Merrill;315;32;small;FALSE;MERR
+Merrill;401;27;small;TRUE;MERR
+Merrill;403;35;small;FALSE;MERR
+Merrill;430;16;small;TRUE;MERR
+Morgan;111;99;small;FALSE;MXXX
+Music;3;120;lecture;FALSE;ARMU
+Music;7;50;small;FALSE;ARMU
+Music;102;27;studio;TRUE;ARMU
+Music;105;450;studio;FALSE;ARMU
+Music;212;47;studio;TRUE;ARMU
+Newport;100;20;small;FALSE;NXXX
+Octagon;201;33;small;FALSE;OCTA
+Seeley Mudd;202;12;small;FALSE;SMUD
+Seeley Mudd;203;12;small;FALSE;SMUD
+Seeley Mudd;204;36;small;FALSE;SMUD
+Seeley Mudd;205;36;small;TRUE;SMUD
+Seeley Mudd;206;56;small;FALSE;SMUD
+Seeley Mudd;207;36;small;TRUE;SMUD
+Webster;8;99;lab;TRUE;WEBS
+Webster;19;99;lab;TRUE;WEBS
+Webster;101;22;small;FALSE;WEBS
+Webster;102;20;small;FALSE;WEBS
+Webster;115;10;small;FALSE;WEBS
+Webster;117;99;lab;TRUE;WEBS
+Webster;122;99;lab;FALSE;WEBS
+Webster;215;99;lab;FALSE;WEBS
+Webster;217;32;seminar;TRUE;WEBS
+Webster;219;15;seminar;TRUE;WEBS
+Webster;220;35;small;TRUE;WEBS
