@@ -3,9 +3,7 @@ import java.util.*;
 import java.lang.*;
 import java.io.*;
 public class Driver{
-	//As of 1:30 on Nov 4th we have Courses, Professors(a dummy list of Kaplan) and Rooms reading in.
-	//We have Professors linked to courses. We have Courses linked to Professors. 
-	//We have preferredTimes implemented and preferredRooms. We literally just have to write the loops that assign hard times and rooms.-LGS
+	
 	public HashMap<String,ArrayList<Room>> buildingMap=new HashMap<String,ArrayList<Room>>(40);
 	public static void main(String args[]) throws IOException{
 		new Driver().go();
@@ -62,7 +60,7 @@ public class Driver{
 		boolean allTimesPresent = true;
 		
 		for (Course c: courses){
-			
+			//System.out.println("Time for "+ c.getShortName()+ " is "+c.getPreferredTimes().get(0).toString());
 			if (c.getPreferredTimes().size()==0) allTimesPresent=false; 
 		
 		}
@@ -81,10 +79,13 @@ public class Driver{
 		    
 		    
 		    }
-		}*/ //for general debugging - jpham14:10/31
+		} *///for general debugging - jpham14:10/31
 		
 		System.out.println("No missing times?: "+allTimesPresent);
 		
+		
+	}
+	public void linkRoomsToCourses(ArrayList<Course> courses, ArrayList<Room> rooms){
 		
 	}
 	
@@ -197,18 +198,39 @@ public class Driver{
 			
 			courseList.add(temp);
 			ch.put(longname, temp);
+			
+			
+			//Making preferred Times Begins
+			String daysOfWeek=cl[row][4];
+			String time=cl[row][5];
+			String[] times=time.split("-",2);
+			char[] dow=daysOfWeek.toCharArray();
+			Time start;
+			Time end;
+			
+			
+			if(!times[0].isEmpty()){
+				for(int i=0;i<dow.length;i++){
+					if(dow[i]=='T' && i!=dow.length-1 && dow[i+1]=='H'){
+						char[] th={'T','H'};
+						start=new Time(th,times[0],true);
+						end=new Time(th, times[1],false);
+						temp.addPreferredTimes(new Tuple<Time,Time>(start,end));
+					}
+					else{
+						
+						start=new Time(dow[i],times[0],true);
+						end=new Time(dow[i], times[1],false);
+						temp.addPreferredTimes(new Tuple<Time,Time>(start,end));
+					}
+				}
+			}//End preferredTimes
 			//Handling preferredRooms Begins
-			//fix this so that it adds all rooms if cl[row][6].isEmpty()
+			
 			if (!cl[row][6].isEmpty()){
 				//Building
 				String buildingShort=cl[row][6];// We should probably check for typos or errors in the building names...-LGS
-				
-				//for (Enumeration<ArrayList<Room>> room = rH.elements(); room.hasMoreElements();)
-				       //System.out.println(room.nextElement());
-				/*for(String s:rH.keySet()){
-					System.out.println("s is "+s);
-				}
-				System.out.println("RH vals "+rH.values());*/
+					
 				ArrayList<Room> roomsInBuilding;
 				if (rH.containsKey(buildingShort)){
 					roomsInBuilding=rH.get(buildingShort);
@@ -217,7 +239,7 @@ public class Driver{
 					continue;
 				}
 				
-				//System.out.println("ribs "+roomsInBuilding);
+				
 				//Room Number
 				
 				/* TODO:bug13: modify this code so roomnum can be a comma seperated list of rooms
@@ -240,46 +262,12 @@ public class Driver{
 				temp.addPreferredRoomsList(roomsInBuilding);
 				
 			}//Making preferredRooms Ends
-			
-			//Making preferred Times Begins
-			String daysOfWeek=cl[row][4];
-			String time=cl[row][5];
-			String[] times=time.split("-",2);
-			char[] dow=daysOfWeek.toCharArray();
-			Time start;
-			Time end;
-			if(times[0].isEmpty()){
-				
-				times=new String[2];
-				times[0]="12:00PM";
-				times[1]="12:50PM";
-			}
-			
-			if(cl[row][4].isEmpty()){
-				daysOfWeek="MWF";
-				dow=daysOfWeek.toCharArray();
-			}
-			
-			for(int i=0;i<dow.length;i++){
-				if(dow[i]=='T' && i!=dow.length-1 && dow[i+1]=='H'){
-					char[] th={'T','H'};
-					start=new Time(th,times[0],true);
-					end=new Time(th, times[1],false);
-					temp.addPreferredTimes(new Tuple<Time,Time>(start,end));
-				}
-				else{
-					
-					start=new Time(dow[i],times[0],true);
-					end=new Time(dow[i], times[1],false);
-					temp.addPreferredTimes(new Tuple<Time,Time>(start,end));
-				}
-			}//End preferredTimes
 		}
 		courseList.trimToSize();
 		return courseList;
 	}
 	
-
+//NOTE: Do we still need this method????-LGS
 		/*public void linkProfessorsAndCourses(ArrayList<Professor> professors, String[][] cSS, Hashtable<String,Course> cH, Hashtable<String,Professor> pH){
 
 
