@@ -14,7 +14,7 @@ public class Driver{
 	
 	public void go() throws IOException{
 		//TODO: bug12: can we abstract this to the actual size of the uploaded file
-		String[][] roomSpreadsheet = new String[81][5];
+		String[][] roomSpreadsheet = new String[81][6];
 		String[][] professorSpreadsheet = new String[2][3];
 		String[][] courseSpreadsheet = new String[642][16];
 		Hashtable<String,Course> courseHash=new Hashtable<String,Course>(courseSpreadsheet.length*2);
@@ -33,20 +33,17 @@ public class Driver{
 		ArrayList<Professor> professors= generateProfessors(professorSpreadsheet,professorHash);
 		ArrayList<Course> courses= generateCourses(courseSpreadsheet,courseHash,buildingMap, professorHash);
 		
-	/*	for(Course c: courses){
+		for(Course c: courses){
 			System.out.println(c.toString());
+			for(Professor p:c.getProfessors()){
+				System.out.println("\t"+p.toString());
+			}
 			for (Room r: c.getPreferredRooms()){
-				System.out.print("\t\t"+r.toString());
+				System.out.print("\t"+r.toString());
 			}
 			System.out.println();
 		}	
 		
-		for(Course c:courses){
-			System.out.println(c.toString());
-			for(Professor p:c.getProfessors()){
-				System.out.println("\t\t"+p.toString());
-			}
-		}*/
 		//linkCoursesToRooms();//this is where the magic happens
 		
 		System.out.println("Success!");
@@ -96,7 +93,7 @@ public class Driver{
 		/*However we construct rS, write a visual representation of it below
 		 * 
 		 * rS:
-		 * [BuildingName|RoomNumber|Capacity|RoomType|Accessible]
+		 * [BuildingName|RoomNumber|Capacity|RoomType|Accessible|BuildingShort]
 		 * [BuildingName|...]
 		 * ...
 		 * current columns are [buildingName|roomNumber|capacity|type|accessible] - jpham14:10/28
@@ -110,9 +107,10 @@ public class Driver{
 			String type=rS[row][3];
 			Boolean accessible=Boolean.valueOf(rS[row][4]);
 			String buildingName=rS[row][0];
+			String buildingShort=rS[row][5];
 			Integer capacity= Integer.valueOf(rS[row][2]);
 			String roomNumber=rS[row][1];
-			Room r = new Room(accessible,buildingName,capacity,roomNumber,type);
+			Room r = new Room(accessible,buildingName, buildingShort, capacity,roomNumber,type);
 			//eventually implement the following line
 			//r.setTech(...)			
 			rooms.add(r);
@@ -125,7 +123,7 @@ public class Driver{
 	}
 	
 	public void addToBuilding(Room r) {
-		String b=r.getBuilding();
+		String b=r.getBuildingShort();
 		if(buildingMap.containsKey(b))
 			buildingMap.get(b).add(r);
 		else{
@@ -203,7 +201,7 @@ public class Driver{
 			//fix this so that it adds all rooms if cl[row][6].isEmpty()
 			if (!cl[row][6].isEmpty()){
 				//Building
-				String building=cl[row][6];// We should probably check for typos or errors in the building names...-LGS
+				String buildingShort=cl[row][6];// We should probably check for typos or errors in the building names...-LGS
 				
 				//for (Enumeration<ArrayList<Room>> room = rH.elements(); room.hasMoreElements();)
 				       //System.out.println(room.nextElement());
@@ -211,7 +209,14 @@ public class Driver{
 					System.out.println("s is "+s);
 				}
 				System.out.println("RH vals "+rH.values());*/
-				ArrayList<Room> roomsInBuilding = rH.get(building);
+				ArrayList<Room> roomsInBuilding;
+				if (rH.containsKey(buildingShort)){
+					roomsInBuilding=rH.get(buildingShort);
+				} else {
+					System.out.println("Throw an error for "+buildingShort+"!");
+					continue;
+				}
+				
 				//System.out.println("ribs "+roomsInBuilding);
 				//Room Number
 				
@@ -229,8 +234,6 @@ public class Driver{
 				 *
 				 * 
 				*/
-				System.out.println(rH);
-				System.out.println(roomsInBuilding);
 				
 				//ok to add here because we're generating rooms
 				//after this will will only remove rooms from preferredRooms

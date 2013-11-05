@@ -15,6 +15,7 @@ public class Room{
 	//private String nickname; //should this be a thing for "Blackbox "Buckley Recital Hall" etc?
 	private int capacity;
 	private String building;
+	private String buildingShort;
 	private boolean isAccessible;
     private String type; //lab,seminar,lecture,small,studio
 
@@ -39,9 +40,10 @@ public class Room{
     }
 
     
-    public Room(boolean accessible,String building,int capacity,String roomNumber,String type){
+    public Room(boolean accessible,String building,String buildingShort,int capacity,String roomNumber,String type){
     	this.capacity=capacity;
     	this.building=building;
+    	this.buildingShort=buildingShort;
     	this.roomNumber=roomNumber;
     	this.isAccessible=accessible;
     	this.type=type.toLowerCase();
@@ -80,6 +82,14 @@ public class Room{
 
 	public String getBuilding() {
 		return building;
+	}
+	
+	public boolean inBuildingShort(String buildingShort){
+		return this.building.equals(building);
+	}
+	
+	public String getBuildingShort() {
+		return buildingShort;
 	}
 
 	public void setBuilding(String building) {

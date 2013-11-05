@@ -9,7 +9,7 @@ Chapin;203;27;lecture;FALSE;CHAP
 Chapin;204;20;lecture;FALSE;CHAP
 Chapin;205;18;lecture;FALSE;CHAP
 Chapin;210;16;lecture;FALSE;CHAP
-Clark;100;16;lecture;FALSE;CXXX
+Clark;100;16;lecture;FALSE;CLAR
 Converse;108;137;lecture;TRUE;CONV
 Converse;207;35;small;FALSE;CONV
 Converse;208;16;small;FALSE;CONV
@@ -19,13 +19,13 @@ Converse;304;20;small;FALSE;CONV
 Converse;308;20;lecture;FALSE;CONV
 Cooper;101;10;seminar;FALSE;COOP
 Cooper;201;10;seminar;FALSE;COOP
-Earth Sciences;107;56;lecture;FALSE;ESXX
-Earth Sciences;100;99;lab;TRUE;ESXX
-Earth Sciences;203;99;lab;TRUE;ESXX
-Earth Sciences;211;99;lab;FALSE;ESXX
-Earth Sciences;300;99;lab;FALSE;ESXX
-Earth Sciences;303;99;lab;FALSE;ESXX
-Earth Sciences;311;99;lab;FALSE;ESXX
+Earth Sciences;107;56;lecture;FALSE;BEBU
+Earth Sciences;100;99;lab;TRUE;BEBU
+Earth Sciences;203;99;lab;TRUE;BEBU
+Earth Sciences;211;99;lab;FALSE;BEBU
+Earth Sciences;300;99;lab;FALSE;BEBU
+Earth Sciences;303;99;lab;FALSE;BEBU
+Earth Sciences;311;99;lab;FALSE;BEBU
 Fayerweather;1;99;studio;TRUE;FAYE
 Fayerweather;17B;99;studio;FALSE;FAYE
 Fayerweather;101;99;studio;FALSE;FAYE
@@ -37,7 +37,7 @@ Fayerweather;205;99;lab;TRUE;FAYE
 Fayerweather;217A;19;small;TRUE;FAYE
 Fayerweather;303;99;lab;TRUE;FAYE
 Johnson Chapel;21;40;lab;FALSE;JOCH
-Kirby;theater;99;studio;FALSE;KXXX
+Kirby;theater;99;studio;FALSE;KIRB
 Life Science;230;16;seminar;FALSE;MCLS
 Life Science;428;16;seminar;FALSE;MCLS
 Mead;115;188;lecture;FALSE;MEAD
@@ -54,7 +54,7 @@ Merrill;315;32;small;FALSE;MERR
 Merrill;401;27;small;TRUE;MERR
 Merrill;403;35;small;FALSE;MERR
 Merrill;430;16;small;TRUE;MERR
-Morgan;111;99;small;FALSE;MXXX
+Morgan;111;99;small;FALSE;MORG
 Music;3;120;lecture;FALSE;ARMU
 Music;7;50;small;FALSE;ARMU
 Music;102;27;studio;TRUE;ARMU
