@@ -93,6 +93,7 @@ public class Time{
 			}
 		
 	}
+
 	public int getMilitaryTime(){
 		int t = this.eventTime.get(Calendar.HOUR);
 		if(this.eventTime.get(Calendar.AM_PM)==1) {
@@ -103,7 +104,7 @@ public class Time{
 		}
 		else System.out.println("You dun fucked up");
 		return t;
-	}
+
 	
 	public String toString(){
 		int h=this.eventTime.get(Calendar.HOUR);

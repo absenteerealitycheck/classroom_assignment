@@ -18,6 +18,7 @@ public class Room{
 	private String buildingShort;
 	private boolean isAccessible;
     private String type; //lab,seminar,lecture,small,studio
+    private ArrayList<Course> courses;
     private boolean[][] timeTable = new boolean[5][48]; //boolean[day][half-hour]
 
     private class Technology{
@@ -115,8 +116,15 @@ public class Room{
 		this.type = type;
 	}
 	
+	public ArrayList<Course> getCourses() {
+		return courses;
+	}
+	public void addCourse(Course course) {
+		this.courses.add(course);
+		//TODO:update3:make call to setTimeTable here
+	}
 	public String toString(){
-		return this.building+this.roomNumber;
+		return this.building+" "+this.roomNumber;
 	}
 	
 	public void startTimeTable() {
@@ -181,12 +189,12 @@ public class Room{
 	public boolean isNotAssigned(Tuple<Time, Time> t) {
 		Time start = t.getFirst();
 		Time end = t.getSecond();
-		int sh=start.getEventTime().HOUR_OF_DAY*2;
+		int sh=start.getMilitaryTime()*2;
 		if(start.getMinute()==30)sh++;
-		int eh=end.getEventTime().HOUR_OF_DAY*2;
+		int eh=end.getMilitaryTime()*2;
 		if(end.getMinute()==20)eh++;
 		else if(end.getMinute()==50)eh+=2;
-		int day=t.getFirst().getEventTime().DAY_OF_WEEK-2;
+		int day=t.getFirst().getDay()-2;
 		for(int k=sh;k<eh;k++){
 			if(timeTable[k][day]) return false;
 		}
