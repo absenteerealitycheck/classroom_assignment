@@ -5,7 +5,7 @@ import java.io.*;
 public class Driver{
 	
 	public HashMap<String,ArrayList<Room>> buildingMap=new HashMap<String,ArrayList<Room>>(40);
-	public ArrayList<Course> badCourses;
+	public ArrayList<Course> badCourses= new ArrayList<Course>(15);
 	public static void main (String args[]) throws IOException{
 		new Driver().go();
 		
@@ -31,7 +31,12 @@ public class Driver{
 		ArrayList<Room> rooms= generateRooms(roomSpreadsheet);
 		ArrayList<Professor> professors= generateProfessors(professorSpreadsheet,professorHash);
 		ArrayList<Course> courses= generateCourses(courseSpreadsheet,courseHash,buildingMap, professorHash);
-		
+		ArrayList<Course> setCourses= bruteForce(courses);
+		for(Course c:courses){
+			System.out.println("Preferred: "+c.getPreferredRooms());
+			if(c.getAssignment()!=null){
+			System.out.println(c.getLongName()+" is in room "+ c.getAssignment().toString());} //"at "+c.getPreferredTimes().get(0));
+		}
 		/*for(Course c: courses){
 			System.out.println(c.toString());
 			for(Professor p:c.getProfessors()){
@@ -90,7 +95,40 @@ public class Driver{
 		*/ //in case you're wondering how the timeTable works in Room
 		
 	}
+	public ArrayList<Course> bruteForce(ArrayList<Course> courses){
+		for(Course c:courses){
+			
+			if(c.getPreferredRooms().isEmpty()){
+				System.out.println("in course "+c.getLongName()+" there are "+c.getPreferredRooms().isEmpty());
+				badCourses.add(c);
+				continue;
+			}
+			for(Room r:c.getPreferredRooms()){
+				for(Tuple<Time,Time> t: c.getPreferredTimes()){
+					if(!r.isNotAssigned(t)){//if the room is assigned at that time
+						System.out.println("ASSIGNED");
+						if(r.equals(c.getPreferredRooms().get(c.getPreferredRooms().size()-1))){
+							System.out.println("PIGEONS");
+							c.setAssignment(r);
+							r.setTimeTable(c.getPreferredTimes());
+						}
+						else{ System.out.println("elsing");break;}//if the room is assigned at that time move on to next room
+					}
+					else if(t.equals(c.getPreferredTimes().get(c.getPreferredTimes().size()-1))){
+						System.out.println("POSTMAN");
+						c.setAssignment(r);
+						r.setTimeTable(c.getPreferredTimes());
+					}
+				
+				}
+			}
+		}
+		return courses;
+			
+	}
 	public void linkRoomsToCourses(ArrayList<Course> courses, ArrayList<Room> rooms){
+		Collections.shuffle(courses);
+		
 		/*courses.shuffle
 		 * courses.sort(courses.getPrefRoom.length)
 		 * courses.sort(courses.getType)

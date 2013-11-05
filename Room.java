@@ -18,7 +18,7 @@ public class Room{
 	private String buildingShort;
 	private boolean isAccessible;
     private String type; //lab,seminar,lecture,small,studio
-    private boolean[][] timeTable = new boolean[5][48]; //boolean[day][half-hour]
+    private boolean[][] timeTable = new boolean[48][5]; //boolean[day][half-hour]
 
     private class Technology{
     	//28-10: I dont think we should touch this yet 
@@ -120,8 +120,8 @@ public class Room{
 	}
 	
 	public void startTimeTable() {
-		for (int i=0;i<5;i++) {
-			for (int j=0;j<48;j++) {
+		for (int i=0;i<48;i++) {
+			for (int j=0;j<5;j++) {
 				timeTable[i][j]=false;
 			}
 		}
@@ -153,7 +153,7 @@ public class Room{
 			j=27;
 			System.out.println("i: "+i+" j: "+j);
 			while (i < j) {
-				timeTable[dayStart][i] = true;
+				timeTable[i][dayStart] = true;
 				i++;
 			}
 					
@@ -180,7 +180,9 @@ public class Room{
 		if(end.getMinute()==20)eh++;
 		else if(end.getMinute()==50)eh+=2;
 		int day=t.getFirst().getDay()-2;
+		System.out.println("day of week is "+ t.getFirst().getEventTime().getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US)+" and the time is "+ t.getFirst().toString()+"-"+t.getSecond().toString());
 		for(int k=sh;k<eh;k++){
+			System.out.println("k is "+k+" and day is "+day);
 			if(timeTable[k][day]) return false;
 		}
 		
