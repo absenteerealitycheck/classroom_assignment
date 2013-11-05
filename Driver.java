@@ -91,18 +91,7 @@ public class Driver{
 		} *///for general debugging - jpham14:10/31
 		
 		System.out.println("No missing times?: "+allTimesPresent);
-		
-
-		
-		/*ArrayList<Tuple<Time,Time>> testTimes = null;
-		for (int i = 0;i<5;i++) {
-			testTimes = courses.get(i).getPreferredTimes();
-			System.out.println(courses.get(i).getLongName());
-			rooms.get(0).setTimeTable(testTimes);
-		}
-		rooms.get(0).printTimeTable();
-		*/
-		 //in case you're wondering how the timeTable works in Room
+	
 		
 	}
 	public void linkRoomsToCourses(ArrayList<Course> courses, ArrayList<Room> rooms){
