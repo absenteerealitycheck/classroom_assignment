@@ -117,6 +117,15 @@ public class Driver{
 		 * }*/
 	}
 	
+	private boolean canMove(Course c){
+		for(Room r : c.getPreferredRooms()){
+			for(Tuple<Time,Time> t:c.getPreferredTimes()){
+				if(r.isNotAssigned(t)) return true;
+			}
+		}
+		return false;
+	}
+	
 	public ArrayList<Room> generateRooms(String[][] rS){
 		System.out.println("Generating Rooms");
 		/*However we construct rS, write a visual representation of it below
