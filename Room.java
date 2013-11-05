@@ -140,7 +140,7 @@ public class Room{
 		for (Tuple t: times) {
 			start = (Time) t.getFirst();
 			end = (Time) t.getSecond();
-			dayStart = start.getDay();
+			dayStart = start.getDay()-2;
 			hourStart = start.getHour();
 			minStart = start.getMinute();
 			hourEnd = end.getHour();
@@ -150,6 +150,7 @@ public class Room{
 			if (minStart > 30) i++;
 			if (minEnd > 30) j++;
 			if (i > j) System.out.println("something's wrong, check for military time"); //debugging
+			j=27;
 			System.out.println("i: "+i+" j: "+j);
 			while (i < j) {
 				timeTable[dayStart][i] = true;
