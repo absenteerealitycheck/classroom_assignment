@@ -37,15 +37,19 @@ public class Driver{
 		
 		linkRoomsToCourses(courses,rooms);//this is where the magic happens
 		for(Course c: courses){
+			System.out.printf("%-3s %-3s %-14s %-15s %n", c.getPreferredTimes().size(), c.getCapacity(),c.getType(), c.toString());
+			
+			//System.out.print(c.getPreferredTimes().size()+": "+c.getCapacity()+": "+c.getType());
 			//System.out.println(c.toString()+": "+c.getCapacity()+": "+c.getPreferredTimes().size());
-			System.out.println(c.getPreferredTimes().size()+": "+c.getCapacity()+": "+c.getType());
 			for(Professor p:c.getProfessors()){
-				//System.out.println("\t"+p.toString());
+				//System.out.printf("%-20s %-20s %n", "",p.toString());
+				System.out.println("\t\t\t"+p.toString());
 			}
 			for (Room r: c.getPreferredRooms()){
-				//System.out.print("\t"+r.toString());
+				//System.out.printf("%-20s %-20s", "",r.toString());
+				System.out.print("\t\t\t"+r.toString());
 			}
-			//System.out.println();
+			System.out.println();
 		}	
 		
 		
@@ -65,7 +69,7 @@ public class Driver{
 		boolean allTimesPresent = true;
 		
 		for (Course c: courses){
-			//System.out.println("Time for "+ c.getShortName()+ " is "+c.getPreferredTimes().get(0).toString());
+			//System.out.println("Time for "+ c.getShortName()+ " is "+c.getPreferredTimes().get(0).first.toString()+"-"+c.getPreferredTimes().get(0).second.toString());
 			if (c.getPreferredTimes().size()==0) allTimesPresent=false; 
 		
 		}
@@ -88,6 +92,10 @@ public class Driver{
 		
 		System.out.println("No missing times?: "+allTimesPresent);
 		
+		/*ArrayList<Tuple<Time,Time>> testTimes = courses.get(0).getPreferredTimes();
+		*rooms.get(0).setTimeTable(testTimes);
+		*rooms.get(0).printTimeTable();
+		*/ //in case you're wondering how the timeTable works in Room
 		
 	}
 	public void linkRoomsToCourses(ArrayList<Course> courses, ArrayList<Room> rooms){
@@ -169,7 +177,15 @@ public class Driver{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
 		
+	private boolean canMove(Course c){
+		for(Room r : c.getPreferredRooms()){
+			for(Tuple<Time,Time> t:c.getPreferredTimes()){
+				if(r.isNotAssigned(t)) return true;
+			}
+		}
+		return false;
 	}
 	
 	public ArrayList<Room> generateRooms(String[][] rS){
@@ -227,7 +243,7 @@ public class Driver{
 			//Don't forget that we're setting the size of profList by hand up in go()
 			if (pH.containsKey(name)){//we should "probably" write our own exception. 
 				try {
-					throw new AlreadyExistingException("This professor name already exists! What are you doing?");
+					throw new Exception("This professor name already exists! What are you doing?");
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
