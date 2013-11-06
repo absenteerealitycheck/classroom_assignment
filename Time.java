@@ -1,25 +1,31 @@
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.Locale;
+import java.io.IOException;
+import java.util.*;
+
+/*
+ * TODO: bug15: Hey guys, we should totally make a hashtable of times so that we dont create the same time object 80 times
+ * TODO: bug16: Fuck. We need to manage our DayOfWeek/Time fields manually; we can't use the Calendar object. Ask me why i would LOVE to tell you. Fuck. -MCM
+ */
 
 public class Time{
    
     private Calendar eventTime;
 	private boolean isStartTime;
 
+	public Time(String t,boolean isStartTime){
+		this.setEventTime(new GregorianCalendar());
+		this.isStartTime=isStartTime;
+		this.setTime(t);
+	}
+	
     public Time(char dow, String t,  boolean isStartTime){
-    	
-    	this.setEventTime(new GregorianCalendar());
-    	this.isStartTime=isStartTime;
+    	this(t,isStartTime);
+    	System.out.println("\t"+dow);
     	this.setDayOfWeek(dow);
-    	this.setTime(t);
     	//parse the shit out of s to turn it into a Calendar
     }
     public Time(char[] dow, String t,  boolean isStartTime){
-    	this.setEventTime(new GregorianCalendar());
-    	this.isStartTime=isStartTime;
+    	this(t,isStartTime);
     	this.setDayThurs(dow);
-    	this.setTime(t);
     	//parse the shit out of s to turn it into a Calendar
     }
    
@@ -67,16 +73,15 @@ public class Time{
     }
     
     public int getDay() {
-    int d = eventTime.get(Calendar.DAY_OF_WEEK);
-    return d;
-    
+	    int d = eventTime.get(Calendar.DAY_OF_WEEK);
+	    return d;
     }
     
     public void setDayThurs(char[]c){
 		eventTime.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
 	}
 	public void setDayOfWeek(char c){
-		
+			
 			if(c=='M'){
 				eventTime.set(Calendar.DAY_OF_WEEK,Calendar.MONDAY);
 			}
@@ -87,14 +92,11 @@ public class Time{
 				eventTime.set(Calendar.DAY_OF_WEEK,Calendar.FRIDAY);
 			}
 			if(c=='T'){
-				
 					eventTime.set(Calendar.DAY_OF_WEEK,Calendar.TUESDAY);
-				
 			}
-		
 	}
 
-	public int getMilitaryTime(){
+	public int getMilitaryHour(){
 		int t = this.eventTime.get(Calendar.HOUR);
 		if(this.eventTime.get(Calendar.AM_PM)==1) {
 			if(t<12) t=t+12;
@@ -124,8 +126,9 @@ public class Time{
 			min=Integer.toString(m);
 		}
 		if(this.isStartTime){
-			
-		return this.eventTime.getDisplayName(Calendar.DAY_OF_WEEK,Calendar.SHORT, Locale.US)+" "+hour+":"+min;}
+			return ""+this.eventTime.get(Calendar.DAY_OF_WEEK);
+		}
+			//return this.eventTime.getDisplayName(Calendar.DAY_OF_WEEK,Calendar.SHORT, Locale.US)+" "+hour+":"+min;}
 		else
 			return hour+":"+min;
 	}

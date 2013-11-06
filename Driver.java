@@ -114,19 +114,23 @@ public class Driver{
 			}
 			for(Room r:c.getPreferredRooms()){
 				for(Tuple<Time,Time> t: c.getPreferredTimes()){
-					if(!r.isNotAssigned(t)){//if the room is assigned at that time
-						System.out.println("ASSIGNED");
+					System.out.println(c.toString());
+					if(r.isAssigned(t)){//if the room is assigned at that time
+						//System.out.println("ASSIGNED");
 						if(r.equals(c.getPreferredRooms().get(c.getPreferredRooms().size()-1))){
-							System.out.println("PIGEONS");
+							//System.out.println("PIGEONS");
 							c.setAssignment(r);
-							r.setTimeTable(c.getPreferredTimes());
+							r.scheduleRoomForTimes(c.getPreferredTimes());
 						}
-						else{ System.out.println("elsing");break;}//if the room is assigned at that time move on to next room
+						else{ 
+							//System.out.println("elsing");
+							break;
+						}//if the room is assigned at that time move on to next room
 					}
 					else if(t.equals(c.getPreferredTimes().get(c.getPreferredTimes().size()-1))){
-						System.out.println("POSTMAN");
+						//System.out.println("POSTMAN");
 						c.setAssignment(r);
-						r.setTimeTable(c.getPreferredTimes());
+						r.scheduleRoomForTimes(c.getPreferredTimes());
 					}
 				
 				}
@@ -225,7 +229,7 @@ public class Driver{
 	private boolean canMove(Course c){
 		for(Room r : c.getPreferredRooms()){
 			for(Tuple<Time,Time> t:c.getPreferredTimes()){
-				if(r.isNotAssigned(t)) return true;
+				if(!r.isAssigned(t)) return true;
 			}
 		}
 		return false;
@@ -310,10 +314,8 @@ public class Driver{
 
 		System.out.println("Generating Courses");
 		ArrayList<Course> courseList=new ArrayList<Course>();
-		int allCourses=cl.length;
-		int eachCourse=cl[0].length;
 		Course temp;
-		for(int row=1;row<allCourses;row++){//start at 1 because first row is headings of columns
+		for(int row=1;row<cl.length;row++){//start at 1 because first row is headings of columns
 			
 			/*
 			 * Create all local variables
@@ -343,6 +345,7 @@ public class Driver{
 			
 			
 			//Making preferred Times Begins
+			
 			String daysOfWeek=cl[row][4];
 			String time=cl[row][5];
 			String[] times=time.split("-",2);
@@ -350,10 +353,16 @@ public class Driver{
 			Time start;
 			Time end;
 			
+			System.out.println("pretemp:");
+			System.out.println();
+			
 			
 			if(!times[0].isEmpty()){
 				for(int i=0;i<dow.length;i++){
+					System.out.println("temp:"+temp.toString());
+					System.out.println(dow);
 					if(dow[i]=='T' && i!=dow.length-1 && dow[i+1]=='H'){
+						i++;
 						char[] th={'T','H'};
 						start=new Time(th,times[0],true);
 						end=new Time(th, times[1],false);
@@ -361,6 +370,21 @@ public class Driver{
 					}
 					else{
 						
+						System.out.println("("+temp.getLongName()+")");
+						if (temp.getLongName().equals("Ecology")){
+							System.out.println("========================================================================================================================================================================================");
+							System.out.println("========================================================================================================================================================================================");
+							System.out.println("========================================================================================================================================================================================");
+							
+							System.out.println(dow);
+							System.out.println(times.toString());
+							
+							
+							
+							System.out.println("========================================================================================================================================================================================");
+							System.out.println("========================================================================================================================================================================================");
+							System.out.println("========================================================================================================================================================================================");
+						}
 						start=new Time(dow[i],times[0],true);
 						end=new Time(dow[i], times[1],false);
 						temp.addPreferredTimes(new Tuple<Time,Time>(start,end));
