@@ -310,10 +310,8 @@ public class Driver{
 
 		System.out.println("Generating Courses");
 		ArrayList<Course> courseList=new ArrayList<Course>();
-		int allCourses=cl.length;
-		int eachCourse=cl[0].length;
 		Course temp;
-		for(int row=1;row<allCourses;row++){//start at 1 because first row is headings of columns
+		for(int row=1;row<cl.length;row++){//start at 1 because first row is headings of columns
 			
 			/*
 			 * Create all local variables
