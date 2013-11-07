@@ -21,11 +21,16 @@ public class Driver{
 	
 	public void go() throws IOException{
 		
-		
+		boolean testing=false;
 		//TODO: bug12: can we abstract this to the actual size of the uploaded file
 		String[][] roomSpreadsheet = new String[81][6];
 		String[][] professorSpreadsheet = new String[2][3];
-		String[][] courseSpreadsheet = new String[642][16];
+		String[][] courseSpreadsheet;
+		if (testing){
+			courseSpreadsheet = new String[10][16];
+		} else {
+			courseSpreadsheet = new String[642][16];
+		}
 		Hashtable<String,Course> courseHash=new Hashtable<String,Course>(courseSpreadsheet.length*2);
 		Hashtable<String,Professor> professorHash=new Hashtable<String,Professor>(professorSpreadsheet.length*2);
 		Hashtable<String,Time> timeHash=new Hashtable<String,Time>(100);
@@ -34,15 +39,22 @@ public class Driver{
 		//print2D(courseSpreadsheet);
 		roomSpreadsheet=makeSpreadsheet(new File("proto-roomslist.csv"),roomSpreadsheet);
 		professorSpreadsheet=makeSpreadsheet(new File("proto-profslist.csv"),professorSpreadsheet);
-		courseSpreadsheet=makeSpreadsheet(new File("proto-courselist.csv"),courseSpreadsheet);
+		if (testing){
+			courseSpreadsheet=makeSpreadsheet(new File("proto-courselist-easy.csv"),courseSpreadsheet);
+		}else{
+			courseSpreadsheet=makeSpreadsheet(new File("proto-courselist.csv"),courseSpreadsheet);
+		}
 		//print2D(roomSpreadsheet);
 		print2D(professorSpreadsheet);
 		
 		//NOTE: I stored nulls because I haven't sanitized the data in any meaningful way yet
 		ArrayList<Room> rooms= generateRooms(roomSpreadsheet);
+		rooms.trimToSize();
 		ArrayList<Professor> professors= generateProfessors(professorSpreadsheet,professorHash);
+		professors.trimToSize();
 		ArrayList<Course> courses= generateCourses(courseSpreadsheet,courseHash,buildingMap, professorHash, timeHash);
-
+		courses.trimToSize();
+		
 		ArrayList<Course> setCourses= bruteForce(courses);
 		for(Course c:courses){
 			System.out.println("Preferred: "+c.getPreferredRooms());
@@ -116,6 +128,7 @@ public class Driver{
 		
 	}
 	public ArrayList<Course> bruteForce(ArrayList<Course> courses){
+		double counter=0;
 		for(Course c:courses){
 			
 			if(c.getPreferredRooms().isEmpty()){
@@ -132,6 +145,7 @@ public class Driver{
 							//System.out.println("PIGEONS");
 							c.setAssignment(r);
 							r.scheduleRoomForTimes(c.getPreferredTimes());
+							counter++;
 						}
 						else{ 
 							//System.out.println("elsing");
@@ -147,6 +161,8 @@ public class Driver{
 				}
 			}
 		}
+		System.out.println("Conflicts is "+counter);
+		System.out.println("Solution Quality is "+((courses.size()-counter)/courses.size()*100)+"%");
 		return courses;
 			
 	}
@@ -361,11 +377,14 @@ public class Driver{
 			
 			if(!times[0].isEmpty()){
 				for(int i=0;i<dow.length;i++){
-					if (dow[i+1].equals("H")){i++;}
+					System.out.println(daysOfWeek);
+					if (i<dow.length-1&&dow[i+1].equals("H")){i++;}
 					if (tH.containsKey(dow[i]+times[0]+times[1])){
 						t=tH.get(dow[i]+times[0]+times[1]);
 					} else {						
-						t=new Time(dow[i],times[0],times[1]);
+						t=new Time(dow[i],
+									times[0].substring(0,times[0].length()-2),times[0].substring(times[0].length()-2),
+									times[1].substring(0,times[1].length()-2),times[1].substring(times[1].length()-2));
 						tH.put(dow[i]+times[0]+times[1],t);
 					}
 					temp.addPreferredTime(t);

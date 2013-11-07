@@ -17,29 +17,37 @@ public class Time implements Comparable<Time>{
 	int blocks; //number of half hour blocks between start and end
 	String token;
 
-	public Time(String dayOfWeek, String start, String end){
+	public Time(String dayOfWeek, String start,String startPM, String end, String endPM){
 		this.dayOfWeek=convertDayOfWeek(dayOfWeek);
 		String[]s=start.split(":");
 		String[]e=end.split(":");
 		this.startHour=Integer.parseInt(s[0]);
+		if (startPM.equals("PM")){this.startHour+=12;}
 		this.startMinute=Integer.parseInt(s[1]);
 		this.endHour=Integer.valueOf(e[0]);
+		if (endPM.equals("PM")){this.endHour+=12;}
 		this.endMinute=Integer.valueOf(e[1]);
 		this.token=dayOfWeek+start+end;
 	}
-	public enum Days{
-		M,T,W,H,F
-	}
+	
 	private int convertDayOfWeek(String dow){
 	
-		switch(Days.valueOf(dow)){
-		case M: return 0;
-		case T: return 1;
-		case W: return 2;
-		case H: return 3;
-		case F: return 4;
-		
+		if(dow.equals("M")){
+			return 0;
 		}
+		else if(dow.equals("T")){
+			return 1;
+		}
+		else if(dow.equals("W")){
+			return 2;
+		}
+		else if(dow.equals("H")){
+			return 3;
+		}
+		else if(dow.equals("F")){
+			return 4;
+		}
+		
 		return -1;
 	}
 	
