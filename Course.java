@@ -37,7 +37,8 @@ public class Course{
     	if (type.equals("lecture")){lectureCourse=true;}
     	if (type.equals("seminar")){seminarCourse=true;}
     }
-
+//make field for do not scehcule, last column will have that  vale when initializing just continue
+    
 	public Room getAssignment() {
 		return assignment;
 	}

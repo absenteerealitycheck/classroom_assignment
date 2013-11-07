@@ -13,6 +13,8 @@ public class Driver{
 	}
 	
 	public void go() throws IOException{
+		
+		
 		//TODO: bug12: can we abstract this to the actual size of the uploaded file
 		String[][] roomSpreadsheet = new String[81][6];
 		String[][] professorSpreadsheet = new String[2][3];
@@ -39,6 +41,7 @@ public class Driver{
 			if(c.getAssignment()!=null){
 			System.out.println(c.getLongName()+" is in room "+ c.getAssignment().toString());} //"at "+c.getPreferredTimes().get(0));
 		}
+		
 		/*for(Course c: courses){
 			System.out.println(c.toString());
 
