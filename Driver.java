@@ -1,8 +1,15 @@
-import java.rmi.AlreadyBoundException;
-import java.util.*;
-import java.lang.*;
-import java.lang.reflect.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Hashtable;
 public class Driver{
 	
 	public HashMap<String,ArrayList<Room>> buildingMap=new HashMap<String,ArrayList<Room>>(40);
@@ -19,6 +26,7 @@ public class Driver{
 		String[][] courseSpreadsheet = new String[642][16];
 		Hashtable<String,Course> courseHash=new Hashtable<String,Course>(courseSpreadsheet.length*2);
 		Hashtable<String,Professor> professorHash=new Hashtable<String,Professor>(professorSpreadsheet.length*2);
+		Hashtable<String,Time> timeHash=new Hashtable<String,Time>(100);
 		//String[][] profSpreadsheet=new String[338][3];
 		//Read csv file into spreadsheet cell by cell
 		//print2D(courseSpreadsheet);
@@ -31,7 +39,7 @@ public class Driver{
 		//NOTE: I stored nulls because I haven't sanitized the data in any meaningful way yet
 		ArrayList<Room> rooms= generateRooms(roomSpreadsheet);
 		ArrayList<Professor> professors= generateProfessors(professorSpreadsheet,professorHash);
-		ArrayList<Course> courses= generateCourses(courseSpreadsheet,courseHash,buildingMap, professorHash);
+		ArrayList<Course> courses= generateCourses(courseSpreadsheet,courseHash,buildingMap, professorHash, timeHash);
 
 		ArrayList<Course> setCourses= bruteForce(courses);
 		for(Course c:courses){
@@ -113,7 +121,7 @@ public class Driver{
 				continue;
 			}
 			for(Room r:c.getPreferredRooms()){
-				for(Tuple<Time,Time> t: c.getPreferredTimes()){
+				for(Time t: c.getPreferredTimes()){
 					System.out.println(c.toString());
 					if(r.isAssigned(t)){//if the room is assigned at that time
 						//System.out.println("ASSIGNED");
@@ -228,7 +236,7 @@ public class Driver{
 		
 	private boolean canMove(Course c){
 		for(Room r : c.getPreferredRooms()){
-			for(Tuple<Time,Time> t:c.getPreferredTimes()){
+			for(Time t:c.getPreferredTimes()){
 				if(!r.isAssigned(t)) return true;
 			}
 		}
@@ -305,13 +313,11 @@ public class Driver{
 	
 	     
 
-	public ArrayList<Course> generateCourses(String[][] cl, Hashtable<String,Course> ch, HashMap<String,ArrayList<Room>> rH, Hashtable<String,Professor> pH){
+	public ArrayList<Course> generateCourses(String[][] cl, Hashtable<String,Course> ch, HashMap<String,ArrayList<Room>> rH, Hashtable<String,Professor> pH, Hashtable<String,Time> tH){
 		/*
 		 * [Shortname|Longname|Professor|Capacity|Day|Time|Building|RoomNumber|Type|CP|DVD|VCR|Slides|OH|Concurrent|Noncurrent]
 		 */
 	
-		
-
 		System.out.println("Generating Courses");
 		ArrayList<Course> courseList=new ArrayList<Course>();
 		Course temp;
@@ -343,60 +349,31 @@ public class Driver{
 			courseList.add(temp);
 			ch.put(longname, temp);
 			
-			
 			//Making preferred Times Begins
-			
 			String daysOfWeek=cl[row][4];
 			String time=cl[row][5];
 			String[] times=time.split("-",2);
-			char[] dow=daysOfWeek.toCharArray();
-			Time start;
-			Time end;
-			
-			System.out.println("pretemp:");
-			System.out.println();
-			
+			String[] dow=daysOfWeek.split("");
+			Time t;
 			
 			if(!times[0].isEmpty()){
 				for(int i=0;i<dow.length;i++){
-					System.out.println("temp:"+temp.toString());
-					System.out.println(dow);
-					if(dow[i]=='T' && i!=dow.length-1 && dow[i+1]=='H'){
-						i++;
-						char[] th={'T','H'};
-						start=new Time(th,times[0],true);
-						end=new Time(th, times[1],false);
-						temp.addPreferredTimes(new Tuple<Time,Time>(start,end));
+					if (dow[i+1].equals("H")){i++;}
+					if (tH.containsKey(dow[i]+times[0]+times[1])){
+						t=tH.get(dow[i]+times[0]+times[1]);
+					} else {						
+						t=new Time(dow[i],times[0],times[1]);
+						tH.put(dow[i]+times[0]+times[1],t);
 					}
-					else{
-						
-						System.out.println("("+temp.getLongName()+")");
-						if (temp.getLongName().equals("Ecology")){
-							System.out.println("========================================================================================================================================================================================");
-							System.out.println("========================================================================================================================================================================================");
-							System.out.println("========================================================================================================================================================================================");
-							
-							System.out.println(dow);
-							System.out.println(times.toString());
-							
-							
-							
-							System.out.println("========================================================================================================================================================================================");
-							System.out.println("========================================================================================================================================================================================");
-							System.out.println("========================================================================================================================================================================================");
-						}
-						start=new Time(dow[i],times[0],true);
-						end=new Time(dow[i], times[1],false);
-						temp.addPreferredTimes(new Tuple<Time,Time>(start,end));
-					}
+					temp.addPreferredTime(t);
 				}
 			}//End preferredTimes
-			//Handling preferredRooms Begins
 			
+			//Handling preferredRooms Begins
 			if (!cl[row][6].isEmpty()){
 				//Building
 				String buildingShort=cl[row][6];// We should probably check for typos or errors in the building names...-LGS
-					
+												// No, bc GIGO -MCM
 				ArrayList<Room> roomsInBuilding;
 				if (rH.containsKey(buildingShort)){
 					roomsInBuilding=rH.get(buildingShort);

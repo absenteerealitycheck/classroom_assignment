@@ -138,12 +138,12 @@ public class Room{
 		}
 	}
 	
-	public void scheduleRoomForTimes(ArrayList<Tuple<Time,Time>> times){
-		for(Tuple<Time,Time> t:times){
-			Time startTime=t.getFirst();
-			Time endTime=t.getSecond();
-			int dayIndex=startTime.getDay()-2;
-			int startHour=startTime.getMilitaryHour()*2;
+	public void scheduleRoomForTimes(ArrayList<Time> times){
+		for(Time t:times){
+			Time startTime=t.getStartTime();
+			Time blocks=t.getBlocks();
+			int dayIndex=startTime.getDay();
+			int startHour=startTime.getHour()*2;
 			if (startTime.getMinute()==30){
 				startHour++;
 			}
