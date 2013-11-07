@@ -139,59 +139,18 @@ public class Room{
 	}
 	
 	public void scheduleRoomForTimes(ArrayList<Time> times){
-		for(Tuple<Time,Time> t:times){
-			Time startTime=t.getFirst();
-			Time endTime=t.getSecond();
-			int dayIndex=startTime.getDay()-2;
-			int startHour=startTime.getMilitaryHour()*2;
-			if (startTime.getMinute()==30){
-				startHour++;
-			}
-			int endHour=endTime.getMilitaryHour()*2;
-			if (endTime.getMinute()==20){
-				endHour++;
-			} else if (endTime.getMinute()==50){
-				endHour+=2;
-			}
-			for(;startHour<endHour;startHour++){
-				timesAssigned[dayIndex][startHour]++;
+
+		for(Time t:times){
+			int dayIndex=t.getDayOfWeek();
+			int startHalfHour=t.getStartHour()*2;
+			if (t.getStartMinute()==30){startHalfHour++;}
+			int blocks=t.getBlocks();
+			for(int i=0;i<blocks;startHalfHour++){
+				timesAssigned[dayIndex][startHalfHour]++;
+
 			}
 		}
 	}
-		
-	/*public void setTimeTable(ArrayList<Tuple<Time,Time>> times){
-		int dayStart;
-		int hourStart;
-		int minStart;
-		int hourEnd;
-		int minEnd;
-		Time start;
-		Time end;
-		int i; //while start
-		int j; //while end
-		for (Tuple t: times) {
-			start = (Time) t.getFirst();
-			end = (Time) t.getSecond();
-			dayStart = start.getDay()-2;
-			hourStart = start.getMilitaryTime();
-			minStart = start.getMinute();
-			hourEnd = end.getMilitaryTime();
-			minEnd = end.getMinute();
-			i = hourStart*2;
-			j = hourEnd*2;
-			if (i > j) {
-				System.out.println("something's wrong, check for military time: "+
-						i+" "+j); //debugging
-				j=2*(hourEnd+12);
-			}
-			if (minStart > 29) i++;
-			if (minEnd > 29) j++;
-			while (i < j) {
-				timeTable[i][dayStart] = true;
-				i++;
-			}		
-		}
-	}*/
 	
 	public void printTimeTable() {
 		int k = 0;
@@ -208,22 +167,17 @@ public class Room{
 		}
 	}	
 	
-	public boolean isAssigned(Tuple<Time, Time> t) {
+	public boolean isAssigned(Time t) {
 		boolean assigned=false;
-		Time start = t.getFirst();
-		Time end = t.getSecond();
-		int sh=start.getMilitaryHour()*2;
-		if(start.getMinute()==30)sh++;
-		int eh=end.getMilitaryHour()*2;
-		if(end.getMinute()==20)eh++;
-		else if(end.getMinute()==50)eh+=2;
-		System.out.print(start.getDay());
-		int day=t.getFirst().getDay()-2;
-		System.out.println(day+start.toString());
-		//System.out.println("day of week is "+ t.getFirst().getEventTime().getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US)+" and the time is "+ t.getFirst().toString()+"-"+t.getSecond().toString());
-		for(int k=sh;k<eh;k++){
-			//System.out.println("k is "+k+" and day is "+day);
-			if(timesAssigned[day][k] > 0) assigned=true;
+		int day=t.getDayOfWeek();
+		int startHalfHour=t.getStartHour()*2;
+		if (t.getStartMinute()==30){startHalfHour++;}
+		int blocks=t.getBlocks();
+		for(int i=0;i<blocks;startHalfHour++){
+			if (timesAssigned[day][startHalfHour]>0){
+				assigned=true;
+				break;
+			}
 		}
 		return assigned;
 	}

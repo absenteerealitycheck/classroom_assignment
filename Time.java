@@ -44,8 +44,17 @@ public class Time implements Comparable<Time>{
 	}
 	
 	public boolean overlaps(Time t){
-		
-		return false;
+		if (this.startHour<t.startHour){
+			if ((this.startHour+this.blocks)>t.getStartHour()){
+				return true;
+			} else return false;
+		} else {
+			if ((t.getStartHour()+t.getBlocks())>this.startHour){
+				return true;
+			}
+			return false;
+		}
+		//I think this can be a one-liner -MCM
 	}
 
 	public int compareTo(Time t) {
@@ -57,5 +66,41 @@ public class Time implements Comparable<Time>{
 		}
 		
 		return this.startHour-t.startHour;
+	}
+	public int getDayOfWeek() {
+		return dayOfWeek;
+	}
+	public void setDayOfWeek(int dayOfWeek) {
+		this.dayOfWeek = dayOfWeek;
+	}
+	public int getStartHour() {
+		return startHour;
+	}
+	public void setStartHour(int startHour) {
+		this.startHour = startHour;
+	}
+	public int getStartMinute() {
+		return startMinute;
+	}
+	public void setStartMinute(int startMinute) {
+		this.startMinute = startMinute;
+	}
+	public int getEndHour() {
+		return endHour;
+	}
+	public void setEndHour(int endHour) {
+		this.endHour = endHour;
+	}
+	public int getEndMinute() {
+		return endMinute;
+	}
+	public void setEndMinute(int endMinute) {
+		this.endMinute = endMinute;
+	}
+	public int getBlocks() {
+		return blocks;
+	}
+	public void setBlocks(int blocks) {
+		this.blocks = blocks;
 	}
 }
