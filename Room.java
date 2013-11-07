@@ -138,7 +138,7 @@ public class Room{
 		}
 	}
 	
-	public void scheduleRoomForTimes(ArrayList<Tuple<Time,Time>> times){
+	public void scheduleRoomForTimes(ArrayList<Time> times){
 		for(Tuple<Time,Time> t:times){
 			Time startTime=t.getFirst();
 			Time endTime=t.getSecond();
