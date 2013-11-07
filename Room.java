@@ -19,7 +19,9 @@ public class Room{
 	private boolean isAccessible;
     private String type; //lab,seminar,lecture,small,studio
 
-    private boolean[][] timeTable = new boolean[48][5]; //boolean[day][half-hour]
+    //private boolean[][] timeTable = new boolean[48][5]; //boolean[day][half-hour]
+    //the code will run faster when we implement time shifting if half hours are in the subarray
+    private int[][] timesAssigned = new int[5][48]; //boolean[day][half-hour]
 
     private ArrayList<Course> courses;
     
@@ -46,18 +48,16 @@ public class Room{
 
     
     public Room(boolean accessible,String building,String buildingShort,int capacity,String roomNumber,String type){
+    	this(building,roomNumber);
     	this.capacity=capacity;
-    	this.building=building;
     	this.buildingShort=buildingShort;
-    	this.roomNumber=roomNumber;
     	this.isAccessible=accessible;
     	this.type=type.toLowerCase();
-    	this.startTimeTable();
     }
     public Room (String building, String roomNumber){//Secondary constructor for use in generateCourses method
     	this.building=building;
     	this.roomNumber=roomNumber;
-    	this.startTimeTable();
+    	this.initRoomAvailable();
     }
     public boolean inSameBuilding(Room r){
     	return this.building==r.getBuilding();
@@ -130,80 +130,55 @@ public class Room{
 		return this.building+" "+this.roomNumber;
 	}
 	
-	public void startTimeTable() {
-		for (int i=0;i<48;i++) {
-			for (int j=0;j<5;j++) {
-				timeTable[i][j]=false;
+	public void initRoomAvailable() {
+		for (int i=0;i<timesAssigned.length;i++) {
+			for (int j=0;j<timesAssigned[i].length;j++) {
+				timesAssigned[i][j]=0;
 			}
 		}
 	}
-		
-	public void setTimeTable(ArrayList<Tuple<Time,Time>> times){
-		int dayStart;
-		int hourStart;
-		int minStart;
-		int hourEnd;
-		int minEnd;
-		Time start;
-		Time end;
-		int i; //while start
-		int j; //while end
-		for (Tuple t: times) {
-			start = (Time) t.getFirst();
-			end = (Time) t.getSecond();
-			dayStart = start.getDay()-2;
-			hourStart = start.getMilitaryTime();
-			minStart = start.getMinute();
-			hourEnd = end.getMilitaryTime();
-			minEnd = end.getMinute();
-			i = hourStart*2;
-			j = hourEnd*2;
-			if (i > j) {
-				System.out.println("something's wrong, check for military time: "+
-						i+" "+j); //debugging
-				j=2*(hourEnd+12);
+	
+	public void scheduleRoomForTimes(ArrayList<Time> times){
+
+		for(Time t:times){
+			int dayIndex=t.getDayOfWeek();
+			int startHalfHour=t.getStartHour()*2;
+			if (t.getStartMinute()==30){startHalfHour++;}
+			int blocks=t.getBlocks();
+			for(int i=0;i<blocks;startHalfHour++){
+				timesAssigned[dayIndex][startHalfHour]++;
+
 			}
-			if (minStart > 29) i++;
-			if (minEnd > 29) j++;
-			while (i < j) {
-				timeTable[i][dayStart] = true;
-				i++;
-			}
-					
 		}
-			
-	}	
+	}
 	
 	public void printTimeTable() {
 		int k = 0;
-		for (int j =0;j<48;j++) {
+		for (int j =0;j<timesAssigned.length;j++) {
 			k=j/2;
 			if(j%2==0){
 				System.out.print(k+":00 ");
 			}
 			else System.out.print(k+":30 ");
-			for (int i=0;i<5;i++) {
-				System.out.print("	"+timeTable[i][j]+"	");
+			for (int i=0;i<timesAssigned[i].length;i++) {
+				System.out.print("	"+timesAssigned[i][j]+"	");
 			}
 			System.out.println(" ");
 		}
 	}	
 	
-	public boolean isNotAssigned(Tuple<Time, Time> t) {
-		Time start = t.getFirst();
-		Time end = t.getSecond();
-		int sh=start.getMilitaryTime()*2;
-		if(start.getMinute()==30)sh++;
-		int eh=end.getMilitaryTime()*2;
-		if(end.getMinute()==20)eh++;
-		else if(end.getMinute()==50)eh+=2;
-		int day=t.getFirst().getDay()-2;
-		System.out.println("day of week is "+ t.getFirst().getEventTime().getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US)+" and the time is "+ t.getFirst().toString()+"-"+t.getSecond().toString());
-		for(int k=sh;k<eh;k++){
-			System.out.println("k is "+k+" and day is "+day);
-			if(timeTable[k][day]) return false;
+	public boolean isAssigned(Time t) {
+		boolean assigned=false;
+		int day=t.getDayOfWeek();
+		int startHalfHour=t.getStartHour()*2;
+		if (t.getStartMinute()==30){startHalfHour++;}
+		int blocks=t.getBlocks();
+		for(int i=0;i<blocks;startHalfHour++){
+			if (timesAssigned[day][startHalfHour]>0){
+				assigned=true;
+				break;
+			}
 		}
-		
-		return true;
+		return assigned;
 	}
 }

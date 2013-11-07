@@ -6,7 +6,7 @@ public class Course{
 	private String longName;
 	private ArrayList<String> shortName; //courses can be cross listed between departments but will have the same longName I think
 	private ArrayList<String> department; // ^ for example, {CS321,MATH232}
-    private ArrayList<Tuple<Time,Time>> preferredTimes;
+    private ArrayList<Time> preferredTimes;
     private int capacity;
     private ArrayList<Room> preferredRooms;
     private ArrayList<Professor> professors;
@@ -28,7 +28,7 @@ public class Course{
     	
       	this.preferredRooms= new ArrayList<Room>(50);
       	this.shortName=new ArrayList<String>(5);
-      	this.preferredTimes = new ArrayList<Tuple<Time,Time>>(10);
+      	this.preferredTimes = new ArrayList<Time>(10);
       	this.professors = new ArrayList<Professor>(2);
             	
     	discussionCourse=labCourse=lectureCourse=seminarCourse=false;
@@ -37,7 +37,8 @@ public class Course{
     	if (type.equals("lecture")){lectureCourse=true;}
     	if (type.equals("seminar")){seminarCourse=true;}
     }
-
+//make field for do not scehcule, last column will have that  vale when initializing just continue
+    
 	public Room getAssignment() {
 		return assignment;
 	}
@@ -46,7 +47,7 @@ public class Course{
 		this.assignment = assignment;
 	}
 
-	public ArrayList<Tuple<Time, Time>> getPreferredTimes() {
+	public ArrayList<Time> getPreferredTimes() {
 		return preferredTimes;
 	}
 	
@@ -54,7 +55,7 @@ public class Course{
 		return this.preferredTimes.size();
 	}
 	
-	public void addPreferredTimes(Tuple<Time, Time> preferredTime) {
+	public void addPreferredTime(Time preferredTime) {
 		this.preferredTimes.add(preferredTime);
 	}
 	

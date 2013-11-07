@@ -1,132 +1,106 @@
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.Locale;
+import java.io.IOException;
+import java.util.*;
 
-public class Time{
-   
-    private Calendar eventTime;
-	private boolean isStartTime;
+/*
+ * TODO: bug15: Hey guys, we should totally make a hashtable of times so that we dont create the same time object 80 times
+ * TODO: bug16: Fuck. We need to manage our DayOfWeek/Time fields manually; we can't use the Calendar object. Ask me why i would LOVE to tell you. Fuck. -MCM
+ */
 
-    public Time(char dow, String t,  boolean isStartTime){
-    	
-    	this.setEventTime(new GregorianCalendar());
-    	this.isStartTime=isStartTime;
-    	this.setDayOfWeek(dow);
-    	this.setTime(t);
-    	//parse the shit out of s to turn it into a Calendar
-    }
-    public Time(char[] dow, String t,  boolean isStartTime){
-    	this.setEventTime(new GregorianCalendar());
-    	this.isStartTime=isStartTime;
-    	this.setDayThurs(dow);
-    	this.setTime(t);
-    	//parse the shit out of s to turn it into a Calendar
-    }
-   
-    public Calendar getEventTime() {
-		return eventTime;
+
+
+public class Time implements Comparable<Time>{
+	int dayOfWeek; //0-4
+	int startHour;
+	int startMinute;
+	int endHour;
+	int endMinute;
+	int blocks; //number of half hour blocks between start and end
+	String token;
+
+	public Time(String dayOfWeek, String start, String end){
+		this.dayOfWeek=convertDayOfWeek(dayOfWeek);
+		String[]s=start.split(":");
+		String[]e=end.split(":");
+		this.startHour=Integer.parseInt(s[0]);
+		this.startMinute=Integer.parseInt(s[1]);
+		this.endHour=Integer.valueOf(e[0]);
+		this.endMinute=Integer.valueOf(e[1]);
+		this.token=dayOfWeek+start+end;
 	}
-
-	public void setEventTime(Calendar eventTime) {
-		this.eventTime = eventTime;
+	public enum Days{
+		M,T,W,H,F
 	}
-
-	public boolean isStartTime() {
-		return isStartTime;
-	}
-
-	public void setStartTime(boolean isStartTime) {
-		this.isStartTime = isStartTime;
-	}
-	public void setTime(String time){
-		String[] timepieces=time.split(":",2);
-		String ampm=timepieces[1].substring(timepieces[1].length()-2);
-		String min= timepieces[1].substring(0, 2);
-		if(ampm.equals("PM")){
-		eventTime.set(Calendar.AM_PM, Calendar.PM);
+	private int convertDayOfWeek(String dow){
+	
+		switch(Days.valueOf(dow)){
+		case M: return 0;
+		case T: return 1;
+		case W: return 2;
+		case H: return 3;
+		case F: return 4;
 		
 		}
-		else{
-			eventTime.set(Calendar.AM_PM, Calendar.AM);
-		
-		}
-		eventTime.set(Calendar.HOUR, Integer.parseInt(timepieces[0]));
-		eventTime.set(Calendar.MINUTE, Integer.parseInt(min));
-	}
-
-    public int getHour() {
-	int h = eventTime.get(Calendar.HOUR);
-	if (h==0) h=12;
-	return h;
-
-    }
-
-    public int getMinute() {
-	int m = eventTime.get(Calendar.MINUTE);
-      	return m;
-    }
-    
-    public int getDay() {
-    int d = eventTime.get(Calendar.DAY_OF_WEEK);
-    return d;
-    
-    }
-    
-    public void setDayThurs(char[]c){
-		eventTime.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
-	}
-	public void setDayOfWeek(char c){
-		
-			if(c=='M'){
-				eventTime.set(Calendar.DAY_OF_WEEK,Calendar.MONDAY);
-			}
-			if(c=='W'){
-				eventTime.set(Calendar.DAY_OF_WEEK,Calendar.WEDNESDAY);
-			}
-			if(c=='F'){
-				eventTime.set(Calendar.DAY_OF_WEEK,Calendar.FRIDAY);
-			}
-			if(c=='T'){
-				
-					eventTime.set(Calendar.DAY_OF_WEEK,Calendar.TUESDAY);
-				
-			}
-		
-	}
-
-	public int getMilitaryTime(){
-		int t = this.eventTime.get(Calendar.HOUR);
-		if(this.eventTime.get(Calendar.AM_PM)==1) {
-			if(t<12) t=t+12;
-		}
-		else if (this.eventTime.get(Calendar.AM_PM)==0){
-			if(t==0)t=t+12;
-		}
-		else System.out.println("You dun fucked up");
-		return t;
+		return -1;
 	}
 	
-	public String toString(){
-		int h=this.eventTime.get(Calendar.HOUR);
-		int m=this.eventTime.get(Calendar.MINUTE);
-		String min="";
-		String hour="";
-		if(h==0){
-			hour="12";
+	public boolean overlaps(Time t){
+		if (this.startHour<t.startHour){
+			if ((this.startHour+this.blocks)>t.getStartHour()){
+				return true;
+			} else return false;
+		} else {
+			if ((t.getStartHour()+t.getBlocks())>this.startHour){
+				return true;
+			}
+			return false;
 		}
-		else{
-			hour=Integer.toString(h);
+		//I think this can be a one-liner -MCM
+	}
+
+	public int compareTo(Time t) {
+		//returns negative if one is earlier than two
+		//returns positive if one is later than two
+		//returns 0 for same start hour and minute
+		if (this.startHour==t.startHour){
+			return this.startMinute-t.startMinute;
 		}
-		if(m==0){
-			min="00";
-		}
-		else{
-			min=Integer.toString(m);
-		}
-		if(this.isStartTime){
-			
-		return this.eventTime.getDisplayName(Calendar.DAY_OF_WEEK,Calendar.SHORT, Locale.US)+" "+hour+":"+min;}
-		else
-			return hour+":"+min;
+		
+		return this.startHour-t.startHour;
+	}
+	public int getDayOfWeek() {
+		return dayOfWeek;
+	}
+	public void setDayOfWeek(int dayOfWeek) {
+		this.dayOfWeek = dayOfWeek;
+	}
+	public int getStartHour() {
+		return startHour;
+	}
+	public void setStartHour(int startHour) {
+		this.startHour = startHour;
+	}
+	public int getStartMinute() {
+		return startMinute;
+	}
+	public void setStartMinute(int startMinute) {
+		this.startMinute = startMinute;
+	}
+	public int getEndHour() {
+		return endHour;
+	}
+	public void setEndHour(int endHour) {
+		this.endHour = endHour;
+	}
+	public int getEndMinute() {
+		return endMinute;
+	}
+	public void setEndMinute(int endMinute) {
+		this.endMinute = endMinute;
+	}
+	public int getBlocks() {
+		return blocks;
+	}
+	public void setBlocks(int blocks) {
+		this.blocks = blocks;
 	}
 }
