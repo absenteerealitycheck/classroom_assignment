@@ -427,6 +427,15 @@ public class Driver{
 				temp.addPreferredRoomsList(roomsInBuilding);
 				
 			}//Making preferredRooms Ends
+			//remove rooms based on access if need be
+			boolean work=false;
+			for(Professor pr: temp.getProfessors()){
+				if(pr.isNeedsAccess())
+					work=true;
+			}
+			if(work)
+				temp.cleanse();
+			//prefRooms are now cleansed if the professor needs accessible rooms
 		}
 		courseList.trimToSize();
 		return courseList;

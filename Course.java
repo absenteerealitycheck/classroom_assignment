@@ -180,4 +180,11 @@ public class Course{
 	public String toString(){
 		return this.longName+" ("+this.shortName+")";
 	}
+	
+	public void cleanse(){
+		for(Room r: preferredRooms){
+			if(!r.isAccessible())
+				preferredRooms.remove(r);
+		}
+	}
 }

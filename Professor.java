@@ -15,6 +15,7 @@ public class Professor{
     private ArrayList<Time> prefTimes; //was a single time but made it an ArrayList in case there are multiple -cbb
     //private boolean stairs; //I don't think we need this, we can probably roll it into preferredRooms
     private ArrayList<Course> courses;
+    private boolean needsAccess;
     
     public Professor(String s){
     	name=s;
@@ -22,16 +23,19 @@ public class Professor{
     	this.department=new ArrayList<String>(5);
     	this.prefTimes=new ArrayList<Time>(10);
     	this.courses= new ArrayList<Course>(5);
+    	needsAccess=false;
     }
     public Professor(String s, ArrayList<Room> r, ArrayList<String> d){    	
     	this(s);
     	offices=r;
     	department=d;
+    	needsAccess=false;
     }
-    public Professor(String s, ArrayList<Room> r, ArrayList<String> d, ArrayList<Time> t, ArrayList<Course> c){
+    public Professor(String s, ArrayList<Room> r, ArrayList<String> d, ArrayList<Time> t, ArrayList<Course> c, boolean b){
     	this(s,r,d);
     	prefTimes=t;
     	courses=c;
+    	needsAccess=b;
     }
     //Accessors and Modifiers Start
     public String getName() {
@@ -76,8 +80,15 @@ public class Professor{
 		prefTimes=t;
 	}
 	
+	public boolean isNeedsAccess() {
+		return needsAccess;
+	}
+	public void setNeedsAccess(boolean needsAccess) {
+		this.needsAccess = needsAccess;
+	}
 	public String toString(){
 		return this.getName();
 	}
+	
 	//Accessors and Modifiers End
 }
