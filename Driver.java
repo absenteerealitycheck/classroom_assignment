@@ -20,7 +20,7 @@ public class Driver{
 	}
 	
 	public void go() throws IOException{
-		
+		boolean lexie=true;
 		boolean testing=false;
 		//TODO: bug12: can we abstract this to the actual size of the uploaded file
 		String[][] roomSpreadsheet = new String[81][6];
