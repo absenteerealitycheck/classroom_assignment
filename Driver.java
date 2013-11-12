@@ -126,7 +126,8 @@ public class Driver{
 		System.out.println("No missing times?: "+allTimesPresent);
 	
 		
-	}
+	} //END GO===================================================================
+	
 	public ArrayList<Course> bruteForce(ArrayList<Course> courses){
 		double counter=0;
 		for(Course c:courses){

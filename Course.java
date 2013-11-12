@@ -180,4 +180,19 @@ public class Course{
 	public String toString(){
 		return this.longName+" ("+this.shortName+")";
 	}
+	
+	public void roomCheck() { //split into separate methods?
+		Room r;
+		for (int i=0;i<preferredRooms.size()-1;i++){
+			r=preferredRooms.get(i);
+			if (r.getCapacity() < this.capacity) {
+				//System.out.println("Course Cap: "+this.capacity+" Room Cap: "+r.getCapacity());
+				preferredRooms.remove(i);
+			}
+			if (!r.getType().equals(this.getType())) {
+				//System.out.println("Course Type: "+this.getType()+ " Room Type: "+r.getType());
+				preferredRooms.remove(i);
+			}
+		}
+	}
 }
