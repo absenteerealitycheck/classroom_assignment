@@ -69,7 +69,7 @@ public class Course{
 	public void setAssignment(Room assignment) {
 		this.assignment = assignment;
 	}
-	public ArrayList<Room> filterRooms(ArrayList<Room> pR){
+	public ArrayList<Room> filterRooms(ArrayList<Room> pR){//checks the room's Tech against the courses Tech needs
 		//System.out.println("pr"+ pR.toString());
 		for(Iterator<Room> it = pR.iterator(); it.hasNext();){
 			Room r=it.next();
@@ -236,9 +236,10 @@ public class Course{
 	
 
 	public void cleanse(){
-		for(Room r: preferredRooms){
+		for(Iterator<Room> it=this.getPreferredRooms().iterator();it.hasNext();){
+			Room r=it.next();
 			if(!r.isAccessible())
-				preferredRooms.remove(r);
+				it.remove();
 		}
 	}
 
