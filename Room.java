@@ -13,12 +13,31 @@ public class Room{
 							    * -cbb
 							    */
 	//private String nickname; //should this be a thing for "Blackbox "Buckley Recital Hall" etc?
+	//Spare Technology booleans
+//	private boolean hasCassette;
+//	private boolean hasLaser;
+//	private boolean hasCD;
+//	private boolean regionFree;
+
+//	private boolean hasPC;
+//	private boolean islaptop;
+//	private boolean hasLCD;
+//	private boolean hasTV;
+//	private int screenSize;
+//	private boolean isFlatscreen;
+//	private boolean isMultiformat;
 	private int capacity;
 	private String building;
 	private String buildingShort;
 	private boolean isAccessible;
     private String type; //lab,seminar,lecture,small,studio
-
+   /* private boolean hasProj;
+	private boolean hasDVD;
+ 	private boolean hasVCR;
+	
+	private boolean hasOverhead;*/
+	boolean[] tech;
+	private int numberOfSlides;
     //private boolean[][] timeTable = new boolean[48][5]; //boolean[day][half-hour]
     //the code will run faster when we implement time shifting if half hours are in the subarray
     private int[][] timesAssigned = new int[5][48]; //boolean[day][half-hour]
@@ -26,27 +45,7 @@ public class Room{
     private ArrayList<Course> courses;
     
 
-    private class Technology{
-    	//28-10: I dont think we should touch this yet 
-    	private boolean isSmall;
-    	private boolean hasProj;
-    	private boolean hasCassette;
-    	private boolean hasLaser;
-    	private boolean hasCD;
-    	private boolean regionFree;
-    	private boolean hasVCR;
-    	private boolean hasPC;
-    	private boolean islaptop;
-    	private boolean hasLCD;
-    	private boolean hasTV;
-    	private int screenSize;
-    	private boolean isFlatscreen;
-    	private boolean isMultiformat;
-    	
-    	private Technology(){}
-    }
-
-    
+   
     public Room(boolean accessible,String building,String buildingShort,int capacity,String roomNumber,String type){
     	this(building,roomNumber);
     	this.capacity=capacity;
@@ -59,7 +58,33 @@ public class Room{
     	this.roomNumber=roomNumber;
     	this.initRoomAvailable();
     }
-    public boolean inSameBuilding(Room r){
+ 	
+    public void setTechnology(boolean[] t, int numberOfSlides){
+    		this.tech=t;
+    		this.numberOfSlides=numberOfSlides;
+    	}
+  public boolean[] getTechnology(){
+	  return this.tech;
+  }
+   /* public boolean hasProj() {
+		return hasProj;
+	}
+	public boolean hasDVD() {
+		return hasDVD;
+	}
+	public boolean hasVCR() {
+		return hasVCR;
+	}*/
+	public int getNumberOfSlides() {
+		return numberOfSlides;
+	}
+	/*public boolean hasOverhead() {
+		return hasOverhead;
+	}*/
+	public int[][] getTimesAssigned() {
+		return timesAssigned;
+	}
+	public boolean inSameBuilding(Room r){
     	return this.building==r.getBuilding();
     }
     
