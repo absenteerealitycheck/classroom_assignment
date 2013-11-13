@@ -240,7 +240,7 @@ public class Course{
 		}
 	}
 
-	public void roomCheck() { //split into separate methods?
+	public void checkCapacity() { //split into separate methods?
 		Room r;
 		for (Iterator i = preferredRooms.iterator();i.hasNext();){
 			r=(Room) i.next();
@@ -249,12 +249,23 @@ public class Course{
 				System.out.println("Course Cap: "+this.capacity+" Room Cap: "+r.getCapacity());
 				i.remove();
 			}
-			else if (!r.getType().equals(this.getType().toLowerCase())) {
-				System.out.println("Course Type: "+this.getType().toLowerCase()+ " Room Type: "+r.getType());
-				i.remove();
-			}
+			
 			else System.out.println("LEGIT");
 		}
-		this.preferredRooms=preferredRooms;
+	}
+	
+	public void checkLabs() {
+		Room r;
+		if (this.getType().toLowerCase().equals("lab")){
+			for (Iterator i = preferredRooms.iterator();i.hasNext();){
+				r=(Room) i.next();
+				if(!r.getType().toLowerCase().equals("lab")) {
+					System.out.print(r.getBuildingShort()+"-"+r.getRoomNumber()+": ");
+					System.out.println("Course Type: "+this.getType().toLowerCase()+" Room Type: "+
+										r.getType().toLowerCase());
+					i.remove();
+				}
+			}
+		}
 	}
 }
