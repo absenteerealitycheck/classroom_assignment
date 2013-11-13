@@ -55,9 +55,20 @@ public class Driver{
 		ArrayList<Course> courses= generateCourses(courseSpreadsheet,courseHash,buildingMap, professorHash, timeHash);
 		courses.trimToSize();
 		
+		for (Course c: courses) {
+			System.out.println("==="+c.getLongName()+"==="+c.getPreferredRooms().size());
+			c.roomCheck();
+			//for (Room r : c.getPreferredRooms()){
+				//System.out.println(r.getBuildingShort()+"-"+r.getRoomNumber());
+			//}
+		}
+		
 		ArrayList<Course> setCourses= bruteForce(courses);
-		/*for(Course c:courses){
-			System.out.println("Preferred: "+c.getPreferredRooms());
+/*
+
+		for(Course c:courses){
+			System.out.println(c.getLongName()+" Preferred: "+c.getPreferredRooms());
+
 			if(c.getAssignment()!=null){
 			System.out.println(c.getLongName()+" is in room "+ c.getAssignment().toString());} //"at "+c.getPreferredTimes().get(0));
 		}*/
@@ -125,6 +136,7 @@ public class Driver{
 		
 		System.out.println("No missing times?: "+allTimesPresent);
 	
+
 		
 	} //END GO===================================================================
 	
@@ -139,7 +151,9 @@ public class Driver{
 			}
 			for(Room r:c.getPreferredRooms()){
 				for(Time t: c.getPreferredTimes()){
-					//System.out.println(c.toString()+"what?");
+
+					//System.out.println(c.toString());
+
 					if(r.isAssigned(t)){//if the room is assigned at that time
 						//System.out.println("ASSIGNED");
 						if(r.equals(c.getPreferredRooms().get(c.getPreferredRooms().size()-1))){
