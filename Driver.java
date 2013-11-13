@@ -57,7 +57,8 @@ public class Driver{
 		
 		for (Course c: courses) {
 			System.out.println("==="+c.getLongName()+"==="+c.getPreferredRooms().size());
-			c.roomCheck();
+			c.checkCapacity();
+			c.checkLabs();
 			//for (Room r : c.getPreferredRooms()){
 				//System.out.println(r.getBuildingShort()+"-"+r.getRoomNumber());
 			//}
