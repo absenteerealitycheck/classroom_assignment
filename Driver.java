@@ -303,18 +303,14 @@ public class Driver{
 			int slidesNeeded=0;
 			for(int i=0;i<tech.length;i++){
 				//System.out.println("i is "+i+" row length at 0 "+ rS[0].length);
-				tech[i]=changeX(rS[row][i+6]);
-				if(i==3&&changeX(rS[row][i+6])){
+				tech[i]= rS[row][i+6].isEmpty();
+				if(i==3&&!(rS[row][i+6].isEmpty())){
 					 slidesNeeded=Integer.parseInt(rS[row][9]);
 				}
 			}
 			
 			
-			/*boolean hasProj=changeX(rS[row][6]);
-			boolean hasDVD=changeX(rS[row][7]);
-			boolean hasVCR=changeX(rS[row][8]);
-			int numberOfSlides=Integer.parseInt(rS[row][9]);
-			boolean hasOverhead=changeX(rS[row][10]);*/
+			
 			Room r = new Room(accessible,buildingName, buildingShort, capacity,roomNumber,type);
 			r.setTechnology(tech,slidesNeeded);
 					
@@ -326,12 +322,7 @@ public class Driver{
 		System.out.println("WOOT WOOT");
 		return rooms;
 	}
-	public boolean changeX(String rS){
-		if(!rS.isEmpty()){
-			return true;
-		}
-		return false;
-	}
+	
 	public void addToBuilding(Room r) {
 		String b=r.getBuildingShort();
 		if(buildingMap.containsKey(b))
@@ -406,8 +397,8 @@ public class Driver{
 			boolean[]tech=new boolean[5];
 			int slidesNeeded=0;
 			for(int i=0;i<tech.length;i++){
-				tech[i]=changeX(cl[row][i+9]);
-				if(i==3&&changeX(cl[row][i+9])){
+				tech[i]=cl[row][i+9].isEmpty();
+				if(i==3&&!(cl[row][i+9].isEmpty())){
 					 slidesNeeded=Integer.parseInt(cl[row][12]);
 				}
 			}
@@ -449,9 +440,9 @@ public class Driver{
 					System.out.println("Throw an error for "+buildingShort+"!");
 					continue;
 				}
-				System.out.println("for course: "+temp.getShortName()+" "+roomsInBuilding.toString() +" before");
-				temp.filterRooms(roomsInBuilding);
-				System.out.println("for course: "+temp.getShortName()+" "+roomsInBuilding.toString() +" after");
+				//System.out.println("for course: "+temp.getShortName()+" "+roomsInBuilding.toString() +" before");
+				temp.techFilterRooms(roomsInBuilding);
+				//System.out.println("for course: "+temp.getShortName()+" "+roomsInBuilding.toString() +" after");
 				//Room Number
 				
 				/* TODO:bug13: modify this code so roomnum can be a comma seperated list of rooms

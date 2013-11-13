@@ -69,22 +69,19 @@ public class Course{
 	public void setAssignment(Room assignment) {
 		this.assignment = assignment;
 	}
-	public ArrayList<Room> filterRooms(ArrayList<Room> pR){//checks the room's Tech against the courses Tech needs
-		//System.out.println("pr"+ pR.toString());
+	public ArrayList<Room> techFilterRooms(ArrayList<Room> pR){//checks the room's Tech against the courses Tech needs
+		
 		for(Iterator<Room> it = pR.iterator(); it.hasNext();){
 			Room r=it.next();
 			if(hasSomething(this.getTech())&&(!compare(this.getTech(), r.getTechnology()))){
-				System.out.println("looking at "+r.toString());
 				it.remove();
 			}
 		}
 		
 		if(!pR.isEmpty()){
-			return pR;
-		}
-		else{
 			System.out.println("There are no rooms in that buiding that work");
-		return pR;}
+		}
+		return pR;
 	}
 	public boolean compare(boolean[] a1, boolean[] a2){
 		for (int j = 0; j<a1.length; j++) {
