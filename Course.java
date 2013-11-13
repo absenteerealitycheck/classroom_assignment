@@ -191,16 +191,19 @@ public class Course{
 
 	public void roomCheck() { //split into separate methods?
 		Room r;
-		for (int i=0;i<preferredRooms.size()-1;i++){
-			r=preferredRooms.get(i);
+		for (Iterator i = preferredRooms.iterator();i.hasNext();){
+			r=(Room) i.next();
+			System.out.print(r.getBuildingShort()+"-"+r.getRoomNumber()+": ");
 			if (r.getCapacity() < this.capacity) {
-				//System.out.println("Course Cap: "+this.capacity+" Room Cap: "+r.getCapacity());
-				preferredRooms.remove(i);
+				System.out.println("Course Cap: "+this.capacity+" Room Cap: "+r.getCapacity());
+				i.remove();
 			}
-			if (!r.getType().equals(this.getType())) {
-				//System.out.println("Course Type: "+this.getType()+ " Room Type: "+r.getType());
-				preferredRooms.remove(i);
+			else if (!r.getType().equals(this.getType().toLowerCase())) {
+				System.out.println("Course Type: "+this.getType().toLowerCase()+ " Room Type: "+r.getType());
+				i.remove();
 			}
+			else System.out.println("LEGIT");
 		}
+		this.preferredRooms=preferredRooms;
 	}
 }

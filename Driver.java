@@ -55,9 +55,17 @@ public class Driver{
 		ArrayList<Course> courses= generateCourses(courseSpreadsheet,courseHash,buildingMap, professorHash, timeHash);
 		courses.trimToSize();
 		
+		for (Course c: courses) {
+			System.out.println("==="+c.getLongName()+"==="+c.getPreferredRooms().size());
+			c.roomCheck();
+			//for (Room r : c.getPreferredRooms()){
+				//System.out.println(r.getBuildingShort()+"-"+r.getRoomNumber());
+			//}
+		}
+		
 		ArrayList<Course> setCourses= bruteForce(courses);
 		for(Course c:courses){
-			System.out.println("Preferred: "+c.getPreferredRooms());
+			System.out.println(c.getLongName()+" Preferred: "+c.getPreferredRooms());
 			if(c.getAssignment()!=null){
 			System.out.println(c.getLongName()+" is in room "+ c.getAssignment().toString());} //"at "+c.getPreferredTimes().get(0));
 		}
@@ -125,6 +133,7 @@ public class Driver{
 		
 		System.out.println("No missing times?: "+allTimesPresent);
 	
+
 		
 	} //END GO===================================================================
 	
@@ -139,7 +148,7 @@ public class Driver{
 			}
 			for(Room r:c.getPreferredRooms()){
 				for(Time t: c.getPreferredTimes()){
-					System.out.println(c.toString());
+					//System.out.println(c.toString());
 					if(r.isAssigned(t)){//if the room is assigned at that time
 						//System.out.println("ASSIGNED");
 						if(r.equals(c.getPreferredRooms().get(c.getPreferredRooms().size()-1))){
@@ -313,7 +322,7 @@ public class Driver{
 		ArrayList<Professor> profList=new ArrayList<Professor>();
 		for(int row=1;row<profs.length;row++){
 			String name=profs[row][0];
-			System.out.println(name);
+			//System.out.println(name);
 			Professor p=new Professor(name);
 			//Don't forget that we're setting the size of profList by hand up in go()
 			if (pH.containsKey(name)){//we should "probably" write our own exception. 
@@ -378,7 +387,7 @@ public class Driver{
 			
 			if(!times[0].isEmpty()){
 				for(int i=0;i<dow.length;i++){
-					System.out.println(daysOfWeek);
+					//System.out.println(daysOfWeek);
 					if (i<dow.length-1&&dow[i+1].equals("H")){i++;}
 					if (tH.containsKey(dow[i]+times[0]+times[1])){
 						t=tH.get(dow[i]+times[0]+times[1]);
