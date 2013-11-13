@@ -1,81 +1,81 @@
-building;number;capacity;type;accessible;buildingShort
-Barrett;102;32;lecture;TRUE;BARR
-Barrett;105;18;seminar;FALSE;BARR
-Chapin;101;37;seminar;FALSE;CHAP
-Chapin;103;16;seminar;TRUE;CHAP
-Chapin;119;16;seminar;TRUE;CHAP
-Chapin;201;51;lecture;FALSE;CHAP
-Chapin;203;27;lecture;FALSE;CHAP
-Chapin;204;20;lecture;FALSE;CHAP
-Chapin;205;18;lecture;FALSE;CHAP
-Chapin;210;16;lecture;FALSE;CHAP
-Clark;100;16;lecture;FALSE;CLAR
-Converse;108;137;lecture;TRUE;CONV
-Converse;207;35;small;FALSE;CONV
-Converse;208;16;small;FALSE;CONV
-Converse;209;35;small;FALSE;CONV
-Converse;302;20;small;FALSE;CONV
-Converse;304;20;small;FALSE;CONV
-Converse;308;20;lecture;FALSE;CONV
-Cooper;101;10;seminar;FALSE;COOP
-Cooper;201;10;seminar;FALSE;COOP
-Earth Sciences;107;56;lecture;FALSE;BEBU
-Earth Sciences;100;99;lab;TRUE;BEBU
-Earth Sciences;203;99;lab;TRUE;BEBU
-Earth Sciences;211;99;lab;FALSE;BEBU
-Earth Sciences;300;99;lab;FALSE;BEBU
-Earth Sciences;303;99;lab;FALSE;BEBU
-Earth Sciences;311;99;lab;FALSE;BEBU
-Fayerweather;1;99;studio;TRUE;FAYE
-Fayerweather;17B;99;studio;FALSE;FAYE
-Fayerweather;101;99;studio;FALSE;FAYE
-Fayerweather;113;31;seminar;FALSE;FAYE
-Fayerweather;115;80;lecture;FALSE;FAYE
-Fayerweather;117;33;small;FALSE;FAYE
-Fayerweather;201;99;lab;FALSE;FAYE
-Fayerweather;205;99;lab;TRUE;FAYE
-Fayerweather;217A;19;small;TRUE;FAYE
-Fayerweather;303;99;lab;TRUE;FAYE
-Johnson Chapel;21;40;lab;FALSE;JOCH
-Kirby;theater;99;studio;FALSE;KIRB
-Life Science;230;16;seminar;FALSE;MCLS
-Life Science;428;16;seminar;FALSE;MCLS
-Mead;115;188;lecture;FALSE;MEAD
-Merrill;1;168;lecture;TRUE;MERR
-Merrill;2;145;lecture;TRUE;MERR
-Merrill;3;70;lecture;FALSE;MERR
-Merrill;4;76;lecture;FALSE;MERR
-Merrill;131;46;semnar;TRUE;MERR
-Merrill;209;15;seminar;FALSE;MERR
-Merrill;211;15;seminar;FALSE;MERR
-Merrill;220;33;small;FALSE;MERR
-Merrill;314;16;small;FALSE;MERR
-Merrill;315;32;small;FALSE;MERR
-Merrill;401;27;small;TRUE;MERR
-Merrill;403;35;small;FALSE;MERR
-Merrill;430;16;small;TRUE;MERR
-Morgan;111;99;small;FALSE;MORG
-Music;3;120;lecture;FALSE;ARMU
-Music;7;50;small;FALSE;ARMU
-Music;102;27;studio;TRUE;ARMU
-Music;105;450;studio;FALSE;ARMU
-Music;212;47;studio;TRUE;ARMU
-Newport;100;20;small;FALSE;NXXX
-Octagon;201;33;small;FALSE;OCTA
-Seeley Mudd;202;12;small;FALSE;SMUD
-Seeley Mudd;203;12;small;FALSE;SMUD
-Seeley Mudd;204;36;small;FALSE;SMUD
-Seeley Mudd;205;36;small;TRUE;SMUD
-Seeley Mudd;206;56;small;FALSE;SMUD
-Seeley Mudd;207;36;small;TRUE;SMUD
-Webster;8;99;lab;TRUE;WEBS
-Webster;19;99;lab;TRUE;WEBS
-Webster;101;22;small;FALSE;WEBS
-Webster;102;20;small;FALSE;WEBS
-Webster;115;10;small;FALSE;WEBS
-Webster;117;99;lab;TRUE;WEBS
-Webster;122;99;lab;FALSE;WEBS
-Webster;215;99;lab;FALSE;WEBS
-Webster;217;32;seminar;TRUE;WEBS
-Webster;219;15;seminar;TRUE;WEBS
-Webster;220;35;small;TRUE;WEBS
+building;number;capacity;type;accessible;buildingShort;CP;DVD;VCR;Slides;OH
+Barrett;102;32;lecture;TRUE;BARR;X;X;X;1;X
+Barrett;105;18;seminar;FALSE;BARR;X;X;X;1;X
+Chapin;101;37;seminar;FALSE;CHAP;X;X;X;;
+Chapin;103;16;seminar;TRUE;CHAP;X;X;X;;
+Chapin;119;16;seminar;TRUE;CHAP;X;X;X;;
+Chapin;201;51;lecture;FALSE;CHAP;;X;X;;
+Chapin;203;27;lecture;FALSE;CHAP;X;X;X;;
+Chapin;204;20;lecture;FALSE;CHAP;;;X;;
+Chapin;205;18;lecture;FALSE;CHAP;X;X;X;;
+Chapin;210;16;lecture;FALSE;CHAP;X;X;X;;
+Clark;100;16;lecture;FALSE;CLAR;;X;X;;
+Converse;108;137;lecture;TRUE;CONV;X;X;X;1;
+Converse;207;35;small;FALSE;CONV;X;X;X;;
+Converse;208;16;small;FALSE;CONV;;;;;
+Converse;209;35;small;FALSE;CONV;X;X;X;;
+Converse;302;20;small;FALSE;CONV;X;X;X;;
+Converse;304;20;small;FALSE;CONV;X;X;X;;
+Converse;308;20;lecture;FALSE;CONV;X;X;X;;
+Cooper;101;10;seminar;FALSE;COOP;;X;X;;
+Cooper;201;10;seminar;FALSE;COOP;;;;;
+Earth Sciences;107;56;lecture;FALSE;BEBU;X;X;X;;X
+Earth Sciences;100;99;lab;TRUE;BEBU;;;;;
+Earth Sciences;203;99;lab;TRUE;BEBU;;;;;
+Earth Sciences;211;99;lab;FALSE;BEBU;;;;;
+Earth Sciences;300;99;lab;FALSE;BEBU;;;;;
+Earth Sciences;303;99;lab;FALSE;BEBU;;;;;
+Earth Sciences;311;99;lab;FALSE;BEBU;;;;;
+Fayerweather;1;99;studio;TRUE;FAYE;;;;;
+Fayerweather;17B;99;studio;FALSE;FAYE;;;;;
+Fayerweather;101;99;studio;FALSE;FAYE;;;;;
+Fayerweather;113;31;seminar;FALSE;FAYE;X;X;X;3;
+Fayerweather;115;80;lecture;FALSE;FAYE;X;X;X;6;
+Fayerweather;117;33;small;FALSE;FAYE;X;X;X;3;
+Fayerweather;201;99;lab;FALSE;FAYE;;;;;
+Fayerweather;205;99;lab;TRUE;FAYE;;;;;
+Fayerweather;217A;19;small;TRUE;FAYE;X;X;X;3;
+Fayerweather;303;99;lab;TRUE;FAYE;;;;;
+Johnson Chapel;21;40;lab;FALSE;JOCH;X;X;X;;
+Kirby;theater;99;studio;FALSE;KIRB;;;;;
+Life Science;230;16;seminar;FALSE;MCLS;X;X;X;;
+Life Science;428;16;seminar;FALSE;MCLS;X;X;X;;
+Mead;115;188;lecture;FALSE;MEAD;X;X;X;3;
+Merrill;1;168;lecture;TRUE;MERR;X;X;X;1;
+Merrill;2;145;lecture;TRUE;MERR;X;X;X;1;
+Merrill;3;70;lecture;FALSE;MERR;X;X;X;2;
+Merrill;4;76;lecture;FALSE;MERR;X;X;X;1;
+Merrill;131;46;semnar;TRUE;MERR;X;X;X;2;
+Merrill;209;15;seminar;FALSE;MERR;;;;;
+Merrill;211;15;seminar;FALSE;MERR;;;;;
+Merrill;220;33;small;FALSE;MERR;X;X;X;1;
+Merrill;314;16;small;FALSE;MERR;X;X;X;;
+Merrill;315;32;small;FALSE;MERR;X;X;X;;
+Merrill;401;27;small;TRUE;MERR;;;X;;
+Merrill;403;35;small;FALSE;MERR;X;X;X;;
+Merrill;430;16;small;TRUE;MERR;;;;;
+Morgan;111;99;small;FALSE;MORG;;;;;
+Music;3;120;lecture;FALSE;ARMU;;;;;
+Music;7;50;small;FALSE;ARMU;;;X;;
+Music;102;27;studio;TRUE;ARMU;X;X;X;;
+Music;105;450;studio;FALSE;ARMU;;;;;
+Music;212;47;studio;TRUE;ARMU;X;X;X;;
+Newport;100;20;small;FALSE;NXXX;;X;X;;
+Octagon;201;33;small;FALSE;OCTA;;;;;
+Seeley Mudd;202;12;small;FALSE;SMUD;;;;;
+Seeley Mudd;203;12;small;FALSE;SMUD;;;;;
+Seeley Mudd;204;36;small;FALSE;SMUD;;;;;
+Seeley Mudd;205;36;small;TRUE;SMUD;X;;;;
+Seeley Mudd;206;56;small;FALSE;SMUD;X;;;;
+Seeley Mudd;207;36;small;TRUE;SMUD;X;;;;
+Webster;8;99;lab;TRUE;WEBS;;;;;
+Webster;19;99;lab;TRUE;WEBS;;;;;
+Webster;101;22;small;FALSE;WEBS;X;X;X;1;
+Webster;102;20;small;FALSE;WEBS;;;;;
+Webster;115;10;small;FALSE;WEBS;;;;;
+Webster;117;99;lab;TRUE;WEBS;;;;;
+Webster;122;99;lab;FALSE;WEBS;;;;;
+Webster;215;99;lab;FALSE;WEBS;;;;;
+Webster;217;32;seminar;TRUE;WEBS;X;X;X;1;
+Webster;219;15;seminar;TRUE;WEBS;X;X;X;;
+Webster;220;35;small;TRUE;WEBS;X;X;X;1;
