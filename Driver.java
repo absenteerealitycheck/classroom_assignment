@@ -11,14 +11,13 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Hashtable;
 public class Driver{
-	
+
 	public HashMap<String,ArrayList<Room>> buildingMap=new HashMap<String,ArrayList<Room>>(40);
 	public ArrayList<Course> badCourses= new ArrayList<Course>(15);
 	public static void main (String args[]) throws IOException{
 		new Driver().go();
-		
 	}
-	
+
 	public void go() throws IOException{
 		boolean lexie=true;
 		boolean testing=false;
@@ -46,7 +45,7 @@ public class Driver{
 		}
 		//print2D(roomSpreadsheet);
 		print2D(professorSpreadsheet);
-		
+
 		//NOTE: I stored nulls because I haven't sanitized the data in any meaningful way yet
 		ArrayList<Room> rooms= generateRooms(roomSpreadsheet);
 		rooms.trimToSize();
@@ -54,18 +53,18 @@ public class Driver{
 		professors.trimToSize();
 		ArrayList<Course> courses= generateCourses(courseSpreadsheet,courseHash,buildingMap, professorHash, timeHash);
 		courses.trimToSize();
-		
+
 		for (Course c: courses) {
 			System.out.println("==="+c.getLongName()+"==="+c.getPreferredRooms().size());
 			c.checkCapacity();
 			c.checkLabs();
 			//for (Room r : c.getPreferredRooms()){
-				//System.out.println(r.getBuildingShort()+"-"+r.getRoomNumber());
+			//System.out.println(r.getBuildingShort()+"-"+r.getRoomNumber());
 			//}
 		}
-		
+
 		ArrayList<Course> setCourses= bruteForce(courses);
-/*
+		/*
 
 		for(Course c:courses){
 			System.out.println(c.getLongName()+" Preferred: "+c.getPreferredRooms());
@@ -73,17 +72,17 @@ public class Driver{
 			if(c.getAssignment()!=null){
 			System.out.println(c.getLongName()+" is in room "+ c.getAssignment().toString());} //"at "+c.getPreferredTimes().get(0));
 		}*/
-		
+
 		/*for(Course c: courses){
 			System.out.println(c.toString());
 
 		//shuffle because maybe it will help
 		Collections.shuffle(courses);
-		
+
 		linkRoomsToCourses(courses,rooms);//this is where the magic happens
 		for(Course c: courses){
 			System.out.printf("%-3s %-3s %-14s %-15s %n", c.getPreferredTimes().size(), c.getCapacity(),c.getType(), c.toString());
-			
+
 			//System.out.print(c.getPreferredTimes().size()+": "+c.getCapacity()+": "+c.getType());
 			//System.out.println(c.toString()+": "+c.getCapacity()+": "+c.getPreferredTimes().size());
 			for(Professor p:c.getProfessors()){
@@ -96,10 +95,10 @@ public class Driver{
 			}
 			System.out.println();
 		}	
-		
-		
+
+
 		System.out.println("Success!");
-		
+
 		/*
 		 * after generating each room, we need to either generate all the professors or all the courses.
 		 * it should be noted that the order we do these in determines greatly what constructors we need for each class
@@ -110,15 +109,15 @@ public class Driver{
 		 *go through each cluster and color separately?
 		 *JP 10/29
 		 */
-		
+
 		boolean allTimesPresent = true;
-		
+
 		for (Course c: courses){
 			//System.out.println("Time for "+ c.getShortName()+ " is "+c.getPreferredTimes().get(0).first.toString()+"-"+c.getPreferredTimes().get(0).second.toString());
 			if (c.getPreferredTimes().size()==0) allTimesPresent=false; 
-		
+
 		}
-	       
+
 		/*Tuple<Time,Time> courseTimes; 
 		Course c;
 		System.out.println(courses.size());
@@ -130,25 +129,107 @@ public class Driver{
 		    courseTimes = c.getPreferredTimes().get(0);
 		    System.out.println("Start: "+courseTimes.getFirst().getHour()+":"+courseTimes.getFirst().getMinute());
 		    System.out.println("End: "+courseTimes.getSecond().getHour()+":"+courseTimes.getSecond().getMinute());
-		    
-		    
+
+
 		    }
 		} *///for general debugging - jpham14:10/31
-		
-		System.out.println("No missing times?: "+allTimesPresent);
-	
 
-		
+		System.out.println("No missing times?: "+allTimesPresent);
+
+
+
 	} //END GO===================================================================
-	
+
+	public HashMap<String, ArrayList<Tuple<Double,String>>> generateCampusMap(){
+
+		double self=0;
+		double good=.3;
+		double mid=.5;
+		double bad=.7;
+		double worse=.9;
+/////////////////////////////////////////////////////////
+		HashMap<String, ArrayList<Tuple<Double,String>>> map = new HashMap<String, ArrayList<Tuple<Double,String>>>(30);
+		/////////////////////////////////////////////////////////
+		map.put("ARMU", new ArrayList<Tuple<Double,String>>(10));
+		map.get("ARMU").add(new Tuple<Double,String>(worse,"CONV"));
+		/////////////////////////////////////////////////////////
+		map.put("BARR", new ArrayList<Tuple<Double,String>>(10));
+		map.get("BARR").add(new Tuple<Double,String>(good,"WEBS"));
+		map.get("BARR").add(new Tuple<Double,String>(mid,"CONV"));
+		/////////////////////////////////////////////////////////
+		map.put("BEBU", new ArrayList<Tuple<Double,String>>(10));
+		map.get("BEBU").add(new Tuple<Double,String>(bad,"MERR"));
+		/////////////////////////////////////////////////////////
+		map.put("CHAP", new ArrayList<Tuple<Double,String>>(10));
+		map.get("CHAP").add(new Tuple<Double,String>(good,"CONV"));
+		map.get("CHAP").add(new Tuple<Double,String>(mid,"JOCH"));
+		/////////////////////////////////////////////////////////
+		map.put("CLAR", new ArrayList<Tuple<Double,String>>(10));
+		map.get("CLAR").add(new Tuple<Double,String>(good,"CHAP"));
+		map.get("CLAR").add(new Tuple<Double,String>(bad,"CONV"));
+		/////////////////////////////////////////////////////////
+		map.put("CONV", new ArrayList<Tuple<Double,String>>(10));
+		map.get("CONV").add(new Tuple<Double,String>(bad,"JOCH"));
+		map.get("CONV").add(new Tuple<Double,String>(mid,"OCTA"));
+		/////////////////////////////////////////////////////////
+		map.put("COOP", new ArrayList<Tuple<Double,String>>(10));
+		map.get("COOP").add(new Tuple<Double,String>(mid,"CHAP"));
+		map.get("COOP").add(new Tuple<Double,String>(bad,"OCTA"));
+		/////////////////////////////////////////////////////////
+		map.put("FAYE", new ArrayList<Tuple<Double,String>>(10));
+		map.get("FAYE").add(new Tuple<Double,String>(mid,"MEAD"));
+		map.get("FAYE").add(new Tuple<Double,String>(mid,"BEBU"));
+		/////////////////////////////////////////////////////////
+		map.put("GROS", new ArrayList<Tuple<Double,String>>(10));
+		/////////////////////////////////////////////////////////
+		map.put("MCLS", new ArrayList<Tuple<Double,String>>(10));
+		map.get("MCLS").add(new Tuple<Double,String>(mid,"MERR"));
+		map.get("MCLS").add(new Tuple<Double,String>(mid,"SMUD"));
+		/////////////////////////////////////////////////////////
+		map.put("MEAD", new ArrayList<Tuple<Double,String>>(10));		
+		/////////////////////////////////////////////////////////
+		map.put("MERR", new ArrayList<Tuple<Double,String>>(10));
+		map.get("MERR").add(new Tuple<Double,String>(bad,"MCLS"));
+		map.get("MERR").add(new Tuple<Double,String>(bad,"SMUD"));
+		/////////////////////////////////////////////////////////
+		map.put("JOCH", new ArrayList<Tuple<Double,String>>(10));
+		map.get("JOCH").add(new Tuple<Double,String>(mid,"WEBS"));
+		map.get("JOCH").add(new Tuple<Double,String>(mid,"OCTA"));
+		map.get("JOCH").add(new Tuple<Double,String>(mid,"CONV"));
+		map.get("JOCH").add(new Tuple<Double,String>(bad,"MORG"));
+		/////////////////////////////////////////////////////////
+		map.put("MORG", new ArrayList<Tuple<Double,String>>(10));
+		/////////////////////////////////////////////////////////
+		map.put("NEWP", new ArrayList<Tuple<Double,String>>(10));
+		/////////////////////////////////////////////////////////
+		map.put("OCTA", new ArrayList<Tuple<Double,String>>(10));
+		map.get("OCTA").add(new Tuple<Double,String>(good,"CHAP"));
+		map.get("OCTA").add(new Tuple<Double,String>(good,"CONV"));
+		map.get("OCTA").add(new Tuple<Double,String>(good,"JOCH"));
+		map.get("OCTA").add(new Tuple<Double,String>(good,"MORG"));
+		map.get("OCTA").add(new Tuple<Double,String>(bad,"WEBS"));
+		/////////////////////////////////////////////////////////
+		map.put("SMUD", new ArrayList<Tuple<Double,String>>(10));
+		map.get("SMUD").add(new Tuple<Double,String>(mid,"MCLS"));
+		map.get("SMUD").add(new Tuple<Double,String>(mid,"CONV"));
+		map.get("SMUD").add(new Tuple<Double,String>(mid,"MERR"));
+		/////////////////////////////////////////////////////////
+		map.put("WEBS", new ArrayList<Tuple<Double,String>>(10));
+		map.get("WEBS").add(new Tuple<Double,String>(mid,"CONV"));
+		map.get("WEBS").add(new Tuple<Double,String>(mid,"JOCH"));
+		map.get("WEBS").add(new Tuple<Double,String>(worse,"MORG"));
+		return map;
+	}
+
 	public ArrayList<Course> bruteForce(ArrayList<Course> courses){
 		double counter=0;
 		for(Course c:courses){
-			
+
 			if(c.getPreferredRooms().isEmpty()){
 				//System.out.println("in course "+c.getLongName()+" there are "+c.getPreferredRooms().isEmpty());
 				badCourses.add(c);
-				continue;
+				throw new RuntimeException(c.toString()+" is overconstrained.");
+				//continue;
 			}
 			for(Room r:c.getPreferredRooms()){
 				for(Time t: c.getPreferredTimes()){
@@ -173,27 +254,27 @@ public class Driver{
 						c.setAssignment(r);
 						r.scheduleRoomForTimes(c.getPreferredTimes());
 					}
-				
+
 				}
 			}
 		}
 		System.out.println("Conflicts is "+counter);
 		System.out.println("Solution Quality is "+((courses.size()-counter)/courses.size()*100)+"%");
 		return courses;
-			
 	}
+	
 	public void linkRoomsToCourses(ArrayList<Course> courses, ArrayList<Room> rooms){
 
 		//Collections.shuffle(courses);
-		
+
 		/*courses.shuffle
 
-		
+
 		//OH GOD DONT TOUCH IT
 		sort(courses,"getTypeCode",-1);
 		sort(courses,"getCapacity",1);
 		sort(courses,"getNumberOfPreferredTimes",1);
-		
+
 		/*
 		 * 
 		 * 
@@ -219,17 +300,17 @@ public class Driver{
 		 * 			
 		 * 		}
 		 * 	}
-			 * if(c.getAssignment==null){
-			 * badClasses.put(c);
-			 * }
+		 * if(c.getAssignment==null){
+		 * badClasses.put(c);
+		 * }
 		 * }
 		 * 
 		 * Assign classes we can't handle to badClasses
 		 * }*/
 	}
-	
+
 	public <T> void sort(ArrayList<Course> list, String getterName, final int order){//help order makes no sense. please document how it works.
-		
+
 		try {
 			//String getterName="get"+fieldName.substring(0,1).toUpperCase()+fieldName.substring(1);
 			final Method getter=Course.class.getMethod(getterName, (Class<?>[]) null);
@@ -243,7 +324,7 @@ public class Driver{
 								return 0;
 							}
 							return ((Integer) getter.invoke(c1, (Object[]) null))<((Integer) getter.invoke(c2, (Object[]) null))?(-1*order):(1*order);
-							
+
 						} catch (IllegalArgumentException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -257,8 +338,8 @@ public class Driver{
 						return -2;
 					}
 				});
-				
-				
+
+
 			}
 		} catch (SecurityException e) {
 			// TODO Auto-generated catch block
@@ -268,7 +349,7 @@ public class Driver{
 			e.printStackTrace();
 		}
 	}
-		
+
 	private boolean canMove(Course c){
 		for(Room r : c.getPreferredRooms()){
 			for(Time t:c.getPreferredTimes()){
@@ -277,7 +358,7 @@ public class Driver{
 		}
 		return false;
 	}
-	
+
 	public ArrayList<Room> generateRooms(String[][] rS){
 		System.out.println("Generating Rooms");
 		/*However we construct rS, write a visual representation of it below
@@ -288,7 +369,7 @@ public class Driver{
 		 * ...
 		 * current columns are [buildingName|roomNumber|capacity|type|accessible] - jpham14:10/28
 		 * 
-		*/
+		 */
 		int numberOfRooms=rS.length;
 		//numberOfRooms=100;
 		ArrayList<Room> rooms= new ArrayList<Room>(numberOfRooms);
@@ -306,11 +387,11 @@ public class Driver{
 				//System.out.println("i is "+i+" row length at 0 "+ rS[0].length);
 				tech[i]=changeX(rS[row][i+6]);
 				if(i==3&&changeX(rS[row][i+6])){
-					 slidesNeeded=Integer.parseInt(rS[row][9]);
+					slidesNeeded=Integer.parseInt(rS[row][9]);
 				}
 			}
-			
-			
+
+
 			/*boolean hasProj=changeX(rS[row][6]);
 			boolean hasDVD=changeX(rS[row][7]);
 			boolean hasVCR=changeX(rS[row][8]);
@@ -318,7 +399,7 @@ public class Driver{
 			boolean hasOverhead=changeX(rS[row][10]);*/
 			Room r = new Room(accessible,buildingName, buildingShort, capacity,roomNumber,type);
 			r.setTechnology(tech,slidesNeeded);
-					
+
 			rooms.add(r);
 			//Changed the buildingNames in the csv to the shortNames as that seems to be how the course scheduler stores them so there is no reason to have a building long name.
 			addToBuilding(r);
@@ -366,23 +447,21 @@ public class Driver{
 		profList.trimToSize();
 		return profList;
 	}
-	
-	     
 
 	public ArrayList<Course> generateCourses(String[][] cl, Hashtable<String,Course> ch, HashMap<String,ArrayList<Room>> rH, Hashtable<String,Professor> pH, Hashtable<String,Time> tH){
 		/*
 		 * [Shortname|Longname|Professor|Capacity|Day|Time|Building|RoomNumber|Type|CP|DVD|VCR|Slides|OH|Concurrent|Noncurrent]
 		 */
-	
+
 		System.out.println("Generating Courses");
 		ArrayList<Course> courseList=new ArrayList<Course>();
 		Course temp;
 		for(int row=1;row<cl.length;row++){//start at 1 because first row is headings of columns
-			
+
 			/*
 			 * Create all local variables
 			 */
-			
+
 			String shortname=cl[row][0];
 			String longname=cl[row][1];
 			//Check for crosslisting
@@ -390,7 +469,7 @@ public class Driver{
 				ch.get(longname).addShortName(shortname);
 				continue;
 			}
-			
+
 			int capacity = (cl[row][3].isEmpty())?10:Integer.parseInt(cl[row][3]);
 			String type=cl[row][8];
 
@@ -401,7 +480,7 @@ public class Driver{
 			Professor p = pH.get(prof);
 			temp.addProfessor(p);
 			p.addCourse(temp);
-			
+
 			courseList.add(temp);
 			ch.put(longname, temp);
 			boolean[]tech=new boolean[5];
@@ -409,19 +488,19 @@ public class Driver{
 			for(int i=0;i<tech.length;i++){
 				tech[i]=changeX(cl[row][i+9]);
 				if(i==3&&changeX(cl[row][i+9])){
-					 slidesNeeded=Integer.parseInt(cl[row][12]);
+					slidesNeeded=Integer.parseInt(cl[row][12]);
 				}
 			}
 			temp.setTech(tech);
 			temp.setNumberOfSlides(slidesNeeded);
-			
+
 			//Making preferred Times Begins
 			String daysOfWeek=cl[row][4];
 			String time=cl[row][5];
 			String[] times=time.split("-",2);
 			String[] dow=daysOfWeek.split("");
 			Time t;
-			
+
 			if(!times[0].isEmpty()){
 				for(int i=0;i<dow.length;i++){
 					//System.out.println(daysOfWeek);
@@ -430,19 +509,19 @@ public class Driver{
 						t=tH.get(dow[i]+times[0]+times[1]);
 					} else {						
 						t=new Time(dow[i],
-									times[0].substring(0,times[0].length()-2),times[0].substring(times[0].length()-2),
-									times[1].substring(0,times[1].length()-2),times[1].substring(times[1].length()-2));
+								times[0].substring(0,times[0].length()-2),times[0].substring(times[0].length()-2),
+								times[1].substring(0,times[1].length()-2),times[1].substring(times[1].length()-2));
 						tH.put(dow[i]+times[0]+times[1],t);
 					}
 					temp.addPreferredTime(t);
 				}
 			}//End preferredTimes
-			
+
 			//Handling preferredRooms Begins
 			if (!cl[row][6].isEmpty()){
 				//Building
 				String buildingShort=cl[row][6];// We should probably check for typos or errors in the building names...-LGS
-												// No, bc GIGO -MCM
+				// No, bc GIGO -MCM
 				ArrayList<Room> roomsInBuilding;
 				if (rH.containsKey(buildingShort)){
 					roomsInBuilding=rH.get(buildingShort);
@@ -451,10 +530,10 @@ public class Driver{
 					continue;
 				}
 				System.out.println("for course: "+temp.getShortName()+" "+roomsInBuilding.toString() +" before");
-				temp.filterRooms(roomsInBuilding);
+				//temp.filterRooms(roomsInBuilding);
 				System.out.println("for course: "+temp.getShortName()+" "+roomsInBuilding.toString() +" after");
 				//Room Number
-				
+
 				/* TODO:bug13: modify this code so roomnum can be a comma seperated list of rooms
 				 * 
 				 * 
@@ -468,12 +547,12 @@ public class Driver{
 				 }
 				 *
 				 * 
-				*/
-				
+				 */
+
 				//ok to add here because we're generating rooms
 				//after this will will only remove rooms from preferredRooms
 				temp.addPreferredRoomsList(roomsInBuilding);
-				
+
 			}//Making preferredRooms Ends
 			//remove rooms based on access if need be
 			boolean work=false;
@@ -481,16 +560,17 @@ public class Driver{
 				if(pr.isNeedsAccess())
 					work=true;
 			}
-			if(work)
+			if(work){
 				temp.cleanse();
+			}
 			//prefRooms are now cleansed if the professor needs accessible rooms
 		}
 		courseList.trimToSize();
 		return courseList;
 	}
-	
+
 	public <T> T coalesce(T a, T b, T c) {
-	    return a != null ? a : (b != null ? b : c);
+		return a != null ? a : (b != null ? b : c);
 	}
 
 	public static String[][] makeSpreadsheet(File file, String[][] strings) throws IOException{
@@ -507,12 +587,12 @@ public class Driver{
 				for(int i=0;i<n;i++){
 					//System.out.println("count is "+count+" i is "+i+" temp. length "+temp.length+ "  th"+csv.length);
 					if(count<csv.length){
-					csv[count][i]=temp[i];
+						csv[count][i]=temp[i];
 					}
 					else break;
 				}
 				count++;
-				
+
 			}
 			readIn.close();
 		} 
