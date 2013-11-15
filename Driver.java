@@ -506,7 +506,7 @@ public class Driver{
 				if(pr.isNeedsAccess())
 					work=true;
 			}
-			if(work)
+			if(temp.isAccessible()) //where the fuck do we put this shit omg wtf >_<
 				temp.cleanse();
 			//prefRooms are now cleansed if the professor needs accessible rooms
 		}
