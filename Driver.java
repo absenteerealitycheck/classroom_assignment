@@ -20,10 +20,10 @@ public class Driver{
 	}
 	
 	public void go() throws IOException{
-		
+		boolean lexie=true;
 		boolean testing=false;
 		//TODO: bug12: can we abstract this to the actual size of the uploaded file
-		String[][] roomSpreadsheet = new String[81][6];
+		String[][] roomSpreadsheet = new String[81][11];
 		String[][] professorSpreadsheet = new String[2][3];
 		String[][] courseSpreadsheet;
 		if (testing){
@@ -55,12 +55,24 @@ public class Driver{
 		ArrayList<Course> courses= generateCourses(courseSpreadsheet,courseHash,buildingMap, professorHash, timeHash);
 		courses.trimToSize();
 		
+		for (Course c: courses) {
+			System.out.println("==="+c.getLongName()+"==="+c.getPreferredRooms().size());
+			c.checkCapacity();
+			c.checkLabs();
+			//for (Room r : c.getPreferredRooms()){
+				//System.out.println(r.getBuildingShort()+"-"+r.getRoomNumber());
+			//}
+		}
+		
 		ArrayList<Course> setCourses= bruteForce(courses);
+/*
+
 		for(Course c:courses){
-			System.out.println("Preferred: "+c.getPreferredRooms());
+			System.out.println(c.getLongName()+" Preferred: "+c.getPreferredRooms());
+
 			if(c.getAssignment()!=null){
 			System.out.println(c.getLongName()+" is in room "+ c.getAssignment().toString());} //"at "+c.getPreferredTimes().get(0));
-		}
+		}*/
 		
 		/*for(Course c: courses){
 			System.out.println(c.toString());
@@ -125,20 +137,24 @@ public class Driver{
 		
 		System.out.println("No missing times?: "+allTimesPresent);
 	
+
 		
-	}
+	} //END GO===================================================================
+	
 	public ArrayList<Course> bruteForce(ArrayList<Course> courses){
 		double counter=0;
 		for(Course c:courses){
 			
 			if(c.getPreferredRooms().isEmpty()){
-				System.out.println("in course "+c.getLongName()+" there are "+c.getPreferredRooms().isEmpty());
+				//System.out.println("in course "+c.getLongName()+" there are "+c.getPreferredRooms().isEmpty());
 				badCourses.add(c);
 				continue;
 			}
 			for(Room r:c.getPreferredRooms()){
 				for(Time t: c.getPreferredTimes()){
-					System.out.println(c.toString());
+
+					//System.out.println(c.toString());
+
 					if(r.isAssigned(t)){//if the room is assigned at that time
 						//System.out.println("ASSIGNED");
 						if(r.equals(c.getPreferredRooms().get(c.getPreferredRooms().size()-1))){
@@ -284,9 +300,21 @@ public class Driver{
 			String buildingShort=rS[row][5];
 			Integer capacity= Integer.valueOf(rS[row][2]);
 			String roomNumber=rS[row][1];
+			boolean[]tech=new boolean[5];
+			int slidesNeeded=0;
+			for(int i=0;i<tech.length;i++){
+				//System.out.println("i is "+i+" row length at 0 "+ rS[0].length);
+				tech[i]= rS[row][i+6].isEmpty();
+				if(i==3&&!(rS[row][i+6].isEmpty())){
+					 slidesNeeded=Integer.parseInt(rS[row][9]);
+				}
+			}
+			
+			
+			
 			Room r = new Room(accessible,buildingName, buildingShort, capacity,roomNumber,type);
-			//eventually implement the following line
-			//r.setTech(...)			
+			r.setTechnology(tech,slidesNeeded);
+					
 			rooms.add(r);
 			//Changed the buildingNames in the csv to the shortNames as that seems to be how the course scheduler stores them so there is no reason to have a building long name.
 			addToBuilding(r);
@@ -312,7 +340,7 @@ public class Driver{
 		ArrayList<Professor> profList=new ArrayList<Professor>();
 		for(int row=1;row<profs.length;row++){
 			String name=profs[row][0];
-			System.out.println(name);
+			//System.out.println(name);
 			Professor p=new Professor(name);
 			//Don't forget that we're setting the size of profList by hand up in go()
 			if (pH.containsKey(name)){//we should "probably" write our own exception. 
@@ -367,6 +395,16 @@ public class Driver{
 			
 			courseList.add(temp);
 			ch.put(longname, temp);
+			boolean[]tech=new boolean[5];
+			int slidesNeeded=0;
+			for(int i=0;i<tech.length;i++){
+				tech[i]=cl[row][i+9].isEmpty();
+				if(i==3&&!(cl[row][i+9].isEmpty())){
+					 slidesNeeded=Integer.parseInt(cl[row][12]);
+				}
+			}
+			temp.setTech(tech);
+			temp.setNumberOfSlides(slidesNeeded);
 			
 			//Making preferred Times Begins
 			String daysOfWeek=cl[row][4];
@@ -377,7 +415,7 @@ public class Driver{
 			
 			if(!times[0].isEmpty()){
 				for(int i=0;i<dow.length;i++){
-					System.out.println(daysOfWeek);
+					//System.out.println(daysOfWeek);
 					if (i<dow.length-1&&dow[i+1].equals("H")){i++;}
 					if (tH.containsKey(dow[i]+times[0]+times[1])){
 						t=tH.get(dow[i]+times[0]+times[1]);
@@ -403,8 +441,9 @@ public class Driver{
 					System.out.println("Throw an error for "+buildingShort+"!");
 					continue;
 				}
-				
-				
+				//System.out.println("for course: "+temp.getShortName()+" "+roomsInBuilding.toString() +" before");
+				temp.techFilterRooms(roomsInBuilding);
+				//System.out.println("for course: "+temp.getShortName()+" "+roomsInBuilding.toString() +" after");
 				//Room Number
 				
 				/* TODO:bug13: modify this code so roomnum can be a comma seperated list of rooms
