@@ -18,7 +18,7 @@ public class Driver{
 	public HashMap<String,ArrayList<Room>> buildingMap=new HashMap<String,ArrayList<Room>>(40);
 	public ArrayList<Course> badCourses= new ArrayList<Course>(15);
 	public static void main (String args[]) throws IOException{
-		new Driver().go(1);
+		new Driver().go();
 		
 	}
 	
@@ -53,7 +53,6 @@ public class Driver{
 	}
 	
 	public void go() throws IOException{
-		boolean lexie=true;
 		boolean testing=false;
 		//TODO: bug12: can we abstract this to the actual size of the uploaded file
 		String[][] roomSpreadsheet = new String[81][11];
