@@ -36,14 +36,14 @@ public class Time implements Comparable<Time>{
 
     // ===============================================================
     // The constructor.
-	public Time(String dow, String start,String startPM, String end, String endPM) throws InstantiationException{
+	public Time(String dow, String start,String startPM, String end, String endPM) {//throws InstantiationException{
 		//Set the day of the week for the time segment
 		this.dayOfWeek=convertDayOfWeek(dow);
 		
 		//Check to confirm valid Day Of Week
-		if(dayOfWeek==-1){
-			throw new InstantiationException();
-		}
+		//if(dayOfWeek==-1){
+		//	throw new InstantiationException();
+		//}
 		//Break up the start and end times into hour and minute 
 		String[]s=start.split(":");
 		String[]e=end.split(":");

@@ -64,24 +64,38 @@ public class Driver{
 					:makeSpreadsheet(new File("proto-courselist.csv"),courseSpreadsheet);
 
 		// Make node objects
+		
 		ArrayList<Room> rooms= generateRooms(roomSpreadsheet);
+		checkForUndocumentedRooms(deptroomSpreadsheet, rooms);
+		
 		ArrayList<Professor> professors= generateProfessors(professorSpreadsheet,professorHash);
 		professors.trimToSize();
-		ArrayList<Course> courses= generateCourses(courseSpreadsheet,courseHash,buildingMap, professorHash, timeHash);
+		ArrayList<Course> courses= generateCourses(courseSpreadsheet,deptroomSpreadsheet,courseHash,rooms, professorHash, timeHash);
 		courses.trimToSize();
 			
+		boolean print=false;
 		for (Course c: courses) {
-			System.out.println("==="+c.getLongName()+"==="+c.getPreferredRooms().size());
-			c.checkCapacity();
+			int startSize=c.getPreferredRooms().size();
+			c.checkCapacity();//rename to ensureCapacity
 			c.checkLabs();
-			//for (Room r : c.getPreferredRooms()){
-				//System.out.println(r.getBuildingShort()+"-"+r.getRoomNumber());
-			//}
+			if (c.getPreferredRooms().size()!=startSize){
+				print=true;
+			}
+			
+			if (print){
+				System.out.println(c.toString());
+	
+				for (Room r : c.getPreferredRooms()){
+					System.out.print("\t"+r.toString());
+				}
+				System.out.println();
+			}
+			print=false;
 		}
 		
 		
-		/*		
 		//ArrayList<Course> setCourses= bruteForce(courses);
+		/*		
 		//shuffle to get different solutions
 		Collections.shuffle(courses);
 		linkRoomsToCourses(courses,rooms);//this is where the magic happens
@@ -90,8 +104,6 @@ public class Driver{
 		 *go through each cluster and color separately?
 		 *JP 10/29
 		 */
-		
-		print2D(courseSpreadsheet);
 	} //go
 	// =================================================================================================================================================================================
 	
@@ -107,7 +119,8 @@ public class Driver{
 	 * @param tH timeHash
 	 * @return
 	 */
-	public ArrayList<Course> generateCourses(String[][] cl, Hashtable<String,Course> ch, HashMap<String,ArrayList<Room>> rH, Hashtable<String,Professor> pH, Hashtable<String,Time> tH){
+	public ArrayList<Course> generateCourses(String[][] cl, String[][] drS,
+			Hashtable<String,Course> ch, ArrayList<Room> r, Hashtable<String,Professor> pH, Hashtable<String,Time> tH){
 
 		System.out.println("Generating Courses");
 		ArrayList<Course> courseList=new ArrayList<Course>();
@@ -119,6 +132,7 @@ public class Driver{
 			 */
 			
 			String shortname=cl[row][0];
+			String deptname=shortname.substring(0,4);
 			String longname=cl[row][1];
 			//Check for crosslisting
 			if(ch.containsKey(longname)){
@@ -171,20 +185,32 @@ public class Driver{
 					}
 					temp.addPreferredTime(t);
 				}
-			}//End preferredTimes
+			}
+			
+			for (int i=0; i<drS.length; i++){
+				if (deptname.equals(drS[i][0])){
+					for (Room room: r){
+						if (room.toString().equals(drS[i][1])){
+							temp.addPreferredRoom(room);
+						}
+					}
+				}
+			}
+			
+			//End preferredTimes
 			
 			//Handling preferredRooms Begins
-			if (!cl[row][6].isEmpty()){
+			//if (!cl[row][6].isEmpty()){
 				//Building
-				String buildingShort=cl[row][6];
+				//String buildingShort=cl[row][6];
 												
-				ArrayList<Room> roomsInBuilding;
-				if (rH.containsKey(buildingShort)){
-					roomsInBuilding=rH.get(buildingShort);
-				} else {
-					System.out.println("Throw an error for "+buildingShort+"!");
-					continue;
-				}
+				//ArrayList<Room> roomsInBuilding;
+				//if (rH.containsKey(buildingShort)){
+				//	roomsInBuilding=rH.get(buildingShort);
+				//} else {
+				//	System.out.println("Throw an error for "+buildingShort+"!");
+				//	continue;
+				//}
 
 				//temp.techFilterRooms(roomsInBuilding);
 				
@@ -192,7 +218,7 @@ public class Driver{
 				//Make generic method that takes a field and removes based on it
 
 				//Room Number
-				 String[] roomnum=cl[row][7].split(",");
+				 /*String[] roomnum=cl[row][7].split(",");
 				 for (String rn : roomnum){
 					 if (!rn.equals("")){
 						 for (Room r:roomsInBuilding){//change to c.getRooms
@@ -200,14 +226,14 @@ public class Driver{
 								 roomsInBuilding.remove(r);
 						 }
 					 }
-				 }
+				 }*/
 				 
 				
 				//ok to add here because we're generating rooms
 				//after this will will only remove rooms from preferredRooms
-				temp.addPreferredRoomsList(roomsInBuilding);
+				//temp.addPreferredRoomsList(roomsInBuilding);
 				
-			}//Making preferredRooms Ends
+			//}//Making preferredRooms Ends
 			//remove rooms based on access if need be
 			boolean needsAccessible=false;
 			for(Professor pr: temp.getProfessors()){
@@ -375,8 +401,38 @@ public class Driver{
 		}
 	} // sort
 	// =================================================================================================================================================================================
-	
-
+	/**
+	 * Debugging method that prints the names of rooms we need data for.
+	 * 
+	 * @param deptroomSpreadsheet
+	 * @param rooms
+	 */
+	public void checkForUndocumentedRooms(String[][] deptroomSpreadsheet, ArrayList<Room> rooms){
+		boolean badDeptRoomExists=false;
+		for (int i=0; i<deptroomSpreadsheet.length; i++){
+			if (deptroomSpreadsheet[i][1].substring(0,4).equals("ESNH")){
+				deptroomSpreadsheet[i][1]="BEBU"+deptroomSpreadsheet[i][1].substring(4);
+			}
+			int count=0;
+			for (int j=0; j<rooms.size(); j++){				
+//				System.out.println(rooms.get(j).toString());
+				if (deptroomSpreadsheet[i][1].equals(rooms.get(j).toString())){
+//					System.out.println(rooms.get(j).toString()+" | "+deptroomSpreadsheet[i][1]);
+				}
+				
+				if (!deptroomSpreadsheet[i][1].equals(rooms.get(j).toString())){
+					count++;
+				}				
+			}
+//			System.out.println(count+","+rooms.size());
+			if (count==rooms.size()){
+				System.out.println(deptroomSpreadsheet[i][1]);
+				deptroomSpreadsheet[i][1]="NULL 000";
+				badDeptRoomExists=true;
+			}
+		}
+		System.out.println("There are "+((badDeptRoomExists)?"some":"no")+" bad rooms.");
+	}
 	
 	// =================================================================================================================================================================================
 	//TODO:Depricate this?
