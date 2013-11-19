@@ -6,30 +6,63 @@ import java.util.*;
  * TODO: bug16: Fuck. We need to manage our DayOfWeek/Time fields manually; we can't use the Calendar object. Ask me why i would LOVE to tell you. Fuck. -MCM
  */
 
+//===================================================================
+//Time
+//Us
+//Fall 2013
+//===================================================================
 
-
+//===================================================================
+//Our Time class that holds a block of time where a given course will take place
 public class Time implements Comparable<Time>{
+// ===================================================================
+
+	
+    // ===============================================================
+    // DATA MEMBERS
+    // ===============================================================
+
+	// ===============================================================
+    // The day of the week, starting hour and minute, ending hour and minute,
+	// And number of half-hour blocks each course takes up, and Class ID (Token)
 	int dayOfWeek; //0-4
 	int startHour;
 	int startMinute;
 	int endHour;
 	int endMinute;
-	int blocks; //number of half hour blocks between start and end
+	int blocks; 
 	String token;
+    // ===============================================================
 
-	public Time(String dayOfWeek, String start,String startPM, String end, String endPM){
-		this.dayOfWeek=convertDayOfWeek(dayOfWeek);
+    // ===============================================================
+    // The constructor.
+	public Time(String dow, String start,String startPM, String end, String endPM) throws InstantiationException{
+		//Set the day of the week for the time segment
+		this.dayOfWeek=convertDayOfWeek(dow);
+		
+		//Check to confirm valid Day Of Week
+		if(dayOfWeek==-1){
+			throw new InstantiationException();
+		}
+		//Break up the start and end times into hour and minute 
 		String[]s=start.split(":");
 		String[]e=end.split(":");
+		
+		//Create the hour and minute blocks for the start and end
 		this.startHour=Integer.parseInt(s[0]);
 		if (startPM.equals("PM")){this.startHour+=12;}
 		this.startMinute=Integer.parseInt(s[1]);
 		this.endHour=Integer.valueOf(e[0]);
 		if (endPM.equals("PM")){this.endHour+=12;}
 		this.endMinute=Integer.valueOf(e[1]);
+		
+		//Establish the unique token for a given time segment
 		this.token=dayOfWeek+start+end;
-	}
+	}// Time
+    // ===============================================================
 	
+	// ===============================================================
+    // Take a string and determine which day of the week our time takes place in
 	private int convertDayOfWeek(String dow){
 	
 		if(dow.equals("M")){
@@ -49,9 +82,13 @@ public class Time implements Comparable<Time>{
 		}
 		
 		return -1;
-	}
+	}// convertDayOfWeek
+    // ===============================================================
 	
+	// ===============================================================
+    // Determine whether the buffered data forms a complete frame.
 	public boolean overlaps(Time t){
+		
 		if (this.startHour<t.startHour){
 			if ((this.startHour+this.blocks)>t.getStartHour()){
 				return true;
@@ -62,53 +99,122 @@ public class Time implements Comparable<Time>{
 			}
 			return false;
 		}
-		//I think this can be a one-liner -MCM
-	}
-
+		//TODO: I think this can be a one-liner -MCM
+	}// overlaps
+    // ===============================================================
+	
+	// ===============================================================
+	// returns negative if one is earlier than two
+	// returns positive if one is later than two
+	// returns 0 for same start hour and minute
 	public int compareTo(Time t) {
-		//returns negative if one is earlier than two
-		//returns positive if one is later than two
-		//returns 0 for same start hour and minute
+
 		if (this.startHour==t.startHour){
 			return this.startMinute-t.startMinute;
 		}
 		
 		return this.startHour-t.startHour;
-	}
+	}// compareTo
+    // ===============================================================
+
+	// ===============================================================
+	// return dayOfWeek
 	public int getDayOfWeek() {
 		return dayOfWeek;
-	}
+	}// getDayOfWeek
+    // ===============================================================
+
+	// ===============================================================
+	// set dayOfWeek
 	public void setDayOfWeek(int dayOfWeek) {
 		this.dayOfWeek = dayOfWeek;
-	}
+	}// setDayOfWeek
+    // ===============================================================
+
+	// ===============================================================
+	// return startHour
 	public int getStartHour() {
 		return startHour;
-	}
+	}// getStartHour
+    // ===============================================================
+
+	// ===============================================================
+	// set startHour
 	public void setStartHour(int startHour) {
 		this.startHour = startHour;
-	}
+	}// setStartHour
+    // ===============================================================
+
+	// ===============================================================
+	// return startMinute
 	public int getStartMinute() {
 		return startMinute;
-	}
+	}// getStartMinute
+    // ===============================================================
+
+	// ===============================================================
+	// set startMinute
 	public void setStartMinute(int startMinute) {
 		this.startMinute = startMinute;
-	}
+	}// setStartMinute
+    // ===============================================================
+
+	// ===============================================================
+	// return endHour
 	public int getEndHour() {
 		return endHour;
-	}
+	}// getEndHour
+    // ===============================================================
+
+	// ===============================================================
+	// set endHour
 	public void setEndHour(int endHour) {
 		this.endHour = endHour;
-	}
+	}// setEndHour
+    // ===============================================================
+
+	// ===============================================================
+	// return endMinute
 	public int getEndMinute() {
 		return endMinute;
-	}
+	}// getEndMinute
+    // ===============================================================
+
+	// ===============================================================
+	// set endMinute
 	public void setEndMinute(int endMinute) {
 		this.endMinute = endMinute;
-	}
+	}// setEndMinute
+    // ===============================================================
+
+	// ===============================================================
+	// return blocks
 	public int getBlocks() {
 		return blocks;
-	}
+	}// getBlocks
+    // ===============================================================
+
+	// ===============================================================
+	// set blocks
 	public void setBlocks(int blocks) {
 		this.blocks = blocks;
-	}
-}
+	}// setBlocks
+    // ===============================================================
+
+	// ===============================================================
+	// return token
+	public String getToken() {
+		return token;
+	}// getToken
+    // ===============================================================
+
+	// ===============================================================
+	// set token
+	public void setToken(String token) {
+		this.token=token;
+	}// setToken
+    // ===============================================================
+
+// ===================================================================
+} // class Time
+// ===================================================================
