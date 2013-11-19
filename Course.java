@@ -235,8 +235,9 @@ public class Course{
 	public void cleanse(){
 		for(Iterator<Room> it=this.getPreferredRooms().iterator();it.hasNext();){
 			Room r=it.next();
-			if(!r.isAccessible())
-				it.remove();
+			if(!r.isAccessible()){
+				it.remove();			
+			}
 		}
 	}
 
