@@ -1,7 +1,9 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -10,13 +12,44 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Hashtable;
+
 public class Driver{
 	
 	public HashMap<String,ArrayList<Room>> buildingMap=new HashMap<String,ArrayList<Room>>(40);
 	public ArrayList<Course> badCourses= new ArrayList<Course>(15);
 	public static void main (String args[]) throws IOException{
-		new Driver().go();
+		new Driver().go(1);
 		
+	}
+	
+	public void go(int overloadingThisMethod) throws IOException{
+		String[][] departmentRooms= new String[600][11];
+		departmentRooms=makeSpreadsheet(new File("Fall.csv"),departmentRooms);
+		ArrayList<String> r=new ArrayList<String>(30);
+		String dept=departmentRooms[0][0].substring(0, 4);
+		BufferedWriter bw=new BufferedWriter(new FileWriter(new File("proto-deptrooms.csv")));
+		//This is really ugly code
+		for(int i=0;i<departmentRooms.length;i++){
+			if (!(departmentRooms[i][0]==null) && departmentRooms[i][0].substring(0, 4).equals(dept)){
+				if(!r.contains(departmentRooms[i][10])){
+					r.add(departmentRooms[i][10]);
+				}
+				continue;
+			}
+			for(String s:r){
+				//System.out.println(dept+";"+s);
+				bw.write(dept+";"+s+"\n");
+			}
+			
+			r.clear();
+			if (departmentRooms[i][0]==null){
+				break;
+			}
+			dept=departmentRooms[i][0].substring(0, 4);
+			
+		}
+		bw.close();
+		System.out.println("Done writing");
 	}
 	
 	public void go() throws IOException{
@@ -139,6 +172,7 @@ public class Driver{
 
 		
 	} //END GO===================================================================
+	
 	
 	public ArrayList<Course> bruteForce(ArrayList<Course> courses){
 		double counter=0;
@@ -431,8 +465,8 @@ public class Driver{
 			//Handling preferredRooms Begins
 			if (!cl[row][6].isEmpty()){
 				//Building
-				String buildingShort=cl[row][6];// We should probably check for typos or errors in the building names...-LGS
-												// No, bc GIGO -MCM
+				String buildingShort=cl[row][6];
+												
 				ArrayList<Room> roomsInBuilding;
 				if (rH.containsKey(buildingShort)){
 					roomsInBuilding=rH.get(buildingShort);
@@ -471,7 +505,7 @@ public class Driver{
 				if(pr.isNeedsAccess())
 					work=true;
 			}
-			if(work)
+			if(temp.isAccessible()) //where the fuck do we put this shit omg wtf >_<
 				temp.cleanse();
 			//prefRooms are now cleansed if the professor needs accessible rooms
 		}
