@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -43,64 +44,47 @@ public class Driver{
 	public void go() throws IOException{
 		
 		boolean testing=false;
-		//TODO: bug12: can we abstract this to the actual size of the uploaded file
-		// Create objects for the csv files
-		//String[][] roomSpreadsheet = new String[81][11];
-		//String[][] professorSpreadsheet = new String[2][3];
-		//String[][] courseSpreadsheet = testing?new String[10][16]:new String[642][16];
-		//String[][] deptroomSpreadsheet = new String[252][2];
-		//String[][] courseHistSpreadsheet = new String [5765][10];
 		
 		
+		String[][] courseRoomSpreadsheet=makeSpreadsheet(new File("proto-roomsandcourselist.csv"));
+		String[][] newCourseRoomSpreadsheet = new String[courseRoomSpreadsheet.length][courseRoomSpreadsheet[0].length];
+		newCourseRoomSpreadsheet[0]=courseRoomSpreadsheet[0];
+		for (int i=1; i<courseRoomSpreadsheet.length; i++){
+			if (courseRoomSpreadsheet[i][0].equals(courseRoomSpreadsheet[i-1][0])){
+				String first = newCourseRoomSpreadsheet[i-1][1];
+				String[] firstList = newCourseRoomSpreadsheet[i-1][1].split(",");
+				String[] secondList = newCourseRoomSpreadsheet[i][1].split(",");
+				ArrayList<String> fL = new ArrayList<String>(Arrays.asList(firstList));
+				for (String s:secondList){
+					if (!fL.contains(s)){
+						first.concat(", "+s);
+					}
+				}
+				newCourseRoomSpreadsheet[i-1][1]=first;
+				continue;
+			} else{
+				newCourseRoomSpreadsheet[i]=courseRoomSpreadsheet[i];	
+			}
+			
+		}
+		
+		
+		boolean giveUp=true;
+		if (giveUp){
+			return;
+		}
+		
+		
+
+		// Make a first pass through the historical data to generate more useful spreadsheets
 		String[][] courseHistSpreadsheet=makeSpreadsheet(new File("proto-coursehistory.csv"));
+		//TODO:bug16 Delete two digit data
 		ArrayList<Tuple<String,ArrayList<String>>> roomsForDepartment = associateFieldAndRooms(courseHistSpreadsheet,1);
 		ArrayList<Tuple<String,ArrayList<String>>> roomsForProfessors = associateFieldAndRooms(courseHistSpreadsheet,4);
 		ArrayList<Tuple<String,ArrayList<String>>> roomsForCourses = associateCourseAndRooms(courseHistSpreadsheet,1);
-		File rFC=new File("proto-roomsandcourseslist.csv");
-		File rFD=new File("proto-roomsanddeptslist.csv");
-		File rFP=new File("proto-roomsandprofslist.csv");
-		Collections.sort(roomsForDepartment, new Comparator<Tuple<String,ArrayList<String>>>(){
-			public int compare(Tuple<String,ArrayList<String>> t1, Tuple<String,ArrayList<String>> t2){
-				return t1.getFirst().compareTo(t2.getFirst());
-			}
-		});
-		writeToCSV(roomsForDepartment,rFD);
-		for (Tuple<String,ArrayList<String>> tas: roomsForDepartment){
-			System.out.println(tas);
-		}
-		System.out.println("===============================================================================================");
-		System.out.println("===============================================================================================");
-		System.out.println("===============================================================================================");
-		System.out.println("===============================================================================================");
-		System.out.println("===============================================================================================");
 		
-		Collections.sort(roomsForProfessors, new Comparator<Tuple<String,ArrayList<String>>>(){
-			public int compare(Tuple<String,ArrayList<String>> t1, Tuple<String,ArrayList<String>> t2){
-				return t1.getFirst().compareTo(t2.getFirst());
-			}
-		});
-		writeToCSV(roomsForProfessors,rFP);
-		for (Tuple<String,ArrayList<String>> tas: roomsForProfessors){
-			System.out.println(tas);
-		}
-		System.out.println("===============================================================================================");
-		System.out.println("===============================================================================================");
-		System.out.println("===============================================================================================");
-		System.out.println("===============================================================================================");
-		System.out.println("===============================================================================================");
-		
-		Collections.sort(roomsForCourses, new Comparator<Tuple<String,ArrayList<String>>>(){
-			public int compare(Tuple<String,ArrayList<String>> t1, Tuple<String,ArrayList<String>> t2){
-				return t1.getFirst().compareTo(t2.getFirst());
-			}
-		});
-		writeToCSV(roomsForCourses,rFC);
-		for (Tuple<String,ArrayList<String>> tas: roomsForCourses){
-			System.out.println(tas);
-			
-		}
-		boolean giveUp=true;
-		if (giveUp){
+		if (!writeFirstPass(roomsForDepartment, roomsForProfessors, roomsForCourses)){
+			System.out.println("Writing the first pass failed.");
 			return;
 		}
 		
@@ -674,6 +658,44 @@ public class Driver{
 		}
 	} //print2D
 	// =================================================================================================================================================================================
+	
+	
+	public boolean writeFirstPass(ArrayList<Tuple<String,ArrayList<String>>> roomsForDepartment, ArrayList<Tuple<String,ArrayList<String>>> roomsForProfessors, ArrayList<Tuple<String,ArrayList<String>>> roomsForCourses){
+		File rFC=new File("proto-roomsandcourseslist.csv");
+		File rFD=new File("proto-roomsanddeptslist.csv");
+		File rFP=new File("proto-roomsandprofslist.csv");
+		Comparator<Tuple<String,ArrayList<String>>> c = new Comparator<Tuple<String,ArrayList<String>>>(){
+			public int compare(Tuple<String,ArrayList<String>> t1, Tuple<String,ArrayList<String>> t2){
+				return t1.getFirst().compareTo(t2.getFirst());
+			}
+		};
+		Collections.sort(roomsForDepartment, c);
+		Collections.sort(roomsForProfessors, c);
+		Collections.sort(roomsForCourses, c);
+		
+		/*for (Tuple<String,ArrayList<String>> tas: roomsForDepartment){
+			System.out.println(tas);
+		}
+		for (Tuple<String,ArrayList<String>> tas: roomsForProfessors){
+			System.out.println(tas);
+		}
+		for (Tuple<String,ArrayList<String>> tas: roomsForCourses){
+			System.out.println(tas);	
+		}*/
+		
+		try {
+			writeToCSV(roomsForDepartment,rFD);
+			writeToCSV(roomsForProfessors,rFP);
+			writeToCSV(roomsForCourses,rFC);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}		
+		return true;
+	} // writeFirstPass
+	// =================================================================================================================================================================================
+	
+	
 	
 	// =================================================================================================================================================================================
 	public void writeToCSV(ArrayList<Tuple<String,ArrayList<String>>> SS, File name) throws IOException{
