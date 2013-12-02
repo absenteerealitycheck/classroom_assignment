@@ -55,13 +55,16 @@ public class Driver{
 		courseHistSpreadsheet=makeSpreadsheet(new File("proto-coursehistory.csv"),courseHistSpreadsheet);
 		ArrayList<Tuple<String,ArrayList<String>>> roomsForDepartment = associateFieldAndRooms(courseHistSpreadsheet,1);
 		ArrayList<Tuple<String,ArrayList<String>>> roomsForProfessors = associateFieldAndRooms(courseHistSpreadsheet,4);
-		
+		ArrayList<Tuple<String,ArrayList<String>>> roomsForCourses = associateCourseAndRooms(courseHistSpreadsheet,1);
+		File rFC=new File("proto-roomsandcourseslist.csv");
+		File rFD=new File("proto-roomsanddeptslist.csv");
+		File rFP=new File("proto-roomsandprofslist.csv");
 		Collections.sort(roomsForDepartment, new Comparator<Tuple<String,ArrayList<String>>>(){
 			public int compare(Tuple<String,ArrayList<String>> t1, Tuple<String,ArrayList<String>> t2){
 				return t1.getFirst().compareTo(t2.getFirst());
 			}
 		});
-		
+		writeToCSV(roomsForDepartment,rFD);
 		for (Tuple<String,ArrayList<String>> tas: roomsForDepartment){
 			System.out.println(tas);
 		}
@@ -76,12 +79,26 @@ public class Driver{
 				return t1.getFirst().compareTo(t2.getFirst());
 			}
 		});
-		
+		writeToCSV(roomsForProfessors,rFP);
 		for (Tuple<String,ArrayList<String>> tas: roomsForProfessors){
 			System.out.println(tas);
 		}
+		System.out.println("===============================================================================================");
+		System.out.println("===============================================================================================");
+		System.out.println("===============================================================================================");
+		System.out.println("===============================================================================================");
+		System.out.println("===============================================================================================");
 		
-		
+		Collections.sort(roomsForCourses, new Comparator<Tuple<String,ArrayList<String>>>(){
+			public int compare(Tuple<String,ArrayList<String>> t1, Tuple<String,ArrayList<String>> t2){
+				return t1.getFirst().compareTo(t2.getFirst());
+			}
+		});
+		writeToCSV(roomsForCourses,rFC);
+		for (Tuple<String,ArrayList<String>> tas: roomsForCourses){
+			System.out.println(tas);
+			
+		}
 		boolean giveUp=true;
 		if (giveUp){
 			return;
@@ -142,6 +159,7 @@ public class Driver{
 		 */
 	} //go
 	// =================================================================================================================================================================================
+	// =================================================================================================================================================================================
 	
 	public ArrayList<Tuple<String,ArrayList<String>>> associateFieldAndRooms(String[][] cHS, int fieldIndex){
 		ArrayList<Tuple<String,ArrayList<String>>> alt = new ArrayList<Tuple<String,ArrayList<String>>>();
@@ -181,8 +199,51 @@ public class Driver{
 		}
 		return alt;
 	}
+	// =================================================================================================================================================================================
 	
 	// =================================================================================================================================================================================
+	
+	public ArrayList<Tuple<String,ArrayList<String>>> associateCourseAndRooms(String[][] cHS, int fieldIndex){
+		ArrayList<Tuple<String,ArrayList<String>>> alt = new ArrayList<Tuple<String,ArrayList<String>>>();
+		
+		for (int i=1; i<cHS.length; i++){
+			String field=cHS[i][fieldIndex].substring(0, cHS[i][fieldIndex].length()-3);
+			
+			String room=cHS[i][7];
+			int makeNewTuple=-1;
+			String[] splitField = field.split("  ");
+			
+			for (String f:splitField){
+				for (int j=0; j<alt.size(); j++){
+					if (alt.get(j).getFirst().equals(f)){
+						makeNewTuple=j+1;
+						break;
+					}
+				}
+				if (makeNewTuple==-1){
+					alt.add(new Tuple<String,ArrayList<String>>(f, new ArrayList<String>()));
+					makeNewTuple=alt.size();
+				}
+				ArrayList<String> a = alt.get(makeNewTuple-1).getSecond();
+				boolean shouldAddRoom=true;
+				for (String s:a){
+					if (s.equals(room)){
+						shouldAddRoom=false;
+						break;
+					}
+				}
+				if (shouldAddRoom){
+					a.add(room);
+				}
+			}
+		}
+		return alt;
+	}
+	
+	// =================================================================================================================================================================================
+	
+	// =================================================================================================================================================================================
+	
 	/**
 	 * 
 	 * @param cl courseList
@@ -599,7 +660,22 @@ public class Driver{
 	} //print2D
 	// =================================================================================================================================================================================
 	
+	// =================================================================================================================================================================================
+	public void writeToCSV(ArrayList<Tuple<String,ArrayList<String>>> SS, File name) throws IOException{
+		BufferedWriter bw=new BufferedWriter(new FileWriter(name));
+		for (Tuple<String,ArrayList<String>> ts :SS){
+			String ts2=ts.getSecond().toString();
+			ts2=ts2.substring(1,ts2.length()-1);
+			//System.out.println(ts.getFirst()+";"+ts2+"\n");
+			bw.write(ts.getFirst()+";"+ts2+"\n");
+		}
+		bw.close();
+		System.out.println("Done writing to file "+name.getName());
+	}
 	
+	
+	// =================================================================================================================================================================================
+
 	
 	// =================================================================================================================================================================================
 	/**
