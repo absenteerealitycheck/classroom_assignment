@@ -45,30 +45,15 @@ public class Driver{
 		
 		boolean testing=false;
 		
-		
-		String[][] courseRoomSpreadsheet=makeSpreadsheet(new File("proto-roomsandcourselist.csv"));
-		String[][] newCourseRoomSpreadsheet = new String[courseRoomSpreadsheet.length][courseRoomSpreadsheet[0].length];
-		newCourseRoomSpreadsheet[0]=courseRoomSpreadsheet[0];
-		for (int i=1; i<courseRoomSpreadsheet.length; i++){
-			if (courseRoomSpreadsheet[i][0].equals(courseRoomSpreadsheet[i-1][0])){
-				String first = newCourseRoomSpreadsheet[i-1][1];
-				String[] firstList = newCourseRoomSpreadsheet[i-1][1].split(",");
-				String[] secondList = newCourseRoomSpreadsheet[i][1].split(",");
-				ArrayList<String> fL = new ArrayList<String>(Arrays.asList(firstList));
-				for (String s:secondList){
-					if (!fL.contains(s)){
-						first.concat(", "+s);
-					}
-				}
-				newCourseRoomSpreadsheet[i-1][1]=first;
-				continue;
-			} else{
-				newCourseRoomSpreadsheet[i]=courseRoomSpreadsheet[i];	
-			}
-			
-		}
+		//Merge the duplicates from manually fixing old two digit course numberings
+		//fixFirstPass();
 		
 		
+		String[][] roomsAndProfsSpreadsheet=makeSpreadsheet(new File("proto-roomsandprofslist.csv"));
+		String[][] roomsAndDeptsSpreadsheet=makeSpreadsheet(new File("proto-roomsanddeptslistlist.csv"));
+		String[][] roomsAndCoursesSpreadsheet=makeSpreadsheet(new File("proto-roomsandcourseslist.csv"));
+		//secondPass(roomsAndProfsSpreadsheet, roomsAndCoursesSpreadsheet, roomsAndDeptsSpreadsheet);
+				
 		boolean giveUp=true;
 		if (giveUp){
 			return;
@@ -144,6 +129,27 @@ public class Driver{
 		 */
 	} //go
 	// =================================================================================================================================================================================
+	
+	
+	
+	// =================================================================================================================================================================================
+	public Object secondPass(String[][]rAPL, String[][] rACL, String[][] rADL){ //probably/def need to add parameters.
+		
+		return null;
+	} // secondPass
+	// =================================================================================================================================================================================
+	
+	
+	
+	// =================================================================================================================================================================================
+	public boolean writeSecondPass(){
+		//see writeFirstPass below for format
+		return false;
+	} // writeSecondPass
+	// =================================================================================================================================================================================
+	
+	
+	
 	// =================================================================================================================================================================================
 	
 	public ArrayList<Tuple<String,ArrayList<String>>> associateFieldAndRooms(String[][] cHS, int fieldIndex){
@@ -598,7 +604,7 @@ public class Driver{
 	 * @throws IOException
 	 */
 	public static String[][] makeSpreadsheet(File file) throws IOException{
-		System.out.println("Reading Files");
+		System.out.println("Reading "+file.getName());
 		String[][] csv = null;
 		try {
 			BufferedReader b = new BufferedReader(new FileReader(file));
@@ -660,6 +666,46 @@ public class Driver{
 	// =================================================================================================================================================================================
 	
 	
+	public void fixFirstPass() throws IOException{
+		System.out.println("Fixing first pass.");
+		String[][] courseRoomSpreadsheet=makeSpreadsheet(new File("proto-roomsandcourseslist.csv"));
+		String[][] newCourseRoomSpreadsheet = new String[courseRoomSpreadsheet.length][courseRoomSpreadsheet[0].length];
+		newCourseRoomSpreadsheet[0]=courseRoomSpreadsheet[0];
+		for (int i=1; i<courseRoomSpreadsheet.length; i++){
+			if (courseRoomSpreadsheet[i][0].equals(courseRoomSpreadsheet[i-1][0])){
+				System.out.println("There was a duplicate!");
+				String first = courseRoomSpreadsheet[i-1][1];
+				String[] firstList = first .split(",");
+				String[] secondList = courseRoomSpreadsheet[i][1].split(",");
+				ArrayList<String> fL = new ArrayList<String>(Arrays.asList(firstList));
+				for (String s:secondList){
+					if (!fL.contains(s)){
+						first.concat(", "+s);
+					}
+				}
+				newCourseRoomSpreadsheet[i-1][1]=first;
+				continue;
+			} else{
+				newCourseRoomSpreadsheet[i]=courseRoomSpreadsheet[i];	
+			}
+			
+		}
+		File f = new File("mega-roomsandcourseslist.csv");
+		BufferedWriter bw=new BufferedWriter(new FileWriter(f));
+		for (String[] s:newCourseRoomSpreadsheet){
+			if(s[0]==null){
+				continue;
+			}
+			bw.write(s[0]+";"+s[1]);
+			bw.newLine();
+		}
+		bw.close();
+		System.out.println("Done writing to file "+f.getName());
+		System.out.println("Done fixing first pass.");
+	}
+	
+	
+	// =================================================================================================================================================================================
 	public boolean writeFirstPass(ArrayList<Tuple<String,ArrayList<String>>> roomsForDepartment, ArrayList<Tuple<String,ArrayList<String>>> roomsForProfessors, ArrayList<Tuple<String,ArrayList<String>>> roomsForCourses){
 		File rFC=new File("proto-roomsandcourseslist.csv");
 		File rFD=new File("proto-roomsanddeptslist.csv");
