@@ -45,14 +45,14 @@ public class Driver{
 		boolean testing=false;
 		//TODO: bug12: can we abstract this to the actual size of the uploaded file
 		// Create objects for the csv files
-		String[][] roomSpreadsheet = new String[81][11];
-		String[][] professorSpreadsheet = new String[2][3];
-		String[][] courseSpreadsheet = testing?new String[10][16]:new String[642][16];
-		String[][] deptroomSpreadsheet = new String[252][2];
-		String[][] courseHistSpreadsheet = new String [5765][10];
+		//String[][] roomSpreadsheet = new String[81][11];
+		//String[][] professorSpreadsheet = new String[2][3];
+		//String[][] courseSpreadsheet = testing?new String[10][16]:new String[642][16];
+		//String[][] deptroomSpreadsheet = new String[252][2];
+		//String[][] courseHistSpreadsheet = new String [5765][10];
 		
 		
-		courseHistSpreadsheet=makeSpreadsheet(new File("proto-coursehistory.csv"),courseHistSpreadsheet);
+		String[][] courseHistSpreadsheet=makeSpreadsheet(new File("proto-coursehistory.csv"));
 		ArrayList<Tuple<String,ArrayList<String>>> roomsForDepartment = associateFieldAndRooms(courseHistSpreadsheet,1);
 		ArrayList<Tuple<String,ArrayList<String>>> roomsForProfessors = associateFieldAndRooms(courseHistSpreadsheet,4);
 		
@@ -87,17 +87,18 @@ public class Driver{
 			return;
 		}
 		
+		
+		// Load the csv files
+		String[][] roomSpreadsheet=makeSpreadsheet(new File("proto-roomslist.csv"));
+		String[][] professorSpreadsheet=makeSpreadsheet(new File("proto-profslist.csv"));
+		String[][] deptroomSpreadsheet=makeSpreadsheet(new File("proto-deptrooms.csv"));
+		String[][] courseSpreadsheet=(testing)?makeSpreadsheet(new File("proto-courselist-easy.csv"))
+					:makeSpreadsheet(new File("proto-courselist.csv"));
+		
 		// Create Hashtables for quicker lookup
 		Hashtable<String,Course> courseHash=new Hashtable<String,Course>(courseSpreadsheet.length*2);
 		Hashtable<String,Professor> professorHash=new Hashtable<String,Professor>(professorSpreadsheet.length*2);
 		Hashtable<String,Time> timeHash=new Hashtable<String,Time>(100);
-		
-		// Load the csv files
-		roomSpreadsheet=makeSpreadsheet(new File("proto-roomslist.csv"),roomSpreadsheet);
-		professorSpreadsheet=makeSpreadsheet(new File("proto-profslist.csv"),professorSpreadsheet);
-		deptroomSpreadsheet=makeSpreadsheet(new File("proto-deptrooms.csv"),deptroomSpreadsheet);
-		courseSpreadsheet=(testing)?makeSpreadsheet(new File("proto-courselist-easy.csv"),courseSpreadsheet)
-					:makeSpreadsheet(new File("proto-courselist.csv"),courseSpreadsheet);
 
 		// Make node objects
 		
@@ -548,13 +549,27 @@ public class Driver{
 	 * Takes a file and reads it into a spreadsheet for us to use
 	 * 
 	 * @param file
-	 * @param strings
 	 * @return
 	 * @throws IOException
 	 */
-	public static String[][] makeSpreadsheet(File file, String[][] strings) throws IOException{
+	public static String[][] makeSpreadsheet(File file) throws IOException{
 		System.out.println("Reading Files");
-		String[][] csv=strings;
+		String[][] csv = null;
+		try {
+			BufferedReader b = new BufferedReader(new FileReader(file));
+			String next=b.readLine(); 
+			int cols=next.split(";").length+1;
+			int rows=1;
+			while ((next=b.readLine())!=null){
+				rows++;
+			}
+			csv = new String[rows][cols];
+		}
+		catch (FileNotFoundException e) {
+			System.out.println("Error making size of spreadsheet.");
+			e.printStackTrace();
+		}
+		
 		try {
 			BufferedReader readIn = new BufferedReader(new FileReader(file));
 			String line="";
@@ -610,8 +625,8 @@ public class Driver{
 	 * @throws IOException
 	 */
 	public void createDeptRoomsCSV() throws IOException{
-		String[][] departmentRooms= new String[600][11];
-		departmentRooms=makeSpreadsheet(new File("Fall.csv"),departmentRooms);
+		// departmentRooms= new String[600][11];
+		String[][] departmentRooms=makeSpreadsheet(new File("Fall.csv"));
 		ArrayList<String> r=new ArrayList<String>(30);
 		String dept=departmentRooms[0][0].substring(0, 4);
 		BufferedWriter bw=new BufferedWriter(new FileWriter(new File("proto-deptrooms.csv")));
