@@ -290,7 +290,7 @@ public class Driver{
 		System.out.println("Conflicts is "+counter);
 		System.out.println("Solution Quality is "+((courses.size()-counter)/courses.size()*100)+"%");
 		return courses;
-	} //brute force
+	} //bruteForce
 	// =================================================================================================================================================================================
 	
 	
