@@ -44,12 +44,48 @@ public class Driver{
 		
 		boolean testing=false;
 		//TODO: bug12: can we abstract this to the actual size of the uploaded file
-		
 		// Create objects for the csv files
 		String[][] roomSpreadsheet = new String[81][11];
 		String[][] professorSpreadsheet = new String[2][3];
 		String[][] courseSpreadsheet = testing?new String[10][16]:new String[642][16];
 		String[][] deptroomSpreadsheet = new String[252][2];
+		String[][] courseHistSpreadsheet = new String [5765][10];
+		
+		
+		courseHistSpreadsheet=makeSpreadsheet(new File("proto-coursehistory.csv"),courseHistSpreadsheet);
+		ArrayList<Tuple<String,ArrayList<String>>> roomsForDepartment = associateFieldAndRooms(courseHistSpreadsheet,1);
+		ArrayList<Tuple<String,ArrayList<String>>> roomsForProfessors = associateFieldAndRooms(courseHistSpreadsheet,4);
+		
+		Collections.sort(roomsForDepartment, new Comparator<Tuple<String,ArrayList<String>>>(){
+			public int compare(Tuple<String,ArrayList<String>> t1, Tuple<String,ArrayList<String>> t2){
+				return t1.getFirst().compareTo(t2.getFirst());
+			}
+		});
+		
+		for (Tuple<String,ArrayList<String>> tas: roomsForDepartment){
+			System.out.println(tas);
+		}
+		System.out.println("===============================================================================================");
+		System.out.println("===============================================================================================");
+		System.out.println("===============================================================================================");
+		System.out.println("===============================================================================================");
+		System.out.println("===============================================================================================");
+		
+		Collections.sort(roomsForProfessors, new Comparator<Tuple<String,ArrayList<String>>>(){
+			public int compare(Tuple<String,ArrayList<String>> t1, Tuple<String,ArrayList<String>> t2){
+				return t1.getFirst().compareTo(t2.getFirst());
+			}
+		});
+		
+		for (Tuple<String,ArrayList<String>> tas: roomsForProfessors){
+			System.out.println(tas);
+		}
+		
+		
+		boolean giveUp=true;
+		if (giveUp){
+			return;
+		}
 		
 		// Create Hashtables for quicker lookup
 		Hashtable<String,Course> courseHash=new Hashtable<String,Course>(courseSpreadsheet.length*2);
@@ -107,7 +143,44 @@ public class Driver{
 	} //go
 	// =================================================================================================================================================================================
 	
-
+	public ArrayList<Tuple<String,ArrayList<String>>> associateFieldAndRooms(String[][] cHS, int fieldIndex){
+		ArrayList<Tuple<String,ArrayList<String>>> alt = new ArrayList<Tuple<String,ArrayList<String>>>();
+		
+		for (int i=1; i<cHS.length; i++){
+			String field=cHS[i][fieldIndex];
+			if (fieldIndex==1){
+				field = field.substring(0, 4);
+			}
+			String room=cHS[i][7];
+			int makeNewTuple=-1;
+			String[] splitField = field.split("  ");
+			
+			for (String f:splitField){
+				for (int j=0; j<alt.size(); j++){
+					if (alt.get(j).getFirst().equals(f)){
+						makeNewTuple=j+1;
+						break;
+					}
+				}
+				if (makeNewTuple==-1){
+					alt.add(new Tuple<String,ArrayList<String>>(f, new ArrayList<String>()));
+					makeNewTuple=alt.size();
+				}
+				ArrayList<String> a = alt.get(makeNewTuple-1).getSecond();
+				boolean shouldAddRoom=true;
+				for (String s:a){
+					if (s.equals(room)){
+						shouldAddRoom=false;
+						break;
+					}
+				}
+				if (shouldAddRoom){
+					a.add(room);
+				}
+			}
+		}
+		return alt;
+	}
 	
 	// =================================================================================================================================================================================
 	/**

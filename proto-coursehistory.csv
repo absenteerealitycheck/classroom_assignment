@@ -2166,7 +2166,7 @@ Term;Course #;Title`;Cross-listed Courses;Faculty;Method;Day and Time;Room;Enrol
 1011F;ENST-70-01;Senior Seminar;;Katharine Sims  Ethan Temeles;L/D;W 02:00PM-05:00PM;MERR 401;21;21
 1011F;EUST-21-01;European Tradition I;;Robert Doran;L/D;MWF 10:00AM-10:50AM;CHAP 204;16;16
 1011F;EUST-30-01;The Bible As Literature;;Ilan Stavchansky;L/D;TTH 10:00AM-11:20AM;CHAP 201;30;30
-1011F;EUST-33-01;Citizenship in Europe;HIST-40-01,EUST-33-01;Zzzzz Zzzzz;L/D;TTH 11:30AM-12:50PM;MERR 403;7;34
+1011F;EUST-33-01;Citizenship in Europe;HIST-40-01,EUST-33-01;Kathryn Edwards;L/D;TTH 11:30AM-12:50PM;MERR 403;7;34
 1011F;EUST-36-01;Dangerous Reading;EUST-36-01,ENGL-48-01,FREN-62-01;Judith Frank  Ronald Rosbottom;L/D;MW 02:00PM-03:20PM;CONV 108;5;51
 1011F;EUST-36-01;Dangerous Reading;EUST-36-01,ENGL-48-01,FREN-62-01;Judith Frank  Ronald Rosbottom;L/D;MW 02:00PM-03:20PM;CONV 108;5;51
 1011F;EUST-37-01;Music & Culture I;MUSI-21-01,EUST-37-01;Klara Moricz;L/D;TTH 11:30AM-12:50PM;ARMU 102;1;14
@@ -2268,12 +2268,12 @@ Term;Course #;Title`;Cross-listed Courses;Faculty;Method;Day and Time;Room;Enrol
 1011F;HIST-04-01;Early Modern Europe;HIST-04-01,EUST-48-01;Margaret Hunt;L/D;MW 12:30PM-01:50PM;JOCH 21;34;38
 1011F;HIST-13-01;Charlemagne to Columbus;;Clare Shawcross;L/D;TTH 10:00AM-11:20AM;SMUD 207;32;32
 1011F;HIST-15-01;Chinese Civilization;HIST-15-01,ASLC-24-01;Jerry Dennerline;L/D;TTH 02:00PM-03:20PM;CHAP 203;16;23
-1011F;HIST-21-01;France in the 20th Century;;Zzzzz Zzzzz;L/D;TTH 02:00PM-03:20PM;CHAP 204;12;12
+1011F;HIST-21-01;France in the 20th Century;;Kathryn Edwards;L/D;TTH 02:00PM-03:20PM;CHAP 204;12;12
 1011F;HIST-27-01;Glob Env Hist 20th Cent;;Edward Melillo;L/D;TTH 10:00AM-11:20AM;MEAD 115;50;50
 1011F;HIST-34-01;Nazi Germany;HIST-34-01,EUST-54-01;Catherine Epstein;LEC;MW 01:00PM-01:50PM;FAYE 115;30;35
 1011F;HIST-34-02;Nazi Germany;EUST-54-02,HIST-34-02;Catherine Epstein;LEC;MW 01:00PM-01:50PM;FAYE 115;29;29
 1011F;HIST-36-01;Italian Renaissance;HIST-36-01,EUST-49-01;Werner Gundersheimer;L/D;W 02:00PM-04:00PM;FAYE 113;23;25
-1011F;HIST-40-01;Citizenship in Europe;HIST-40-01,EUST-33-01;Zzzzz Zzzzz;L/D;TTH 11:30AM-12:50PM;MERR 403;27;34
+1011F;HIST-40-01;Citizenship in Europe;HIST-40-01,EUST-33-01;Kathryn Edwards;L/D;TTH 11:30AM-12:50PM;MERR 403;27;34
 1011F;HIST-49-01;Amer Diplomacy: Case Studies;HIST-49-01,POSC-46-01;Norman Levin  Pavel Machala;L/D;W 02:00PM-04:30PM;MORG 111;12;29
 1011F;HIST-49-01;Amer Diplomacy: Case Studies;HIST-49-01,POSC-46-01;Norman Levin  Pavel Machala;L/D;W 02:00PM-04:30PM;MORG 111;12;29
 1011F;HIST-53-01;Pop Revolution Mod Mexico;;Rick Lopez;L/D;MW 12:30PM-01:50PM;WEBS 217;18;18
@@ -2717,7 +2717,7 @@ Term;Course #;Title`;Cross-listed Courses;Faculty;Method;Day and Time;Room;Enrol
 1011S;ENST-32-01;U.S. Environ. Policy;;Paul Newlin;L/D;MW 02:00PM-03:20PM;MERR 131;21;21
 1011S;EUST-15-01;WWII in Literature & Film;;Ronald Rosbottom;L/D;TTH 11:30AM-12:50PM;ESNH 107;54;54
 1011S;EUST-22-01;European Tradition II;;Ronald Rosbottom;L/D;MW 08:30AM-09:50AM;CONV 209;25;25
-1011S;EUST-23-01;The French Empire (1830-1962);EUST-23-01,HIST-23-01;Zzzzz Zzzzz;L/D;TTH 11:30AM-12:50PM;CONV 304;6;23
+1011S;EUST-23-01;The French Empire (1830-1962);EUST-23-01,HIST-23-01;Kathryn Edwards;L/D;TTH 11:30AM-12:50PM;CONV 304;6;23
 1011S;EUST-24-01;Poetic Translation;;Catherine Ciepiela;L/D;MW 12:30PM-01:50PM;MCLS 230;6;6
 1011S;EUST-28-01;17th-Cent Europ Theater;EUST-28-01,SPAN-28-01;James Maraniss;L/D;TTH 10:00AM-11:20AM;OCTA 201;23;66
 1011S;EUST-35-01;20th Cent Cult & Polit;POSC-72-01,EUST-35-01;Ronald Tiersky;L/D;MW 02:00PM-03:20PM;CONV 209;1;16
@@ -2729,7 +2729,7 @@ Term;Course #;Title`;Cross-listed Courses;Faculty;Method;Day and Time;Room;Enrol
 1011S;EUST-60-01;Performance;GERM-60-01,EUST-60-01;Heidi Gilpin;L/D;SU 06:00PM-09:00PM;CONV 302;0;13
 1011S;EUST-71-01;Poland:heart of Eur 20th C;EUST-71-01,HIST-33-01;Catherine Epstein;L/D;MW 02:00PM-03:20PM;CHAP 203;1;14
 1011S;EUST-72-01;Fascism;EUST-72-01,HIST-35-01;Rick Lopez;L/D;TTH 10:00AM-11:20AM;CHAP 101;4;29
-1011S;EUST-76-01;Algerian and Vietnam Wars;HIST-81-01,EUST-76-01;Zzzzz Zzzzz;L/D;TH 02:00PM-04:00PM;CHAP 205;1;15
+1011S;EUST-76-01;Algerian and Vietnam Wars;HIST-81-01,EUST-76-01;Kathryn Edwards;L/D;TH 02:00PM-04:00PM;CHAP 205;1;15
 1011S;FAMS-10-01;Film and Writing;ENGL-01-05,FAMS-10-01;Helen von Schmidt;L/D;TTH 11:30AM-12:50PM;MERR 4;15;46
 1011S;FAMS-32-01;Japan on Screen;ASLC-34-01,FAMS-32-01;Timothy Van Compernolle;L/D;TTH 02:00PM-03:20PM;WEBS 217;12;22
 1011S;FAMS-37-01;U.S. Film of the 1970s;ENGL-84-01,FAMS-37-01;Amelie Hastie;L/D;TTH 10:00AM-11:20AM;FAYE 117;10;19
@@ -2781,7 +2781,7 @@ Term;Course #;Title`;Cross-listed Courses;Faculty;Method;Day and Time;Room;Enrol
 1011S;HIST-16-01;Modern China;HIST-16-01,ASLC-46-01;Jerry Dennerline;L/D;TTH 02:00PM-03:20PM;CHAP 101;20;29
 1011S;HIST-19-01;Mid East Hist: 600-1800;ASLC-26-01,HIST-19-01;Monica Ringer;L/D;TTH 11:30AM-12:50PM;CHAP 201;29;34
 1011S;HIST-22-01;Colnl & Pst Colnl Afric;HIST-22-01,BLST-47-01;Sean Redding;L/D;MWF 10:00AM-10:50AM;CHAP 201;16;25
-1011S;HIST-23-01;The French Empire (1830-1962);EUST-23-01,HIST-23-01;Zzzzz Zzzzz;L/D;TTH 11:30AM-12:50PM;CONV 304;17;23
+1011S;HIST-23-01;The French Empire (1830-1962);EUST-23-01,HIST-23-01;Kathryn Edwards;L/D;TTH 11:30AM-12:50PM;CONV 304;17;23
 1011S;HIST-24-01;WWII in Global Perspect;;Catherine Epstein;LEC;MW 01:00PM-01:50PM;FAYE 115;22;22
 1011S;HIST-24-02;WWII in Global Perspect;;Trent Maxey;LEC;MW 01:00PM-01:50PM;FAYE 115;21;21
 1011S;HIST-25-01;The Wild & the Cultivated;;Edward Melillo;L/D;TTH 02:00PM-03:20PM;MERR 403;12;12
@@ -2798,7 +2798,7 @@ Term;Course #;Title`;Cross-listed Courses;Faculty;Method;Day and Time;Room;Enrol
 1011S;HIST-67-01;History of Science;;John Servos;L/D;TTH 08:30AM-09:50AM;CHAP 203;24;24
 1011S;HIST-75-01;China: People and State;HIST-75-01,ASLC-70-01;Jerry Dennerline;L/D;W 02:00PM-04:00PM;MCLS 230;5;9
 1011S;HIST-80-01;Inside Iran;ASLC-59-01,HIST-80-01;Monica Ringer;L/D;TTH 02:00PM-03:20PM;CHAP 119;10;11
-1011S;HIST-81-01;Algerian and Vietnam Wars;HIST-81-01,EUST-76-01;Zzzzz Zzzzz;L/D;TH 02:00PM-04:00PM;CHAP 205;14;15
+1011S;HIST-81-01;Algerian and Vietnam Wars;HIST-81-01,EUST-76-01;Kathryn Edwards;L/D;TH 02:00PM-04:00PM;CHAP 205;14;15
 1011S;HIST-82-01;Race & Educ Opportunity;HIST-82-01,BLST-67-01;Hilary Moss;L/D;W 02:00PM-04:30PM;WEBS 217;8;22
 1011S;HIST-84-01;Back to the Future;;Joseph Ellis;L/D;T 02:00PM-04:00PM;CONV 308;13;13
 1011S;HIST-85-01;Therapeutc Rev/Mod Medicn;;John Servos;L/D;W 02:00PM-04:00PM;MERR 314;13;13
@@ -5762,4 +5762,4 @@ Term;Course #;Title`;Cross-listed Courses;Faculty;Method;Day and Time;Room;Enrol
 1213S;WAGS-237-01;Gender and Work;SOCI-237-01,WAGS-237-01;Eun Mi Mun;L/D;TTH 10:00AM-11:20AM;MCLS 428;8;14
 1213S;WAGS-312-01;Queer Geographies;WAGS-312-01,ENGL-370-01;Michele Barale;L/D;MF 12:00PM-01:20PM;FAYE 217;5;9
 1213S;WAGS-326-01;Enlightening Passion;ASLC-326-01,WAGS-326-01,RELI-326-01;Paola Zamperini;L/D;MW 12:30PM-01:50PM;MERR 314;2;5
-1213S;WAGS-330-01;Black Sexualities;BLST-236-01,WAGS-330-01;Khary Polk;L/D;TTH 02:30PM-03:50PM;MERR 401;5;21
+1213S;WAGS-330-01;Black Sexualities;BLST-236-01,WAGS-330-01;Khary Polk;L/D;TTH 02:30PM-03:50PM;MERR 401;5;2110

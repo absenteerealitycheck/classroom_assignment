@@ -37,7 +37,7 @@ public class Tuple<F,S> {
 	//=====================================================
 	
 	public String toString(){
-		return this.first.toString()+" , "+this.second.toString();
+		return "<"+this.first.toString()+", "+this.second.toString()+">";
 	}
 // ========================================================
 } //tuple
