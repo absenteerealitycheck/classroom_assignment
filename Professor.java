@@ -15,7 +15,7 @@ public class Professor{
 // ========================================================
 	
 	private String name;
-    private ArrayList<Room> offices; 
+    private ArrayList<Room> pastRooms; 
     private ArrayList<String> department;
     private ArrayList<Time> prefTimes;
      private ArrayList<Course> courses;
@@ -29,7 +29,7 @@ public class Professor{
      */
     public Professor(String s){
     	name=s;
-    	this.offices=new ArrayList<Room>(5); //not actually going to build each room, just going to embed building in fake room
+    	this.pastRooms=new ArrayList<Room>(5); //not actually going to build each room, just going to embed building in fake room
     	this.department=new ArrayList<String>(5);
     	this.prefTimes=new ArrayList<Time>(10);
     	this.courses= new ArrayList<Course>(5);
@@ -49,7 +49,7 @@ public class Professor{
     public Professor(String s, ArrayList<Room> r, ArrayList<String> d){    	
     	// create a new Professor object with previous constructor
     	this(s);
-    	offices=r;
+    	pastRooms=r;
     	department=d;
     	// dummy setter for access
     	needsAccess=false;
@@ -60,7 +60,7 @@ public class Professor{
     /**
      * 
      * @param s - professor name
-     * @param r - offices
+     * @param r - pastRooms
      * @param d - departments 
      * @param t - preferredTimes
      * @param c - courses taught
@@ -91,6 +91,14 @@ public class Professor{
      */
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public void addRooms(Room r) {
+		this.pastRooms.add(r);
+	}
+	
+	public ArrayList<Room> getRooms() {
+		return this.pastRooms;
 	}
 
 	/**

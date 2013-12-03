@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
 
 // =====================================================================================================================================================================================
 // The driver that loads various .csv files, parses them to construct objects, and runs a heuristic solution
@@ -49,15 +50,16 @@ public class Driver{
 		//fixFirstPass();
 		
 		
-		String[][] roomsAndProfsSpreadsheet=makeSpreadsheet(new File("proto-roomsandprofslist.csv"));
-		String[][] roomsAndDeptsSpreadsheet=makeSpreadsheet(new File("proto-roomsanddeptslistlist.csv"));
+		String[][] roomsAndProfsSpreadsheet=makeSpreadsheet(new File("proto-roomsandprofslist-test.csv"));
+		String[][] roomsAndDeptsSpreadsheet=makeSpreadsheet(new File("proto-roomsanddeptslist.csv"));
 		String[][] roomsAndCoursesSpreadsheet=makeSpreadsheet(new File("proto-roomsandcourseslist.csv"));
 		//secondPass(roomsAndProfsSpreadsheet, roomsAndCoursesSpreadsheet, roomsAndDeptsSpreadsheet);
 				
-		boolean giveUp=true;
-		if (giveUp){
-			return;
-		}
+
+		// Aggregate spreadsheets to form preferred rooms list for courses.
+		
+		String[][] courseSpreadsheet=makeSpreadsheet(new File("workingCourseList.csv"));
+		
 		
 		
 
@@ -73,29 +75,40 @@ public class Driver{
 			return;
 		}
 		
+		/*
+		 * 	String[][] roomsAndProfsSpreadsheet=makeSpreadsheet(new File("proto-roomsandprofslist.csv"));
+		String[][] roomsAndDeptsSpreadsheet=makeSpreadsheet(new File("proto-roomsanddeptslist.csv"));
+		String[][] roomsAndCoursesSpreadsheet=makeSpreadsheet(new File("proto-roomsandcourseslist.csv"));
+		 */
 		
 		// Load the csv files
 		String[][] roomSpreadsheet=makeSpreadsheet(new File("proto-roomslist.csv"));
-		String[][] professorSpreadsheet=makeSpreadsheet(new File("proto-profslist.csv"));
+		/*String[][] professorSpreadsheet=makeSpreadsheet(new File("proto-profslist.csv"));
 		String[][] deptroomSpreadsheet=makeSpreadsheet(new File("proto-deptrooms.csv"));
 		String[][] courseSpreadsheet=(testing)?makeSpreadsheet(new File("proto-courselist-easy.csv"))
 					:makeSpreadsheet(new File("proto-courselist.csv"));
+		*/
 		
 		// Create Hashtables for quicker lookup
 		Hashtable<String,Course> courseHash=new Hashtable<String,Course>(courseSpreadsheet.length*2);
-		Hashtable<String,Professor> professorHash=new Hashtable<String,Professor>(professorSpreadsheet.length*2);
+		Hashtable<String,Professor> professorHash=new Hashtable<String,Professor>(roomsAndProfsSpreadsheet.length*2);
 		Hashtable<String,Time> timeHash=new Hashtable<String,Time>(100);
 
 		// Make node objects
 		
 		ArrayList<Room> rooms= generateRooms(roomSpreadsheet);
-		checkForUndocumentedRooms(deptroomSpreadsheet, rooms);
+		//checkForUndocumentedRooms(roomsAndDeptsSpreadsheet, rooms);
 		
-		ArrayList<Professor> professors= generateProfessors(professorSpreadsheet,professorHash);
+		ArrayList<Professor> professors= generateProfessors(roomsAndProfsSpreadsheet,professorHash, rooms);
 		professors.trimToSize();
-		ArrayList<Course> courses= generateCourses(courseSpreadsheet,deptroomSpreadsheet,courseHash,rooms, professorHash, timeHash);
+		ArrayList<Course> courses= generateCourses(courseSpreadsheet,roomsAndDeptsSpreadsheet,courseHash,rooms, professorHash, timeHash);
 		courses.trimToSize();
 			
+		boolean giveUp=true;
+		if (giveUp){
+			return;
+		}
+		
 		boolean print=false;
 		for (Course c: courses) {
 			int startSize=c.getPreferredRooms().size();
@@ -152,26 +165,35 @@ public class Driver{
 	
 	// =================================================================================================================================================================================
 	
-	public ArrayList<Tuple<String,ArrayList<String>>> associateFieldAndRooms(String[][] cHS, int fieldIndex){
+	
+	// ===============================================================================
+	// MICHAEL. PIGEONS. PIGEONS EVERYWHERE.
+	// OKAY, now check this method and help us.
+	// ===============================================================================
+	public ArrayList<Tuple<String,ArrayList<String>>> associateFieldAndRooms(String[][] cHS, int fieldIndex) throws IOException{
 		ArrayList<Tuple<String,ArrayList<String>>> alt = new ArrayList<Tuple<String,ArrayList<String>>>();
-		
+		BufferedWriter bw=new BufferedWriter(new FileWriter(new File("test-data.csv")));
 		for (int i=1; i<cHS.length; i++){
 			String field=cHS[i][fieldIndex];
+			bw.write(field+"\n");
 			if (fieldIndex==1){
 				field = field.substring(0, 4);
 			}
+			
 			String room=cHS[i][7];
 			int makeNewTuple=-1;
 			String[] splitField = field.split("  ");
-			
+			bw.write(splitField.length+"\n");
 			for (String f:splitField){
 				for (int j=0; j<alt.size(); j++){
 					if (alt.get(j).getFirst().equals(f)){
 						makeNewTuple=j+1;
+						bw.write("mnt: "+makeNewTuple+" "+f+"\n");
 						break;
 					}
 				}
 				if (makeNewTuple==-1){
+					bw.write("Adding: "+f+"\n");
 					alt.add(new Tuple<String,ArrayList<String>>(f, new ArrayList<String>()));
 					makeNewTuple=alt.size();
 				}
@@ -188,6 +210,7 @@ public class Driver{
 				}
 			}
 		}
+		bw.close();
 		return alt;
 	}
 	// =================================================================================================================================================================================
@@ -250,7 +273,7 @@ public class Driver{
 		System.out.println("Generating Courses");
 		ArrayList<Course> courseList=new ArrayList<Course>();
 		Course temp;
-		for(int row=1;row<cl.length;row++){//start at 1 because first row is headings of columns
+		for(int row=0;row<cl.length;row++){//start at 1 because first row is headings of columns
 			
 			/*
 			 * Create all local variables
@@ -259,26 +282,44 @@ public class Driver{
 			String shortname=cl[row][0];
 			String deptname=shortname.substring(0,4);
 			String longname=cl[row][1];
-			//Check for crosslisting
-			if(ch.containsKey(longname)){
-				ch.get(longname).addShortName(shortname);
-				continue;
-			}
 			
-			int capacity = (cl[row][3].isEmpty())?10:Integer.parseInt(cl[row][3]);
-			String type=cl[row][8];
+			
+			
+		
+			
+			int capacity = (cl[row][8].isEmpty())?10:Integer.parseInt(cl[row][8]);
+			String type=cl[row][4]; //must parse L/D, LAB, LEC, DIS
 
 			temp= new Course(capacity,longname,type);
 			temp.addShortName(shortname);
-
-			String prof=(cl[row][2].isEmpty())?"Scott Kaplan":cl[row][2];
-			Professor p = pH.get(prof);
-			temp.addProfessor(p);
-			p.addCourse(temp);
 			
+			//Check for crosslisting
+			if(!cl[row][2].isEmpty()){
+				String[] crossList=cl[row][2].split(",");
+				for (String s: crossList) {
+					if (!s.equals(shortname)){temp.addShortName(s);}
+				}
+				continue;
+			}
+
+			//Check professors
+			String prof=(cl[row][3].isEmpty())?"Scott Kaplan":cl[row][3];
+			String[] profs = prof.split("  ");
+			for (String s:profs){
+				System.out.println(s);
+				System.out.println(pH.containsKey(s));
+				Professor p = pH.get(s);
+				temp.addProfessor(p);
+				if (temp==null) System.out.println("TEMP");
+				else if(p==null) System.out.println("PROF");
+				p.addCourse(temp);
+			}
+							
 			courseList.add(temp);
 			ch.put(longname, temp);
-			boolean[]tech=new boolean[5];
+			
+			// TODO: handle tech please - must find out where getting info from
+			/*boolean[]tech=new boolean[5];
 			int slidesNeeded=0;
 			for(int i=0;i<tech.length;i++){
 				tech[i]=cl[row][i+9].isEmpty();
@@ -288,12 +329,14 @@ public class Driver{
 			}
 			temp.setTech(tech);
 			temp.setNumberOfSlides(slidesNeeded);
+			*/
 			
 			//Making preferred Times Begins
-			String daysOfWeek=cl[row][4];
-			String time=cl[row][5];
+			String[] dayandTime=cl[row][5].split(" ");
+			String day = dayandTime[0];
+			String time=dayandTime[1];
 			String[] times=time.split("-",2);
-			String[] dow=daysOfWeek.split("");
+			String[] dow=day.split("");
 			Time t;
 			
 			if(!times[0].isEmpty()){
@@ -462,13 +505,34 @@ public class Driver{
 	
 	// =================================================================================================================================================================================
 	//TODO:Depricate this?
-	public ArrayList<Professor> generateProfessors(String[][] profs, Hashtable<String,Professor> pH){//just some speculative code for now on how we should break stuff up		
+	public ArrayList<Professor> generateProfessors(String[][] profs, Hashtable<String,Professor> pH, ArrayList<Room> rooms){//just some speculative code for now on how we should break stuff up		
 		System.out.println("Generating Professors");
 		ArrayList<Professor> profList=new ArrayList<Professor>();
-		for(int row=1;row<profs.length;row++){
+		for(int row=0;row<profs.length;row++){
 			String name=profs[row][0];
 			//System.out.println(name);
 			Professor p=new Professor(name);
+			String[] r = profs[row][1].split(", ");
+			if (r[0].isEmpty()){ continue; }
+			System.out.println(p.getName());
+			//TODO: might want to check this
+			for (String s: r){
+				System.out.println(s);
+				String ss = s.substring(0,4);
+				if(ss.equals("ESNH")) {ss="BEBU";}
+				if(ss.equals("MUSI")) {ss="ARMU";}
+				ArrayList<Room> bm = buildingMap.get(ss);
+				
+				for(Iterator<Room> it = bm.iterator(); it.hasNext();){
+					Room ru=it.next();
+					if(ru.getRoomNumber().equals(s.substring(6))){
+						p.addRooms(ru);
+					}
+				}
+								
+			}
+			System.out.println("Survived");
+			
 			//Don't forget that we're setting the size of profList by hand up in go()
 			if (pH.containsKey(name)){//we should "probably" write our own exception. 
 				try {
@@ -480,6 +544,8 @@ public class Driver{
 			profList.add(p);
 			pH.put(name,p);
 		}
+		
+		
 		System.out.println("Help");
 		profList.trimToSize();
 		return profList;
