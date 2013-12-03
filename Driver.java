@@ -30,7 +30,11 @@ public class Driver{
 	public ArrayList<Course> badCourses= new ArrayList<Course>(15);
 	
 	// =================================================================================================================================================================================
-	// The entry point. Switch into non-static methods to start the program.
+	/**
+	 *  The entry point. Switch into non-static methods to start the program.
+	 * @param args
+	 * @throws IOException
+	 */
 	public static void main (String args[]) throws IOException{
 		new Driver().go();
 		
@@ -40,7 +44,10 @@ public class Driver{
 	
 	
 	// ================================================================================================================================================================================
-	// The real non-static main method
+	/**
+	 *  The real non-static main method
+	 * @throws IOException
+	 */
 	public void go() throws IOException{
 		
 		boolean testing=false;
@@ -117,7 +124,7 @@ public class Driver{
 		}
 		
 		
-		//ArrayList<Course> setCourses= bruteForce(courses);
+		ArrayList<Course> setCourses= bruteForce(courses);
 		/*		
 		//shuffle to get different solutions
 		Collections.shuffle(courses);
@@ -382,6 +389,60 @@ public class Driver{
 	
 	// =================================================================================================================================================================================
 	/**
+	 * Takes a file and reads it into a spreadsheet for us to use
+	 * 
+	 * @param file
+	 * @return
+	 * @throws IOException
+	 */
+	public static String[][] makeSpreadsheet(File file) throws IOException{
+		System.out.println("Reading "+file.getName());
+		String[][] csv = null;
+		try {
+			BufferedReader b = new BufferedReader(new FileReader(file));
+			String next=b.readLine(); 
+			int cols=next.split(";").length+1;
+			int rows=1;
+			while ((next=b.readLine())!=null){
+				rows++;
+			}
+			csv = new String[rows][cols];
+		}
+		catch (FileNotFoundException e) {
+			System.out.println("Error making size of spreadsheet.");
+			e.printStackTrace();
+		}
+		
+		try {
+			BufferedReader readIn = new BufferedReader(new FileReader(file));
+			String line="";
+			String[] row=new String[csv[0].length];
+			int count=0;
+			while((line=readIn.readLine())!=null){
+				String [] temp= line.split(";",row.length);
+				int n = Math.min(temp.length, row.length);
+				for(int i=0;i<n;i++){
+					if(count<csv.length){
+						csv[count][i]=temp[i];
+					}
+					else break;
+				}
+				count++;
+			}
+			readIn.close();
+		} 
+		catch (FileNotFoundException e) {
+			System.out.println("You Done Goofed");
+			e.printStackTrace();
+		}
+		return csv;
+	}// makeSpreadsheet
+	// =================================================================================================================================================================================
+	
+	
+	
+	// =================================================================================================================================================================================
+	/**
 	 * bruteForce is a solver	
 	 * @param courses The list of all course objects for this semester
 	 * @return The list of courses, all assigned to rooms
@@ -591,60 +652,6 @@ public class Driver{
 		//OK THANK YOU
 		 */
 	}// linkRoomsToCourses
-	// =================================================================================================================================================================================
-	
-	
-	
-	// =================================================================================================================================================================================
-	/**
-	 * Takes a file and reads it into a spreadsheet for us to use
-	 * 
-	 * @param file
-	 * @return
-	 * @throws IOException
-	 */
-	public static String[][] makeSpreadsheet(File file) throws IOException{
-		System.out.println("Reading "+file.getName());
-		String[][] csv = null;
-		try {
-			BufferedReader b = new BufferedReader(new FileReader(file));
-			String next=b.readLine(); 
-			int cols=next.split(";").length+1;
-			int rows=1;
-			while ((next=b.readLine())!=null){
-				rows++;
-			}
-			csv = new String[rows][cols];
-		}
-		catch (FileNotFoundException e) {
-			System.out.println("Error making size of spreadsheet.");
-			e.printStackTrace();
-		}
-		
-		try {
-			BufferedReader readIn = new BufferedReader(new FileReader(file));
-			String line="";
-			String[] row=new String[csv[0].length];
-			int count=0;
-			while((line=readIn.readLine())!=null){
-				String [] temp= line.split(";",row.length);
-				int n = Math.min(temp.length, row.length);
-				for(int i=0;i<n;i++){
-					if(count<csv.length){
-						csv[count][i]=temp[i];
-					}
-					else break;
-				}
-				count++;
-			}
-			readIn.close();
-		} 
-		catch (FileNotFoundException e) {
-			System.out.println("You Done Goofed");
-			e.printStackTrace();
-		}
-		return csv;
-	}// makeSpreadsheet
 	// =================================================================================================================================================================================
 	
 	

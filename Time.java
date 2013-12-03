@@ -4,6 +4,8 @@ import java.util.*;
 /*
  * TODO: bug15: Hey guys, we should totally make a hashtable of times so that we dont create the same time object 80 times
  * TODO: bug16: Fuck. We need to manage our DayOfWeek/Time fields manually; we can't use the Calendar object. Ask me why i would LOVE to tell you. Fuck. -MCM
+ * TODO: bug 20: Rewrite Time so that we can construnct ~400 Time objects of half hour blocks between M and F and add a list of times to every course
+ * 
  */
 
 //===================================================================
@@ -16,11 +18,6 @@ import java.util.*;
 //Our Time class that holds a block of time where a given course will take place
 public class Time implements Comparable<Time>{
 // ===================================================================
-
-	
-    // ===============================================================
-    // DATA MEMBERS
-    // ===============================================================
 
 	// ===============================================================
     // The day of the week, starting hour and minute, ending hour and minute,
@@ -35,8 +32,15 @@ public class Time implements Comparable<Time>{
     // ===============================================================
 
     // ===============================================================
-    // The constructor.
-	public Time(String dow, String start,String startPM, String end, String endPM) {//throws InstantiationException{
+    /**
+     * Allocates a new Time object 
+     * @param dow
+     * @param start
+     * @param startsInPM
+     * @param end
+     * @param endsInPM
+     */
+	public Time(String dow, String start,String startsInPM, String end, String endsInPM) {//throws InstantiationException{
 		//Set the day of the week for the time segment
 		this.dayOfWeek=convertDayOfWeek(dow);
 		
@@ -50,10 +54,10 @@ public class Time implements Comparable<Time>{
 		
 		//Create the hour and minute blocks for the start and end
 		this.startHour=Integer.parseInt(s[0]);
-		if (startPM.equals("PM")){this.startHour+=12;}
+		if (startsInPM.equals("PM")){this.startHour+=12;}
 		this.startMinute=Integer.parseInt(s[1]);
 		this.endHour=Integer.valueOf(e[0]);
-		if (endPM.equals("PM")){this.endHour+=12;}
+		if (endsInPM.equals("PM")){this.endHour+=12;}
 		this.endMinute=Integer.valueOf(e[1]);
 		
 		//Establish the unique token for a given time segment
@@ -62,7 +66,14 @@ public class Time implements Comparable<Time>{
     // ===============================================================
 	
 	// ===============================================================
-    // Take a string and determine which day of the week our time takes place in
+    // 
+	/**
+	 * Converts a String representation of the day of week and into an 
+	 * int representation using 0 for Monday, 4 for Friday, and -1 for
+	 * Saturday or Sunday.
+	 * @param dow - String representation of the day of the week
+	 * @return int representation of the day of the week 
+	 */
 	private int convertDayOfWeek(String dow){
 	
 		if(dow.equals("M")){
@@ -86,7 +97,13 @@ public class Time implements Comparable<Time>{
     // ===============================================================
 	
 	// ===============================================================
-    // Determine whether the buffered data forms a complete frame.
+    //
+	/**
+	 * Returns true if this Time overlaps with the specified Time. More 
+	 * formally, returns true if and only if TODO:write this logic
+	 * @param t - Time to compare to
+	 * @return true if this Time overlaps the specified Time.
+	 */
 	public boolean overlaps(Time t){
 		
 		if (this.startHour<t.startHour){
@@ -104,9 +121,12 @@ public class Time implements Comparable<Time>{
     // ===============================================================
 	
 	// ===============================================================
-	// returns negative if one is earlier than two
-	// returns positive if one is later than two
-	// returns 0 for same start hour and minute
+	// returns negative if one is earlier than two// returns positive if one is later than two// returns 0 for same start hour and minute
+	/**
+	 * 
+	 * @param t 
+	 * @return
+	 */
 	public int compareTo(Time t) {
 
 		if (this.startHour==t.startHour){
@@ -119,6 +139,10 @@ public class Time implements Comparable<Time>{
 
 	// ===============================================================
 	// return dayOfWeek
+	/**
+	 * 
+	 * @return
+	 */
 	public int getDayOfWeek() {
 		return dayOfWeek;
 	}// getDayOfWeek
