@@ -68,16 +68,13 @@ public class Driver{
 		String[][] roomsAndDeptsSpreadsheet=makeSpreadsheet(new File("proto-roomsanddeptslist.csv"));
 		String[][] roomsAndCoursesSpreadsheet=makeSpreadsheet(new File("proto-roomsandcourseslist.csv"));
 		//secondPass(roomsAndProfsSpreadsheet, roomsAndCoursesSpreadsheet, roomsAndDeptsSpreadsheet);
-<<<<<<< HEAD
-				
-	
-=======
+
 		
 		// Aggregate spreadsheets to form preferred rooms list for courses.
 		
 		String[][] courseSpreadsheet=makeSpreadsheet(new File("workingCourseList.csv"));
 		
->>>>>>> prefRooms
+
 		
 		
 
@@ -104,12 +101,8 @@ public class Driver{
 		/*String[][] professorSpreadsheet=makeSpreadsheet(new File("proto-profslist.csv"));
 		String[][] deptroomSpreadsheet=makeSpreadsheet(new File("proto-deptrooms.csv"));
 		String[][] courseSpreadsheet=(testing)?makeSpreadsheet(new File("proto-courselist-easy.csv"))
-<<<<<<< HEAD
 					:makeSpreadsheet(new File("workingCourseList.csv"));
-=======
-					:makeSpreadsheet(new File("proto-courselist.csv"));
-		*/
->>>>>>> prefRooms
+
 		
 		// Create Hashtables for quicker lookup
 		Hashtable<String,Course> courseHash=new Hashtable<String,Course>(courseSpreadsheet.length*2);
@@ -408,23 +401,37 @@ public class Driver{
 			String[] times=time.split("-",2);
 			String[] dow=day.split("");
 			Time t;
-			
-			if(!times[0].isEmpty()){
-				for(int i=0;i<dow.length;i++){
-					//System.out.println(daysOfWeek);
-					if (i<dow.length-1&&dow[i+1].equals("H")){i++;}
-					if (tH.containsKey(dow[i]+times[0]+times[1])){
-						t=tH.get(dow[i]+times[0]+times[1]);
-					} else {						
-						t=new Time(dow[i],
-									times[0].substring(0,times[0].length()-2),times[0].substring(times[0].length()-2),
-									times[1].substring(0,times[1].length()-2),times[1].substring(times[1].length()-2));
-						tH.put(dow[i]+times[0]+times[1],t);
-					}
-					temp.addPreferredTime(t);
+			int dayOf = -1;
+			for (int i=0;i<dow.length;i++){
+				if(dow[i].equals("M")){
+					 dayOf = 0;
 				}
+				else if(dow[i].equals("T")){
+					if ((i+1)!=dow[i].length) {
+						if (dow[i+1].equals("H"))
+							dayOf=3;
+						else dayOf=1;
+					}
+				}
+				
+				else if(dow[i].equals("W")){
+					return 2;
+				}
+				
+				else if(dow[i].equals("F")){
+					return 4;
+				}
+				
+				else if(dow[i].equals("H")){
+					continue;
+				}
+				
+				else return -1;
+				
 			}
-			//End preferredTimes
+				
+		
+
 			//Making preferredRooms 
 			
 			ArrayList<Room> dRooms=new ArrayList<Room>();

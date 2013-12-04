@@ -19,6 +19,9 @@ public class Course{
 	private ArrayList<String> shortName; 
 	private ArrayList<String> department;
 	private ArrayList<Time> preferredTimes;
+	private Time time;
+
+
 	private int capacity;
 	private ArrayList<Room> preferredRooms;
 	private ArrayList<Professor> professors;
@@ -67,6 +70,16 @@ public class Course{
 	
 	// ====================================================
 	// Getters and Setters
+	
+	public Time getTime() {
+		return time;
+	}
+
+
+	public void setTime(Time time) {
+		this.time = time;
+	}
+
 	
 	/**
 	 * 
