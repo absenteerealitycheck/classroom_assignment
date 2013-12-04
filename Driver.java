@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
 
 // =====================================================================================================================================================================================
 // The driver that loads various .csv files, parses them to construct objects, and runs a heuristic solution
@@ -64,49 +65,75 @@ public class Driver{
 		
 		
 		String[][] roomsAndProfsSpreadsheet=makeSpreadsheet(new File("proto-roomsandprofslist.csv"));
-		String[][] roomsAndDeptsSpreadsheet=makeSpreadsheet(new File("proto-roomsanddeptslistlist.csv"));
+		String[][] roomsAndDeptsSpreadsheet=makeSpreadsheet(new File("proto-roomsanddeptslist.csv"));
 		String[][] roomsAndCoursesSpreadsheet=makeSpreadsheet(new File("proto-roomsandcourseslist.csv"));
 		//secondPass(roomsAndProfsSpreadsheet, roomsAndCoursesSpreadsheet, roomsAndDeptsSpreadsheet);
+<<<<<<< HEAD
 				
 	
+=======
+		
+		// Aggregate spreadsheets to form preferred rooms list for courses.
+		
+		String[][] courseSpreadsheet=makeSpreadsheet(new File("workingCourseList.csv"));
+		
+>>>>>>> prefRooms
 		
 		
 
 		// Make a first pass through the historical data to generate more useful spreadsheets
 		String[][] courseHistSpreadsheet=makeSpreadsheet(new File("proto-coursehistory.csv"));
 		//TODO:bug16 Delete two digit data
-		ArrayList<Tuple<String,ArrayList<String>>> roomsForDepartment = associateFieldAndRooms(courseHistSpreadsheet,1);
+		/*ArrayList<Tuple<String,ArrayList<String>>> roomsForDepartment = associateFieldAndRooms(courseHistSpreadsheet,1);
 		ArrayList<Tuple<String,ArrayList<String>>> roomsForProfessors = associateFieldAndRooms(courseHistSpreadsheet,4);
 		ArrayList<Tuple<String,ArrayList<String>>> roomsForCourses = associateCourseAndRooms(courseHistSpreadsheet,1);
 		
 		if (!writeFirstPass(roomsForDepartment, roomsForProfessors, roomsForCourses)){
 			System.out.println("Writing the first pass failed.");
 			return;
-		}
+		}*/
 		
+		/*
+		 * 	String[][] roomsAndProfsSpreadsheet=makeSpreadsheet(new File("proto-roomsandprofslist.csv"));
+		String[][] roomsAndDeptsSpreadsheet=makeSpreadsheet(new File("proto-roomsanddeptslist.csv"));
+		String[][] roomsAndCoursesSpreadsheet=makeSpreadsheet(new File("proto-roomsandcourseslist.csv"));
+		 */
 		
 		// Load the csv files
 		String[][] roomSpreadsheet=makeSpreadsheet(new File("proto-roomslist.csv"));
-		String[][] professorSpreadsheet=makeSpreadsheet(new File("proto-profslist.csv"));
+		/*String[][] professorSpreadsheet=makeSpreadsheet(new File("proto-profslist.csv"));
 		String[][] deptroomSpreadsheet=makeSpreadsheet(new File("proto-deptrooms.csv"));
 		String[][] courseSpreadsheet=(testing)?makeSpreadsheet(new File("proto-courselist-easy.csv"))
+<<<<<<< HEAD
 					:makeSpreadsheet(new File("workingCourseList.csv"));
+=======
+					:makeSpreadsheet(new File("proto-courselist.csv"));
+		*/
+>>>>>>> prefRooms
 		
 		// Create Hashtables for quicker lookup
 		Hashtable<String,Course> courseHash=new Hashtable<String,Course>(courseSpreadsheet.length*2);
-		Hashtable<String,Professor> professorHash=new Hashtable<String,Professor>(professorSpreadsheet.length*2);
+		Hashtable<String,Professor> professorHash=new Hashtable<String,Professor>(roomsAndProfsSpreadsheet.length*2);
 		Hashtable<String,Time> timeHash=new Hashtable<String,Time>(100);
 
 		// Make node objects
 		
 		ArrayList<Room> rooms= generateRooms(roomSpreadsheet);
-		checkForUndocumentedRooms(deptroomSpreadsheet, rooms);
+		HashMap<String,ArrayList<Room>> roomsAndProfsHash=toHash(roomsAndProfsSpreadsheet,rooms);
+		HashMap<String,ArrayList<Room>> roomsAndDeptsHash=toHash(roomsAndDeptsSpreadsheet,rooms);		
+		HashMap<String,ArrayList<Room>> roomsAndCoursesHash=toHash(roomsAndCoursesSpreadsheet,rooms);
+		//checkForUndocumentedRooms(roomsAndDeptsSpreadsheet, rooms);
 		
-		ArrayList<Professor> professors= generateProfessors(professorSpreadsheet,professorHash);
+		ArrayList<Professor> professors= generateProfessors(roomsAndProfsSpreadsheet,professorHash, rooms);
 		professors.trimToSize();
-		ArrayList<Course> courses= generateCourses(courseSpreadsheet,deptroomSpreadsheet,courseHash,rooms, professorHash, timeHash);
+		ArrayList<Course> courses= generateCourses(courseSpreadsheet,roomsAndDeptsHash,roomsAndCoursesHash,courseHash,rooms, professorHash, timeHash,roomsAndProfsHash);
 		courses.trimToSize();
 			
+		boolean giveUp=true;
+		if (giveUp){
+			return;
+		}
+		
 		boolean print=false;
 		for (Course c: courses) {
 			int startSize=c.getPreferredRooms().size();
@@ -187,29 +214,36 @@ public class Driver{
 	
 	// =================================================================================================================================================================================
 	
-	public ArrayList<Tuple<String,ArrayList<String>>> associateFieldAndRooms(String[][] cHS, int fieldIndex){
+	
+	// ===============================================================================
+	public ArrayList<Tuple<String,ArrayList<String>>> associateFieldAndRooms(String[][] cHS, int fieldIndex) throws IOException{
 		ArrayList<Tuple<String,ArrayList<String>>> alt = new ArrayList<Tuple<String,ArrayList<String>>>();
-		
+		BufferedWriter bw=new BufferedWriter(new FileWriter(new File("test-data.csv")));
 		for (int i=1; i<cHS.length; i++){
 			String field=cHS[i][fieldIndex];
+			bw.write(field+"\n");
 			if (fieldIndex==1){
 				field = field.substring(0, 4);
 			}
+			
 			String room=cHS[i][7];
 			int makeNewTuple=-1;
 			String[] splitField = field.split("  ");
-			
+			bw.write(splitField.length+"\n");
 			for (String f:splitField){
 				for (int j=0; j<alt.size(); j++){
 					if (alt.get(j).getFirst().equals(f)){
 						makeNewTuple=j+1;
+						bw.write("mnt: "+makeNewTuple+" "+f+"\n");
 						break;
 					}
 				}
 				if (makeNewTuple==-1){
+					bw.write("Adding: "+f+"\n");
 					alt.add(new Tuple<String,ArrayList<String>>(f, new ArrayList<String>()));
 					makeNewTuple=alt.size();
 				}
+				
 				ArrayList<String> a = alt.get(makeNewTuple-1).getSecond();
 				boolean shouldAddRoom=true;
 				for (String s:a){
@@ -221,12 +255,38 @@ public class Driver{
 				if (shouldAddRoom){
 					a.add(room);
 				}
+				makeNewTuple=-1;
 			}
+			
 		}
+		bw.close();
+		System.out.println("dun dun DONE");
 		return alt;
 	}
 	// =================================================================================================================================================================================
-	
+	// =================================================================================================================================================================================
+		public HashMap<String,ArrayList<Room>> toHash(String[][]SS, ArrayList<Room> rooms){
+			HashMap<String,ArrayList<Room>> hm=new HashMap<String,ArrayList<Room>>();
+			
+			for(int i=0;i<SS.length;i++){
+				ArrayList<Room> temprooms=new ArrayList<Room>();
+				for(Room r:rooms){
+					String[] ss= SS[i][1].split(", ");
+					for(int j=0;j<ss.length;j++){
+						if(r.toString().equals(ss[j])){
+							temprooms.add(r);
+							
+						}
+					}
+					
+					
+				}
+				hm.put(SS[i][0].toString(),temprooms);
+			}
+			return hm;
+		}
+	// =================================================================================================================================================================================
+		
 	// =================================================================================================================================================================================
 	
 	public ArrayList<Tuple<String,ArrayList<String>>> associateCourseAndRooms(String[][] cHS, int fieldIndex){
@@ -279,13 +339,13 @@ public class Driver{
 	 * @param tH timeHash
 	 * @return
 	 */
-	public ArrayList<Course> generateCourses(String[][] cl, String[][] drS,
-			Hashtable<String,Course> ch, ArrayList<Room> r, Hashtable<String,Professor> pH, Hashtable<String,Time> tH){
+	public ArrayList<Course> generateCourses(String[][] cl, HashMap<String,ArrayList<Room>> drS,HashMap<String,ArrayList<Room>> crS,
+			Hashtable<String,Course> ch, ArrayList<Room> r, Hashtable<String,Professor> pH, Hashtable<String,Time> tH,HashMap<String,ArrayList<Room>> rapH){
 
 		System.out.println("Generating Courses");
 		ArrayList<Course> courseList=new ArrayList<Course>();
 		Course temp;
-		for(int row=1;row<cl.length;row++){//start at 1 because first row is headings of columns
+		for(int row=0;row<cl.length;row++){//start at 1 because first row is headings of columns
 			
 			/*
 			 * Create all local variables
@@ -294,26 +354,42 @@ public class Driver{
 			String shortname=cl[row][0];
 			String deptname=shortname.substring(0,4);
 			String longname=cl[row][1];
-			//Check for crosslisting
-			if(ch.containsKey(longname)){
-				ch.get(longname).addShortName(shortname);
-				continue;
-			}
 			
-			int capacity = (cl[row][3].isEmpty())?10:Integer.parseInt(cl[row][3]);
-			String type=cl[row][8];
+			
+			
+		
+			
+			int capacity = (cl[row][8].isEmpty())?10:Integer.parseInt(cl[row][8]);
+			String type=cl[row][4]; //must parse L/D, LAB, LEC, DIS
 
 			temp= new Course(capacity,longname,type);
 			temp.addShortName(shortname);
-
-			String prof=(cl[row][2].isEmpty())?"Scott Kaplan":cl[row][2];
-			Professor p = pH.get(prof);
-			temp.addProfessor(p);
-			p.addCourse(temp);
 			
+			//Check for crosslisting
+			if(!cl[row][2].isEmpty()){
+				String[] crossList=cl[row][2].split(",");
+				for (String s: crossList) {
+					if (!s.equals(shortname)){temp.addShortName(s);}
+				}
+				continue;
+			}
+
+			//Check professors
+			String prof=(cl[row][3].isEmpty())?"Scott Kaplan":cl[row][3];
+			String[] profs = prof.split("  ");
+			for (String s:profs){
+				Professor p = pH.get(s);
+				temp.addProfessor(p);
+				if (temp==null) System.out.println("TEMP");
+				else if(p==null) System.out.println("PROF");
+				p.addCourse(temp);
+			}
+							
 			courseList.add(temp);
 			ch.put(longname, temp);
-			boolean[]tech=new boolean[5];
+			
+			// TODO: handle tech please - must find out where getting info from
+			/*boolean[]tech=new boolean[5];
 			int slidesNeeded=0;
 			for(int i=0;i<tech.length;i++){
 				tech[i]=cl[row][i+9].isEmpty();
@@ -323,12 +399,14 @@ public class Driver{
 			}
 			temp.setTech(tech);
 			temp.setNumberOfSlides(slidesNeeded);
+			*/
 			
 			//Making preferred Times Begins
-			String daysOfWeek=cl[row][4];
-			String time=cl[row][5];
+			String[] dayandTime=cl[row][5].split(" ");
+			String day = dayandTime[0];
+			String time=dayandTime[1];
 			String[] times=time.split("-",2);
-			String[] dow=daysOfWeek.split("");
+			String[] dow=day.split("");
 			Time t;
 			
 			if(!times[0].isEmpty()){
@@ -346,69 +424,60 @@ public class Driver{
 					temp.addPreferredTime(t);
 				}
 			}
-			
-			for (int i=0; i<drS.length; i++){
-				if (deptname.equals(drS[i][0])){
-					for (Room room: r){
-						if (room.toString().equals(drS[i][1])){
-							temp.addPreferredRoom(room);
-						}
-					}
-				}
-			}
-			
 			//End preferredTimes
+			//Making preferredRooms 
 			
-			//Handling preferredRooms Begins
-			//if (!cl[row][6].isEmpty()){
-				//Building
-				//String buildingShort=cl[row][6];
-												
-				//ArrayList<Room> roomsInBuilding;
-				//if (rH.containsKey(buildingShort)){
-				//	roomsInBuilding=rH.get(buildingShort);
-				//} else {
-				//	System.out.println("Throw an error for "+buildingShort+"!");
-				//	continue;
-				//}
-
-				//temp.techFilterRooms(roomsInBuilding);
+			ArrayList<Room> dRooms=new ArrayList<Room>();
+			dRooms.addAll(drS.get(deptname));
+			System.out.println(shortname+"\n");
+			System.out.println("dRooms size: "+ dRooms.size());
+			//System.out.println(crS.containsKey(shortname.substring(0, shortname.length()-3))+" for course "+shortname);
+			ArrayList<Room> cRooms=crS.get(shortname.substring(0, shortname.length()-3));
+			ArrayList<Room> pRooms=new ArrayList<Room>();
+			System.out.println(temp.getProfessors().size());
+			for(Professor p:temp.getProfessors()){
+				//System.out.println("prof rooms "+rapH.get(p.getName()));
+				pRooms.addAll(rapH.get(p.getName()));
+			}
+			System.out.println("sizes "+pRooms.size()+" "+cRooms.size());
+			ArrayList<Room> tempD2=new ArrayList<Room>();
+			ArrayList<Room> tempD=new ArrayList<Room>();
+			tempD.addAll(dRooms);
+				for(int j=0;j<dRooms.size();j++){
+					//System.out.println("conatins c "+cRooms.contains(dRooms.get(j)));
+					//System.out.println("conatins p "+pRooms.contains(dRooms.get(j)));
+					if(!cRooms.contains(dRooms.get(j))&&!pRooms.contains(dRooms.get(j))){
+						tempD2.add(dRooms.get(j));
+					}
+					
+					
+				}
 				
-				
-				//Make generic method that takes a field and removes based on it
-
-				//Room Number
-				 /*String[] roomnum=cl[row][7].split(",");
-				 for (String rn : roomnum){
-					 if (!rn.equals("")){
-						 for (Room r:roomsInBuilding){//change to c.getRooms
-							 if(!r.isRoomNumber(rn)){
-								 roomsInBuilding.remove(r);
-						 }
-					 }
-				 }*/
-				 
-				
-				//ok to add here because we're generating rooms
-				//after this will will only remove rooms from preferredRooms
-				//temp.addPreferredRoomsList(roomsInBuilding);
-				
-			//}//Making preferredRooms Ends
-			//remove rooms based on access if need be
-			boolean needsAccessible=false;
-			for(Professor pr: temp.getProfessors()){
-				if(pr.isNeedsAccess())
-					needsAccessible=true;
+			
+			
+			System.out.println("tempD2 "+tempD2.size());
+			
+			for(Room r2:tempD2){
+				dRooms.remove(r2);
 			}
 			
-			
-			if(needsAccessible){ //where the fuck do we put this shit omg wtf >_<
-				temp.cleanse();
+			if(dRooms.isEmpty()){
+				System.out.println("EMPTY");
+				dRooms.addAll(tempD);
 			}
-				
-			//prefRooms are now cleansed if the professor needs accessible rooms
+			temp.addPreferredRoomsList(dRooms);
+			//dRooms=drS.get(deptname);
+			
+			//System.out.println("dRooms size again "+dRooms.size()+"\n");
+			
+			
+			
+			
+			//End preferredRooms
+			
 		}
 		courseList.trimToSize();
+		System.out.println("Done courses");
 		return courseList;
 	}// generateCourses
 	// =================================================================================================================================================================================
@@ -551,13 +620,34 @@ public class Driver{
 	
 	// =================================================================================================================================================================================
 	//TODO:Depricate this?
-	public ArrayList<Professor> generateProfessors(String[][] profs, Hashtable<String,Professor> pH){//just some speculative code for now on how we should break stuff up		
+	public ArrayList<Professor> generateProfessors(String[][] profs, Hashtable<String,Professor> pH, ArrayList<Room> rooms){//just some speculative code for now on how we should break stuff up		
 		System.out.println("Generating Professors");
 		ArrayList<Professor> profList=new ArrayList<Professor>();
-		for(int row=1;row<profs.length;row++){
+		for(int row=0;row<profs.length;row++){
 			String name=profs[row][0];
 			//System.out.println(name);
 			Professor p=new Professor(name);
+			String[] r = profs[row][1].split(", ");
+			if (r[0].isEmpty()){ continue; }
+			System.out.println(p.getName());
+			//TODO: might want to check this
+			for (String s: r){
+				System.out.println(s);
+				String ss = s.substring(0,4);
+				if(ss.equals("ESNH")) {ss="BEBU";}
+				if(ss.equals("MUSI")) {ss="ARMU";}
+				ArrayList<Room> bm = buildingMap.get(ss);
+				
+				for(Iterator<Room> it = bm.iterator(); it.hasNext();){
+					Room ru=it.next();
+					if(ru.getRoomNumber().equals(s.substring(6))){
+						p.addRooms(ru);
+					}
+				}
+								
+			}
+			System.out.println("Survived");
+			
 			//Don't forget that we're setting the size of profList by hand up in go()
 			if (pH.containsKey(name)){//we should "probably" write our own exception. 
 				try {
@@ -569,6 +659,8 @@ public class Driver{
 			profList.add(p);
 			pH.put(name,p);
 		}
+		
+		
 		System.out.println("Help");
 		profList.trimToSize();
 		return profList;
