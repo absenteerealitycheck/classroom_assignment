@@ -28,6 +28,7 @@ public class Driver{
 	
 	public HashMap<String,ArrayList<Room>> buildingMap=new HashMap<String,ArrayList<Room>>(40);
 	public ArrayList<Course> badCourses= new ArrayList<Course>(15);
+	public ArrayList<Time> times = new ArrayList<Time>(85); //17 half-hour blocks per day, 5 days
 	
 	// =================================================================================================================================================================================
 	/**
@@ -52,6 +53,12 @@ public class Driver{
 		
 		boolean testing=false;
 		
+		generateTimes();
+		
+		boolean giveUp=true;
+		if (giveUp){
+			return;
+		}
 		//Merge the duplicates from manually fixing old two digit course numberings
 		//fixFirstPass();
 		
@@ -61,10 +68,7 @@ public class Driver{
 		String[][] roomsAndCoursesSpreadsheet=makeSpreadsheet(new File("proto-roomsandcourseslist.csv"));
 		//secondPass(roomsAndProfsSpreadsheet, roomsAndCoursesSpreadsheet, roomsAndDeptsSpreadsheet);
 				
-		boolean giveUp=true;
-		if (giveUp){
-			return;
-		}
+	
 		
 		
 
@@ -86,7 +90,7 @@ public class Driver{
 		String[][] professorSpreadsheet=makeSpreadsheet(new File("proto-profslist.csv"));
 		String[][] deptroomSpreadsheet=makeSpreadsheet(new File("proto-deptrooms.csv"));
 		String[][] courseSpreadsheet=(testing)?makeSpreadsheet(new File("proto-courselist-easy.csv"))
-					:makeSpreadsheet(new File("proto-courselist.csv"));
+					:makeSpreadsheet(new File("workingCourseList.csv"));
 		
 		// Create Hashtables for quicker lookup
 		Hashtable<String,Course> courseHash=new Hashtable<String,Course>(courseSpreadsheet.length*2);
@@ -137,7 +141,31 @@ public class Driver{
 	} //go
 	// =================================================================================================================================================================================
 	
-	
+	// ===================================================================
+	/**
+	 * makes times for each of the days in 30 min increments
+	 */
+	public void generateTimes(){
+		Time temp=null;
+		for (int i=0;i<5;i++) {
+			boolean seventy = false;
+			for (int j=830;j<1700;j+=30){
+				if (seventy) {
+					j+=40;
+					temp = new Time(i,j,j+30);
+					System.out.println(temp.toString());
+					times.add(temp);
+					seventy=false;
+				}
+				else {
+					temp = new Time(i,j,j+70);
+					System.out.println(temp.toString());
+					times.add(temp);
+					seventy=true;				
+				}
+			}
+		}
+	}
 	
 	// =================================================================================================================================================================================
 	public Object secondPass(String[][]rAPL, String[][] rACL, String[][] rADL){ //probably/def need to add parameters.
@@ -808,3 +836,48 @@ public class Driver{
 // =====================================================================================================================================================================================
 } // class Driver
 // =====================================================================================================================================================================================
+
+/* from Time, for later
+//Break up the start and end times into hour and minute 
+String[]s=start.split(":");
+String[]e=end.split(":");
+
+//Create the hour and minute blocks for the start and end
+this.startHour=Integer.parseInt(s[0]);
+if (startsInPM.equals("PM")){this.startHour+=12;}
+this.startMinute=Integer.parseInt(s[1]);
+this.endHour=Integer.valueOf(e[0]);
+if (endsInPM.equals("PM")){this.endHour+=12;}
+this.endMinute=Integer.valueOf(e[1]);
+*/
+
+// ===============================================================
+// 
+/**
+ * Converts a String representation of the day of week and into an 
+ * int representation using 0 for Monday, 4 for Friday, and -1 for
+ * Saturday or Sunday.
+ * @param dow - String representation of the day of the week
+ * @return int representation of the day of the week 
+ *//*
+private int convertDayOfWeek(String dow){
+
+	if(dow.equals("M")){
+		return 0;
+	}
+	else if(dow.equals("T")){
+		return 1;
+	}
+	else if(dow.equals("W")){
+		return 2;
+	}
+	else if(dow.equals("H")){
+		return 3;
+	}
+	else if(dow.equals("F")){
+		return 4;
+	}
+	
+	return -1;
+}// convertDayOfWeek
+// ===============================================================*/
