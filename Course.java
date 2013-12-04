@@ -18,7 +18,6 @@ public class Course{
 	private String longName;
 	private ArrayList<String> shortName; 
 	private ArrayList<String> department;
-	private ArrayList<Time> preferredTimes;
 	private Time time;
 
 
@@ -55,7 +54,7 @@ public class Course{
 	
 		this.preferredRooms= new ArrayList<Room>(50);
 		this.shortName=new ArrayList<String>(5);
-		this.preferredTimes = new ArrayList<Time>(10);
+		this.time = null;
 		this.professors = new ArrayList<Professor>(2);
 
 		// Course type setter.
@@ -153,31 +152,7 @@ public class Course{
 		this.capacity = capacity;
 	}
 	
-	/**
-	 * 
-	 * @return preferred times for this course
-	 */
-	public ArrayList<Time> getPreferredTimes() {
-		return preferredTimes;
-	}
 	
-	/**
-	 * 
-	 * @param preferredTime added to preferredTimes list
-	 */
-	public void addPreferredTime(Time preferredTime) {
-		this.preferredTimes.add(preferredTime);
-	}
-	
-	/**
-	 * 
-	 * @return number of preferred times
-	 */
-	public int getNumberOfPreferredTimes(){
-		return this.preferredTimes.size();
-	}
-
-
 	/**
 	 * 
 	 * @return course type (lab, lecture, discussion, seminar)

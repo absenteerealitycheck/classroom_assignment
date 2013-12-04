@@ -28,7 +28,7 @@ public class Time implements Comparable<Time>{
 	int startTime; //use "military" time, i.e. 8:00am = 0800 = 800
 	int endTime;
 	//String token;
-	ArrayList<Course> courses; 
+	ArrayList<Course> courses= new ArrayList<Course>(); 
     // ===============================================================
 
     // ===============================================================
@@ -141,9 +141,18 @@ public class Time implements Comparable<Time>{
 	public void setCourses(ArrayList<Course> c) {
 		this.courses=c;
 	}
+	public void addCourse(Course c){
+		this.courses.add(c);
+	}
 	
 	public String toString() {
 		return (dayOfWeek+": "+startTime+", "+endTime);
+	}
+
+	@Override
+	public int compareTo(Time arg0) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 	
 // ===================================================================
