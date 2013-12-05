@@ -55,7 +55,7 @@ public class Driver{
 		boolean testing=false;
 		
 		
-		System.out.println("Hello World!");
+	/*	System.out.println("Hello World!");
 		Room sr=new Room("SMUD", "007");
 		System.out.println(sr);
 		
@@ -68,17 +68,14 @@ public class Driver{
 		
 		sr.addCourse(cr);
 		System.out.println(sr.getCourses());
+		*/
 		
-		
-		boolean giveUp=true;
-		if (giveUp){
-			return;
-		}
-		
+	
+
 		
 		
 		generateTimes();
-		
+
 		
 		//Merge the duplicates from manually fixing old two digit course numberings
 		//fixFirstPass();
@@ -94,9 +91,8 @@ public class Driver{
 		
 		String[][] courseSpreadsheet=makeSpreadsheet(new File("workingCourseList.csv"));
 		System.out.println("Mother fucking breadcrumbs!: "+courseSpreadsheet.length);
-		System.in.read();
-		
-		
+		//System.in.read();
+	
 
 		// Make a first pass through the historical data to generate more useful spreadsheets
 		String[][] courseHistSpreadsheet=makeSpreadsheet(new File("proto-coursehistory.csv"));
@@ -144,9 +140,10 @@ public class Driver{
 			
 		
 		
-		boolean print=false;
+		//boolean print=false;
+		ArrayList<Time> tempTimes=null;
 		for (Course c: courses) {
-			int startSize=c.getPreferredRooms().size();
+			/*int startSize=c.getPreferredRooms().size();
 			c.checkCapacity();//rename to ensureCapacity
 			c.checkLabs();
 			if (c.getPreferredRooms().size()!=startSize){
@@ -161,10 +158,24 @@ public class Driver{
 				}
 				System.out.println();
 			}
-			print=false;
+			print=false;*/
+			
+			System.out.println(c.getShortName());
+			tempTimes = c.getTimes();
+			if (tempTimes.isEmpty()) {
+				System.out.println("=problem=");
+				//break;
+			}
+			for (Time t:tempTimes){
+				System.out.print(t.toString()+" | ");
+			}
+			System.out.print("\n");
 		}
 		
-		
+		boolean giveUp=true;
+		if (giveUp){
+			return;
+		}
 		//ArrayList<Course> setCourses= bruteForce(courses);
 		/*		
 		//shuffle to get different solutions
@@ -187,7 +198,8 @@ public class Driver{
 		Time temp=null;
 		for (int i=0;i<5;i++) {
 			boolean seventy = false;
-			for (int j=800;j<1830;j+=30){
+			for (int j=000;j<1830;j+=30){
+				if (j==1200) System.out.println("WHATUP");
 				if (seventy) {
 					
 					temp = new Time(i,j,j+70);
@@ -353,12 +365,15 @@ public class Driver{
 	 * @return
 	 * @throws IOException 
 	 */
+	
+	//TODO: check for prev creation before seeing crosslists
+		
 	public ArrayList<Course> generateCourses(String[][] cl, HashMap<String,ArrayList<Room>> drS,HashMap<String,ArrayList<Room>> crS,
 			Hashtable<String,Course> ch, ArrayList<Room> r, Hashtable<String,Professor> pH, Hashtable<String,Time> tH,HashMap<String,ArrayList<Room>> rapH) throws IOException{
 
 		System.out.println("Generating Courses");
 		System.out.println(cl.length);
-		System.in.read();
+		//System.in.read();
 		ArrayList<Course> courseList=new ArrayList<Course>();
 		Course temp;
 		
@@ -384,11 +399,14 @@ public class Driver{
 			
 			//Check for crosslisting
 			if(!cl[row][2].isEmpty()){
+				System.out.println("CROSSED");
 				String[] crossList=cl[row][2].split(",");
 				for (String s: crossList) {
+					System.out.print("["+s+"]");
 					if (!s.equals(shortname)){temp.addShortName(s);}
 				}
-				continue;
+				System.out.print("\n");
+				if (ch.containsKey(temp.getLongName())) continue;
 			}
 
 			//Check professors
@@ -423,14 +441,14 @@ public class Driver{
 			String day = dayandTime[0];
 			String time=dayandTime[1];
 			String[] dow=day.split("");
-				for(String s:dow){
-					System.out.println(s+ "in dow");
-				}
+			/*for(String s:dow){
+					System.out.println(s+ " in dow");
+			}*/
 			Time t=null;
 			ArrayList<Integer> dayOf=new ArrayList<Integer>(dow.length) ;
-			System.out.println(dayOf.size());
+			//System.out.println(dayOf.size());
 			for (int i=0;i<dow.length;i++){
-				System.out.println("print i "+i+ "dayOf"+ dayOf.size());
+				//System.out.println("print i "+i+ "dayOf"+ dayOf.size());
 				if(dow[i].equals("M")){
 					
 					 dayOf.add(0);
@@ -470,18 +488,27 @@ public class Driver{
 			String ending=time2[1];
 			int startHours=(Integer.parseInt(begin.substring(0, 2)));
 			int endHour=(Integer.parseInt(ending.substring(0, 2)));
-			System.out.println("thing 2: "+Integer.parseInt(begin.substring(3,begin.length()-2)));
+		//	System.out.println("thing 2: "+Integer.parseInt(begin.substring(3,begin.length()-2)));
 			int start=(Integer.parseInt(begin.substring(0, 2)))*100+Integer.parseInt(begin.substring(3,begin.length()-2));
 			int end=(Integer.parseInt(ending.substring(0, 2)))*100;
+			
+			if(begin.substring((begin.length()-2)).equals("PM")&&!(begin.subSequence(0, 2).equals("12"))){
+				start+=1200;
+				startHours+=12;
+			}
+			if(ending.substring((ending.length()-2)).equals("PM")&&!(ending.subSequence(0, 2).equals("12"))){
+				end+=1200;
+				endHour+=12;
+			}
 			int numOfBlocks=(endHour-startHours)*2;
-		
+			
 			if(ending.subSequence(3,ending.length()-2).equals("20")){
-				System.out.println("end is 30");
+			//	System.out.println("end is 30");
 				end+=30;
 				numOfBlocks++;
 			}
 			else if(ending.subSequence(3,ending.length()-2).equals("50")){
-				System.out.println("end is 00");
+			//	System.out.println("end is 00");
 				end+=100;
 				numOfBlocks+=2;
 			}
@@ -490,26 +517,20 @@ public class Driver{
 			
 			}
 			else if(ending.subSequence(3,ending.length()-2).equals("30")){
-				System.out.println("end is 30");
+			//	System.out.println("end is 30");
 				end+=30;
 				numOfBlocks++;
 			}
 			
-			if(begin.substring((begin.length()-2)).equals("PM")&&!(begin.subSequence(0, 2).equals("12"))){
-				start+=1200;
-			}
-			if(ending.substring((ending.length()-2)).equals("PM")&&!(ending.subSequence(0, 2).equals("12"))){
-				
-				end+=1200;
-			}
+
 			
-			System.out.println(" number of blocks: "+numOfBlocks);
-			System.out.println(" start: "+start);
-			System.out.println(" end: "+end);
+			//System.out.println(" number of blocks: "+numOfBlocks);
+		/*	System.out.println(" start: "+start);
+			System.out.println(" end: "+end);*/
 			int basicend=start;
-			System.out.println("thing: "+(String.valueOf(start).substring(String.valueOf(start).length()-2).equals("00")));
+			//System.out.println("thing: "+(String.valueOf(start).substring(String.valueOf(start).length()-2).equals("00")));
 			if(String.valueOf(start).substring(String.valueOf(start).length()-2).equals("00")){
-				System.out.println("in if>");
+			//	System.out.println("in if>");
 				
 				basicend=start+30;
 			}
@@ -520,7 +541,8 @@ public class Driver{
 			
 			int index=-1;
 			//System.out.println(t.toString());
-			System.out.println(" number of blocks2: "+numOfBlocks);
+			//System.out.println(" number of blocks2: "+numOfBlocks);
+	
 			for(int j=0;j<dayOf.size();j++){
 				for(Time ti:times){
 					if(ti.getDayOfWeek()==dayOf.get(j)&&ti.getStartTime()==start&&ti.getEndTime()==basicend){
@@ -528,11 +550,20 @@ public class Driver{
 					}
 				}
 			
-				
+				//System.out.println(temp.toString());
+				//System.out.println("Index: "+index);
+				Time timeT;
+				//System.out.println("BLOCKS: "+numOfBlocks);
 				for(int i=0;i<numOfBlocks;i++){
-					System.out.println("index: "+(index+i)+ "contains? "+times.get(index).toString());
+					//System.out.println("index: "+(index+i)+ " contains? "+times.get(index+i).toString());
 					times.get(index+i).addCourse(temp);//add to Time block in ArrayList of Times
+					timeT=times.get(index+i);
+					if (temp==null) System.out.println("!!!");
+					if (timeT==null) System.out.println("???");
+					//System.out.print(timeT.toString() + " | ");
+					temp.addTime(timeT);
 				}
+				//System.out.print("\n");
 			}
 			
 			//temp.setTime(t);//add Time to Course
@@ -542,17 +573,17 @@ public class Driver{
 			
 			ArrayList<Room> dRooms=new ArrayList<Room>();
 			dRooms.addAll(drS.get(deptname));
-			System.out.println(shortname+"\n");
-			System.out.println("dRooms size: "+ dRooms.size());
+			//System.out.println(shortname+"\n");
+			//System.out.println("dRooms size: "+ dRooms.size());
 			//System.out.println(crS.containsKey(shortname.substring(0, shortname.length()-3))+" for course "+shortname);
 			ArrayList<Room> cRooms=crS.get(shortname.substring(0, shortname.length()-3));
 			ArrayList<Room> pRooms=new ArrayList<Room>();
-			System.out.println(temp.getProfessors().size());
+		//	System.out.println(temp.getProfessors().size());
 			for(Professor p:temp.getProfessors()){
 				//System.out.println("prof rooms "+rapH.get(p.getName()));
 				pRooms.addAll(rapH.get(p.getName()));
 			}
-			System.out.println("sizes "+pRooms.size()+" "+cRooms.size());
+			//System.out.println("sizes "+pRooms.size()+" "+cRooms.size());
 			ArrayList<Room> tempD2=new ArrayList<Room>();
 			ArrayList<Room> tempD=new ArrayList<Room>();
 			tempD.addAll(dRooms);
@@ -568,7 +599,7 @@ public class Driver{
 				
 			
 			
-			System.out.println("tempD2 "+tempD2.size());
+			//System.out.println("tempD2 "+tempD2.size());
 			
 			for(Room r2:tempD2){
 				dRooms.remove(r2);
@@ -590,6 +621,7 @@ public class Driver{
 			
 		}
 		courseList.trimToSize();
+
 		System.out.println("Done courses");
 		return courseList;
 	}// generateCourses

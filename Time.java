@@ -99,6 +99,24 @@ public class Time implements Comparable<Time>{
     // ===============================================================
 	
 	// ===============================================================
+	// set startTime
+	public void setStartTime(int startTime) {
+		this.startTime = startTime;
+	}// setStartTime
+
+	// ===============================================================
+	// return endTime
+	public int getEndTime() {
+		return endTime;
+	}// getEndTime
+
+	// ===============================================================
+	// set endTime
+	public void setEndTime(int endTime) {
+		this.endTime = endTime;
+	}// setEndTime
+
+	// ===============================================================
 	public int getStartHour(){
 		return Integer.parseInt((""+startTime).substring(0, (""+startTime).length()-2));
 	}
@@ -121,26 +139,7 @@ public class Time implements Comparable<Time>{
 		return (h*2)+(m/30);
 	}
 
-	// ===============================================================
-	// set startTime
-	public void setStartTime(int startTime) {
-		this.startTime = startTime;
-	}// setStartTime
-    // ===============================================================
-
-	// ===============================================================
-	// return endTime
-	public int getEndTime() {
-		return endTime;
-	}// getEndTime
-    // ===============================================================
-
-	// ===============================================================
-	// set endTime
-	public void setEndTime(int endTime) {
-		this.endTime = endTime;
-	}// setEndTime
-    // ===============================================================
+	
 
 	/*// ===============================================================
 	// return token

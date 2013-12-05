@@ -19,8 +19,7 @@ public class Course{
 	private ArrayList<String> shortName; 
 	private ArrayList<String> department;
 	private Time time;
-
-
+	private ArrayList<Time> times; 
 	private int capacity;
 	private ArrayList<Room> preferredRooms;
 	private ArrayList<Professor> professors;
@@ -28,8 +27,6 @@ public class Course{
 	private boolean labCourse;
 	private boolean lectureCourse;
 	private boolean seminarCourse;
-	private ArrayList<Course> concurrent;
-	private ArrayList<Course> noncurrent;
 	private Room assignment;
 	private ArrayList<Course> edges;
 	private boolean[] tech;//list of tech booleans
@@ -55,6 +52,7 @@ public class Course{
 		this.preferredRooms= new ArrayList<Room>(50);
 		this.shortName=new ArrayList<String>(5);
 		this.time = null;
+		this.times = new ArrayList<Time>();
 		this.professors = new ArrayList<Professor>(2);
 
 		// Course type setter.
@@ -78,7 +76,18 @@ public class Course{
 	public void setTime(Time time) {
 		this.time = time;
 	}
-
+	
+	public ArrayList<Time> getTimes() {
+		return times;
+	}
+	
+	public void setTime(ArrayList<Time> t) {
+		this.times = t;
+	}
+	
+	public void addTime(Time t){
+		this.times.add(t);
+	}
 	
 	/**
 	 * 
