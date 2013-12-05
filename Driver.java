@@ -54,12 +54,32 @@ public class Driver{
 		
 		boolean testing=false;
 		
-		generateTimes();
+		
+		System.out.println("Hello World!");
+		Room sr=new Room("SMUD", "007");
+		System.out.println(sr);
+		
+		Course cr= new Course(-1,"Foobar","test");
+		cr.addShortName("COSC-0");
+		System.out.println(cr);
+		
+		String crs="Foobar ([COSC-0])*";
+		System.out.println(crs);
+		
+		sr.addCourse(cr);
+		System.out.println(sr.getCourses());
+		
 		
 		boolean giveUp=true;
 		if (giveUp){
 			return;
 		}
+		
+		
+		
+		generateTimes();
+		
+		
 		//Merge the duplicates from manually fixing old two digit course numberings
 		//fixFirstPass();
 		
@@ -73,8 +93,8 @@ public class Driver{
 		// Aggregate spreadsheets to form preferred rooms list for courses.
 		
 		String[][] courseSpreadsheet=makeSpreadsheet(new File("workingCourseList.csv"));
-		
-
+		System.out.println("Mother fucking breadcrumbs!: "+courseSpreadsheet.length);
+		System.in.read();
 		
 		
 
@@ -103,7 +123,7 @@ public class Driver{
 		String[][] courseSpreadsheet=(testing)?makeSpreadsheet(new File("proto-courselist-easy.csv"))
 					:makeSpreadsheet(new File("workingCourseList.csv"));
 
-		
+		*/
 		// Create Hashtables for quicker lookup
 		Hashtable<String,Course> courseHash=new Hashtable<String,Course>(courseSpreadsheet.length*2);
 		Hashtable<String,Professor> professorHash=new Hashtable<String,Professor>(roomsAndProfsSpreadsheet.length*2);
@@ -122,10 +142,7 @@ public class Driver{
 		ArrayList<Course> courses= generateCourses(courseSpreadsheet,roomsAndDeptsHash,roomsAndCoursesHash,courseHash,rooms, professorHash, timeHash,roomsAndProfsHash);
 		courses.trimToSize();
 			
-		boolean giveUp=true;
-		if (giveUp){
-			return;
-		}
+		
 		
 		boolean print=false;
 		for (Course c: courses) {
@@ -148,7 +165,7 @@ public class Driver{
 		}
 		
 		
-		ArrayList<Course> setCourses= bruteForce(courses);
+		//ArrayList<Course> setCourses= bruteForce(courses);
 		/*		
 		//shuffle to get different solutions
 		Collections.shuffle(courses);
@@ -166,25 +183,28 @@ public class Driver{
 	 * makes times for each of the days in 30 min increments
 	 */
 	public void generateTimes(){
+		System.out.println("Generating Times");
 		Time temp=null;
 		for (int i=0;i<5;i++) {
 			boolean seventy = false;
-			for (int j=830;j<1700;j+=30){
+			for (int j=800;j<1830;j+=30){
 				if (seventy) {
+					
+					temp = new Time(i,j,j+70);
 					j+=40;
-					temp = new Time(i,j,j+30);
 					System.out.println(temp.toString());
 					times.add(temp);
 					seventy=false;
 				}
 				else {
-					temp = new Time(i,j,j+70);
+					temp = new Time(i,j,j+30);
 					System.out.println(temp.toString());
 					times.add(temp);
 					seventy=true;				
 				}
 			}
 		}
+		System.out.println("Done Generating Times");
 	}
 	
 	// =================================================================================================================================================================================
@@ -331,14 +351,18 @@ public class Driver{
 	 * @param pH professorHash
 	 * @param tH timeHash
 	 * @return
+	 * @throws IOException 
 	 */
 	public ArrayList<Course> generateCourses(String[][] cl, HashMap<String,ArrayList<Room>> drS,HashMap<String,ArrayList<Room>> crS,
-			Hashtable<String,Course> ch, ArrayList<Room> r, Hashtable<String,Professor> pH, Hashtable<String,Time> tH,HashMap<String,ArrayList<Room>> rapH){
+			Hashtable<String,Course> ch, ArrayList<Room> r, Hashtable<String,Professor> pH, Hashtable<String,Time> tH,HashMap<String,ArrayList<Room>> rapH) throws IOException{
 
 		System.out.println("Generating Courses");
+		System.out.println(cl.length);
+		System.in.read();
 		ArrayList<Course> courseList=new ArrayList<Course>();
 		Course temp;
-		for(int row=0;row<cl.length;row++){//start at 1 because first row is headings of columns
+		
+		for(int row=0;row<cl.length;row++){
 			
 			/*
 			 * Create all local variables
@@ -395,42 +419,124 @@ public class Driver{
 			*/
 			
 			//Making preferred Times Begins
-			String[] dayandTime=cl[row][5].split(" ");
+			String[] dayandTime=cl[row][5].split(" ");//TODO:HANDLE DAYS OF WEEK YOU FOOL
 			String day = dayandTime[0];
 			String time=dayandTime[1];
-			String[] times=time.split("-",2);
 			String[] dow=day.split("");
-			Time t;
-			int dayOf = -1;
+				for(String s:dow){
+					System.out.println(s+ "in dow");
+				}
+			Time t=null;
+			ArrayList<Integer> dayOf=new ArrayList<Integer>(dow.length) ;
+			System.out.println(dayOf.size());
 			for (int i=0;i<dow.length;i++){
+				System.out.println("print i "+i+ "dayOf"+ dayOf.size());
 				if(dow[i].equals("M")){
-					 dayOf = 0;
+					
+					 dayOf.add(0);
 				}
 				else if(dow[i].equals("T")){
-					if ((i+1)!=dow[i].length) {
-						if (dow[i+1].equals("H"))
-							dayOf=3;
-						else dayOf=1;
+					
+					if ((i+1)!=dow.length) {
+						if (dow[i+1].equals("H")){
+							dayOf.add(3);
+						}
+						else{
+							dayOf.add(1);
+						}
 					}
+					else{
+						dayOf.add(1);
+					}
+					
 				}
 				
 				else if(dow[i].equals("W")){
-					return 2;
+					dayOf.add(2);
 				}
 				
 				else if(dow[i].equals("F")){
-					return 4;
+					dayOf.add( 4);
 				}
 				
 				else if(dow[i].equals("H")){
 					continue;
 				}
 				
-				else return -1;
-				
+								
 			}
-				
+			String[] time2=time.split("-",2);	
+			String begin=time2[0];
+			String ending=time2[1];
+			int startHours=(Integer.parseInt(begin.substring(0, 2)));
+			int endHour=(Integer.parseInt(ending.substring(0, 2)));
+			System.out.println("thing 2: "+Integer.parseInt(begin.substring(3,begin.length()-2)));
+			int start=(Integer.parseInt(begin.substring(0, 2)))*100+Integer.parseInt(begin.substring(3,begin.length()-2));
+			int end=(Integer.parseInt(ending.substring(0, 2)))*100;
+			int numOfBlocks=(endHour-startHours)*2;
 		
+			if(ending.subSequence(3,ending.length()-2).equals("20")){
+				System.out.println("end is 30");
+				end+=30;
+				numOfBlocks++;
+			}
+			else if(ending.subSequence(3,ending.length()-2).equals("50")){
+				System.out.println("end is 00");
+				end+=100;
+				numOfBlocks+=2;
+			}
+			else if(ending.subSequence(3,ending.length()-2).equals("00")) {
+				end+=Integer.parseInt(ending.substring(3,ending.length()-2));
+			
+			}
+			else if(ending.subSequence(3,ending.length()-2).equals("30")){
+				System.out.println("end is 30");
+				end+=30;
+				numOfBlocks++;
+			}
+			
+			if(begin.substring((begin.length()-2)).equals("PM")&&!(begin.subSequence(0, 2).equals("12"))){
+				start+=1200;
+			}
+			if(ending.substring((ending.length()-2)).equals("PM")&&!(ending.subSequence(0, 2).equals("12"))){
+				
+				end+=1200;
+			}
+			
+			System.out.println(" number of blocks: "+numOfBlocks);
+			System.out.println(" start: "+start);
+			System.out.println(" end: "+end);
+			int basicend=start;
+			System.out.println("thing: "+(String.valueOf(start).substring(String.valueOf(start).length()-2).equals("00")));
+			if(String.valueOf(start).substring(String.valueOf(start).length()-2).equals("00")){
+				System.out.println("in if>");
+				
+				basicend=start+30;
+			}
+			else if(String.valueOf(start).substring(String.valueOf(start).length()-2).equals("30")){
+				basicend=start+70;
+				numOfBlocks--;
+			}
+			
+			int index=-1;
+			//System.out.println(t.toString());
+			System.out.println(" number of blocks2: "+numOfBlocks);
+			for(int j=0;j<dayOf.size();j++){
+				for(Time ti:times){
+					if(ti.getDayOfWeek()==dayOf.get(j)&&ti.getStartTime()==start&&ti.getEndTime()==basicend){
+						index=times.indexOf(ti);	
+					}
+				}
+			
+				
+				for(int i=0;i<numOfBlocks;i++){
+					System.out.println("index: "+(index+i)+ "contains? "+times.get(index).toString());
+					times.get(index+i).addCourse(temp);//add to Time block in ArrayList of Times
+				}
+			}
+			
+			//temp.setTime(t);//add Time to Course
+			//preferredTimes	
 
 			//Making preferredRooms 
 			
@@ -551,7 +657,7 @@ public class Driver{
 	 * @param courses The list of all course objects for this semester
 	 * @return The list of courses, all assigned to rooms
 	 **/
-	public ArrayList<Course> bruteForce(ArrayList<Course> courses){
+	/*public ArrayList<Course> bruteForce(ArrayList<Course> courses){
 		double counter=0;
 		for(Course c:courses){
 			if(c.getPreferredRooms().isEmpty()){
@@ -580,7 +686,7 @@ public class Driver{
 		System.out.println("Conflicts is "+counter);
 		System.out.println("Solution Quality is "+((courses.size()-counter)/courses.size()*100)+"%");
 		return courses;
-	} //bruteForce
+	} //bruteForce*/
 	// =================================================================================================================================================================================
 	
 	
@@ -636,10 +742,10 @@ public class Driver{
 			Professor p=new Professor(name);
 			String[] r = profs[row][1].split(", ");
 			if (r[0].isEmpty()){ continue; }
-			System.out.println(p.getName());
+			//System.out.println(p.getName());
 			//TODO: might want to check this
 			for (String s: r){
-				System.out.println(s);
+				//System.out.println(s);
 				String ss = s.substring(0,4);
 				if(ss.equals("ESNH")) {ss="BEBU";}
 				if(ss.equals("MUSI")) {ss="ARMU";}
@@ -653,7 +759,7 @@ public class Driver{
 				}
 								
 			}
-			System.out.println("Survived");
+			//System.out.println("Survived");
 			
 			//Don't forget that we're setting the size of profList by hand up in go()
 			if (pH.containsKey(name)){//we should "probably" write our own exception. 

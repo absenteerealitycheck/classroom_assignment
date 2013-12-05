@@ -1,317 +1,83 @@
-// =========================================================================================================================================================================
+// =========================================================================================================================================
 // Room.java
 // againessmith13, jpham14, mmillian15, cbottum15
 // Fall 2013
-// =========================================================================================================================================================================
-
+// =========================================================================================================================================
 
 import java.util.*;
 import java.lang.*;
 import java.io.*;
 
-// =========================================================================================================================================================================
+// =========================================================================================================================================
 /**
- * An object that holds information about rooms on Amherst College Campus
+ * An object that holds information about rooms on Amherst College campus.
  */
-
 public class Room{
-// =========================================================================================================================================================================	
+	// =========================================================================================================================================	
 	private String roomNumber; 
 	private int capacity;
 	private String building;
 	private String buildingShort;
 	private boolean isAccessible;
-    private String type; //lab,seminar,lecture,small,studio
-   	boolean[] tech;
+	//TODO:What if a Room has more than one possible type?
+	private String type; //lab,seminar,lecture,small,studio
+	private boolean[] tech;
 	private int numberOfSlides;
-    private int[][] timesAssigned = new int[5][48]; //boolean[day][half-hour]
-    private ArrayList<Course> courses;
-    
+	private int[][] timesAssigned = new int[5][48]; //boolean[day][half-hour]
+	private ArrayList<Course> courses;
+	// =========================================================================================================================================
 
-// =========================================================================================================================================================================
-	/** The constructor.
-	* @param accessible boolean to indicate if the room is near an elevator
-	* @param building full building name
-	* @param buildingShort abbreviation for building name
-	* @param capacity capacity of the room
-	* @param roomNumber number of the room in the building
-	* @param type kind of room such as lab or lecture
-	*/  
-    public Room(boolean accessible,String building,String buildingShort,int capacity,String roomNumber,String type){
-    	//Initialize the globals
-    	this(building,roomNumber);
-    	this.capacity=capacity;
-    	this.buildingShort=buildingShort;
-    	this.isAccessible=accessible;
-    	this.type=type.toLowerCase();
-
-    } // Room
-// =========================================================================================================================================================================
-// =========================================================================================================================================================================
-	/**
-	 *  Secondary constructor for testing 
-	 * @param building name of building
-	 * @param roomNumber room number
-	 */
-    public Room (String building, String roomNumber){//Secondary constructor for use in generateCourses method
-    	//Initializes with all fields available in dummy data
-    	this.building=building;
-    	this.roomNumber=roomNumber;
-    	this.initRoomAvailable();
-    }// Room
-// =========================================================================================================================================================================   
-// =========================================================================================================================================================================
-    /**
-     * setTechnology sets booleans to indicate what technology a room has available
-     * @param t the array of technology booleans for this Room
-     * @param numberOfSlides int to indicates the number of slides this Room has
-     */
-    public void setTechnology(boolean[] t, int numberOfSlides){
-    		this.tech=t;
-    		this.numberOfSlides=numberOfSlides;
-    	}//setTechnology
-// =========================================================================================================================================================================    
-
-// ========================================================================================================================================================================= 
-   /**
-    * getTechnology returns the booleans indicating the Room's technological capabilities
-    * @return array of booleans indicating the Room's technological capabilities
-    */
-   public boolean[] getTechnology(){
-	  return this.tech;
-  }//getTechnology
-// =========================================================================================================================================================================   
-
-// ========================================================================================================================================================================= 
-   /**
-    * getNumberOfSlides
-    * @return int of number of slides in that Room
-    */
-	public int getNumberOfSlides() {
-		return numberOfSlides;
-	}//getNumberOfSlides
-// ========================================================================================================================================================================= 
-// ========================================================================================================================================================================= 
-	/**
-	 * getTimesAssigned
-	 * @return int [][] of times the Room is occupied
-	 */
-	public int[][] getTimesAssigned() {
-		return timesAssigned;
-	}//getTimesAssigned
-// ========================================================================================================================================================================= 
-// ========================================================================================================================================================================= 
-	/**
-	 * inSameBuilding
-	 * @param r another Room
-	 * @return boolean indicating if r is in the same building as this Room
-	 */
-	public boolean inSameBuilding(Room r){
-    	return this.building==r.getBuilding();
-    }//inSameBuilding
-// ========================================================================================================================================================================= 
-// ========================================================================================================================================================================= 
-	/**
-	 * getRoomNumber
-	 * @return String of this Room's room number
-	 */
-	public String getRoomNumber() {
-		return roomNumber;
-	}//getRoomNumber
-// ========================================================================================================================================================================= 
-// ========================================================================================================================================================================= 
-	/**
-	 * setRoomNumber
-	 * @param roomNumber a String representation of a room number
-	 */
-	public void setRoomNumber(String roomNumber) {
-		this.roomNumber = roomNumber;
-	}//setRoomNumber(String roomNumber)
-// ========================================================================================================================================================================= 
-// ========================================================================================================================================================================= 
-	/**
-	 * getCapacity
-	 * @return capacity of Room
-	 */
-	public int getCapacity() {
-		return capacity;
-	}//getCapacity
-// =========================================================================================================================================================================
-// =========================================================================================================================================================================
-	/**
-	 *  setCapacity
-	 * @param capacity is the capacity we are setting for this Room
-	 */
-	public void setCapacity(int capacity) {
-		this.capacity = capacity;
-	}//setCapacity(int capacity)
-// =========================================================================================================================================================================	
-// =========================================================================================================================================================================
-	/**
-	 * inBuilding
-	 * @param building String representation of a building name
-	 * @return whether this Room is in building
-	 */
-	public boolean inBuilding(String building){
-		return this.building.equals(building);
-	}//inBuilding
-// =========================================================================================================================================================================
-// =========================================================================================================================================================================
-	/**
-	 * getBuilding
-	 * @return building of Room
-	 */
-	public String getBuilding() {
-		return building;
-	}//getBuilding
-// =========================================================================================================================================================================	
-// =========================================================================================================================================================================
-	/**
-	 * inBuildingShort
-	 * @param buildingShort a building abbreviation
-	 * @return whether the Room is in the building represented by buildingShort
-	 */
-	public boolean inBuildingShort(String buildingShort){
-		return this.building.equals(building);
-	}//inBuildignShort
-// =========================================================================================================================================================================
-// =========================================================================================================================================================================
-	/**
-	 * getBuildingShort
-	 * @return the short form of a Room's building
-	 */
-	public String getBuildingShort() {
-		return buildingShort;
-	}//getBuildingShort
-// =========================================================================================================================================================================
-// =========================================================================================================================================================================
-	/**
-	 * setBuilding sets this Room's building to building
-	 * @param building the building this Room belongs to
-	 */
-	public void setBuilding(String building) {
-		this.building = building;
-	}//setBuilding
-// =========================================================================================================================================================================
-// =========================================================================================================================================================================
-	/**
-	 * isAccessible
-	 * @return whether the room is accessible
-	 */
-	public boolean isAccessible() {
-		return isAccessible;
-	}//isAccessible
-// =========================================================================================================================================================================
-// =========================================================================================================================================================================
-	/**
-	 * setAccessible
-	 * @param isAccessible the accessibility we are setting for the Room
-	 */
-	public void setAccessible(boolean isAccessible) {
-		this.isAccessible = isAccessible;
-	}//setAccessible
-// =========================================================================================================================================================================
-// =========================================================================================================================================================================
-	/**
-	 * getType
-	 * @return the type of Room
-	 */
-	public String getType() {
-		return type;
-	}//getType
-// =========================================================================================================================================================================
-// =========================================================================================================================================================================
-	/**
-	 * setType
-	 * @param type String representation to set the type of this Room
-	 */
-	public void setType(String type) {
-		this.type = type;
-	}//setType
-// =========================================================================================================================================================================
-// =========================================================================================================================================================================
-	/**
-	 * getCourses
-	 * @return list of courses in this Room
-	 */
-	public ArrayList<Course> getCourses() {
-		return courses;
+	// =========================================================================================================================================
+	/** Constructs a Room object with the specified parameters.
+	 * @param accessible - if the Room is handicap accessible
+	 * @param building - the full building name
+	 * @param buildingShort - the abbreviation for building name
+	 * @param capacity - the capacity of the room
+	 * @param roomNumber - the number of the room in the building
+	 * @param type - the kind of room such as lab or lecture
+	 */  
+	public Room(boolean accessible,String building,String buildingShort,int capacity,String roomNumber,String type){
+		this(building,roomNumber);
+		this.capacity=capacity;
+		this.buildingShort=buildingShort;
+		this.isAccessible=accessible;
+		this.type=type.toLowerCase();
 	}
-// =========================================================================================================================================================================
-// =========================================================================================================================================================================
+	// =========================================================================================================================================
+
+	// =========================================================================================================================================
 	/**
-	 * addCourse
-	 * @param course a course to put in this Room
+	 * Construct a simple Room object with the specified parameters.
+	 * @param buildingShort - the short name of building
+	 * @param roomNumber - the room number
 	 */
-	public void addCourse(Course course) {
-		this.courses.add(course);
-		//TODO:update3:make call to setTimeTable here
-	}//addCourse
-// =========================================================================================================================================================================
-// =========================================================================================================================================================================
+	public Room (String buildingShort, String roomNumber){//Secondary constructor for use in generateCourses method
+		this.buildingShort=buildingShort;
+		this.roomNumber=roomNumber;
+		this.initRoomAvailable();
+		this.courses=new ArrayList<Course>();
+	}
+	// =========================================================================================================================================
+
+	// =========================================================================================================================================
+
 	/**
-	 * toString no seriously it's a toString
+	 * Initializes the Room's list of occupied times to 0, marking it as empty.
 	 */
-	public String toString(){
-		return this.buildingShort+" "+this.roomNumber;
-	}//toString
-// =========================================================================================================================================================================
-// =========================================================================================================================================================================
-	/**
-	 * initRoomAvailable sets up the original blank timetable for this Room
-	 * 
-	 */
-	public void initRoomAvailable() {
+	private void initRoomAvailable() {
 		for (int i=0;i<timesAssigned.length;i++) {
 			for (int j=0;j<timesAssigned[i].length;j++) {
 				timesAssigned[i][j]=0;
 			}
 		}
-	}//initRoomAvailable
-// =========================================================================================================================================================================
-// =========================================================================================================================================================================
-	/**
-	 * scheduleRoomForTimes adds 1 to the half an hour period to which a course is assigned for this Room in timesAssigned[][]
-	 * @param times a list of Times to increment for this Room
-	 */
-	public void scheduleRoomForTimes(ArrayList<Time> times){
+	}
+	// =========================================================================================================================================
 
-		for(Time t:times){
-			int dayIndex=t.getDayOfWeek();
-			int startHalfHour=t.getStartHour()*2;
-			if (t.getStartMinute()==30){startHalfHour++;}
-			int blocks=t.getBlocks();
-			for(int i=0;i<blocks;startHalfHour++){
-				timesAssigned[dayIndex][startHalfHour]++;
-
-			}
-		}
-	}//scheduleRoomForTimes
-// =========================================================================================================================================================================
-// =========================================================================================================================================================================
+	// =========================================================================================================================================
 	/**
-	 * printTimeTable prints the current timesAssigned for this Room
-	 */
-	public void printTimeTable() {
-		int k = 0;
-		for (int j =0;j<timesAssigned.length;j++) {
-			k=j/2;
-			if(j%2==0){
-				System.out.print(k+":00 ");
-			}
-			else System.out.print(k+":30 ");
-			for (int i=0;i<timesAssigned[i].length;i++) {
-				System.out.print("	"+timesAssigned[i][j]+"	");
-			}
-			System.out.println(" ");
-		}
-	}//printTimeTable	
-// =========================================================================================================================================================================
-// =========================================================================================================================================================================
-	/**
-	 * isAssigned checks if a Time has been assigned for this Room
-	 * @param t a Time to check
-	 * @return the assignment status of the Time
+	 * Returns true if this Room is occupied by at least one other course during the specified Time.
+	 * @param t - the Time to check
+	 * @return true if this Room is occupied
 	 */
 	public boolean isAssigned(Time t) {
 		boolean assigned=false;
@@ -326,8 +92,303 @@ public class Room{
 			}
 		}
 		return assigned;
-	}//isAssigned
-// =========================================================================================================================================================================
+	}
+	// =========================================================================================================================================
+
+	// =========================================================================================================================================
+	/**
+	 * Marks this Room as being occupied by one more course for each Time in the specified list of Times.
+	 * @param times - the list of Times
+	 */
+	private void scheduleRoomForTimes(ArrayList<Time> times){
+		for(Time t:times){
+			int dayIndex=t.getDayOfWeek();
+			int startHalfHour=t.getStartHour()*2;
+			if (t.getStartMinute()==30){startHalfHour++;}
+			int blocks=t.getBlocks();
+			for(int i=0;i<blocks;startHalfHour++){
+				timesAssigned[dayIndex][startHalfHour]++;
+
+			}
+		}
+	}
+	// =========================================================================================================================================
+
+	// =========================================================================================================================================
+	/**
+	 * Marks this Room as being occupied by one less course for each Time in the specified list of Times.
+	 * @param times - the list of Times
+	 */
+	private void unscheduleRoomForTimes(ArrayList<Time> times){
+		for(Time t:times){
+			int dayIndex=t.getDayOfWeek();
+			int startHalfHour=t.getStartHour()*2;
+			if (t.getStartMinute()==30){startHalfHour++;}
+			int blocks=t.getBlocks();
+			for(int i=0;i<blocks;startHalfHour++){
+				if (--timesAssigned[dayIndex][startHalfHour]<0){
+					throw new IllegalStateException(this.toString()+" not occupied at "+t.toString());
+				}
+			}
+		}
+	}
+	// =========================================================================================================================================
+
+	// =========================================================================================================================================
+	/**
+	 * Ensures that this Room contains the specified Course.
+	 * @param course - the Course whose presence in this Room is to be ensured
+	 */
+	public void addCourse(Course course) {
+		if (!this.courses.contains(course)){
+			this.courses.add(course);
+		}
+		//TODO:update3:make call to setTimeTable here
+	}
+	// =========================================================================================================================================
+
+	// =========================================================================================================================================
+	/**
+	 * Removes the specified Course from this Room, if it is present. Returns true if this Room contained the specified Course (or equivalently, 
+	 * if this collection changed as a result of the call).
+	 * @param course - the Course to be removed from this Room, if present
+	 * @return true if an Course was removed as a result of this call
+	 */
+	public boolean removeCourse(Course course){
+		if (!this.courses.contains(course)){
+			return this.courses.remove(course);
+		}
+		return false;
+		//TODO:Call unscheduleRoomForTimes()
+	}
+	// =========================================================================================================================================
+
+	// =========================================================================================================================================
+	/**
+	 * Returns the list of Courses scheduled to be in this room.
+	 * @return the list of Courses
+	 */
+	public ArrayList<Course> getCourses() {
+		return this.courses;
+	}
+	// =========================================================================================================================================
+
+	// ========================================================================================================================================= 
+	/**
+	 * Returns a two-dimensional int array view of the availability of this Room. Each cell in the two-dimensional array represents the occupancy 
+	 * of the room for a day and time, and reflects the number of requests being made for that day and time. The array is backed by the Room, so 
+	 * changes made to the Room are reflected in the array, and vice-versa.
+	 * @return a two-dimensional array view of the availability of this Room
+	 */
+	public int[][] getTimesAssigned() {
+		return timesAssigned;
+	}
+	// =========================================================================================================================================
+
+	// =========================================================================================================================================
+	/**
+	 * Returns the four-letter abbreviation of this Room's building.
+	 * @return the four-letter abbreviation of this Room's building
+	 */
+	public String getBuildingShort() {
+		return buildingShort;
+	}
+	// =========================================================================================================================================
+
+	// =========================================================================================================================================
+	/**
+	 * Changes the four-letter abbreviation for this Room's building.
+	 * @param buildingShort - the four-letter abbreviation for this Room's building
+	 */
+	public void setBuildingShort(String buildingShort) {
+		this.buildingShort=buildingShort;
+	}
+	// =========================================================================================================================================
+
+	// =========================================================================================================================================
+	/**
+	 * Returns the full name of this Room's building.
+	 * @return the name of this Room's building
+	 */
+	public String getBuilding() {
+		return building;
+	}
+	// =========================================================================================================================================
+
+	// =========================================================================================================================================
+	/**
+	 * Changes the full name of this Room's building.
+	 * @param building - the full name of this Room's building
+	 */
+	public void setBuilding(String building) {
+		this.building = building;
+	}
+	// =========================================================================================================================================
+
+	// =========================================================================================================================================
+	/**
+	 * Returns true if this Room's building or buildingShort matches the specified String, i.e. if this Room is in the specified building.  
+	 * @param building - the name of the building to test
+	 * @return true if this Room is in the specified building
+	 */
+	public boolean inBuilding(String building){
+		return this.building.equals(building) || this.buildingShort.equals(building);
+	}
+	// =========================================================================================================================================
+
+	// ========================================================================================================================================= 
+	/**
+	 * Tests if the specified Room is in the same building as this Room.
+	 * @param r - the Room to test against this Room
+	 * @return true if the specified Room is in the same building as this Room, false otherwise
+	 */
+	public boolean inSameBuilding(Room r){
+		return this.building==r.getBuilding();
+	}
+	// =========================================================================================================================================
+
+	// ========================================================================================================================================= 
+	/**
+	 * Returns the room number for this Room.
+	 * @return the room number for this Room
+	 */
+	public String getRoomNumber() {
+		return roomNumber;
+	}
+	// =========================================================================================================================================
+
+	// ========================================================================================================================================= 
+	/**
+	 * Changes the room number for this Room.
+	 * @param roomNumber the value to which the room number should be changed
+	 */
+	public void setRoomNumber(String roomNumber) {
+		this.roomNumber = roomNumber;
+	}
+	// =========================================================================================================================================
+
+	// =========================================================================================================================================
+	/**
+	 * Sets the boolean values for what technology the Room has available
+	 * @param t - the array of technology booleans for this Room
+	 * @param numberOfSlides - an int indicating the number of slides this Room has
+	 */
+	public void setTechnology(boolean[] t, int numberOfSlides){
+		this.tech=t;
+		this.numberOfSlides=numberOfSlides;
+	}
+	// =========================================================================================================================================    
+
+	// ========================================================================================================================================= 
+	/**
+	 * Returns the array of booleans describing the Room's technological capabilities.
+	 * @return the array of booleans describing the Room's technological capabilities
+	 */
+	public boolean[] getTechnology(){
+		return this.tech;
+	}
+	// =========================================================================================================================================   
+
+	// ========================================================================================================================================= 
+	/**
+	 * Returns the number of slides in this Room.
+	 * @return the number of slides in this Room.
+	 */
+	public int getNumberOfSlides() {
+		return numberOfSlides;
+	}
+	// =========================================================================================================================================
+
+	// ========================================================================================================================================= 
+	/**
+	 * Returns the capacity for this Room.
+	 * @return the capacity for this Room.
+	 */
+	public int getCapacity() {
+		return capacity;
+	}
+	// =========================================================================================================================================
+
+	// =========================================================================================================================================
+	/**
+	 * Changes the capacity for this Room to the specified value.
+	 * @param capacity - the value to which the capacity should be changed.
+	 */
+	public void setCapacity(int capacity) {
+		this.capacity = capacity;
+	}
+	// =========================================================================================================================================
+
+	// =========================================================================================================================================
+	/**
+	 * Returns true if this Room is handicap accessible.
+	 * @return true if this Room is handicap accessible.
+	 */
+	public boolean isAccessible() {
+		return isAccessible;
+	}
+	// =========================================================================================================================================
+
+	// =========================================================================================================================================
+	/**
+	 * Changes the value indicating if this Room is handicap accessible.
+	 * @param isAccessible - the boolean indicating if this Room is handicap accessible.
+	 */
+	public void setAccessible(boolean isAccessible) {
+		this.isAccessible = isAccessible;
+	}
+	// =========================================================================================================================================
+
+	// =========================================================================================================================================
+	/**
+	 * Returns the type of this Room.
+	 * @return the type of this Room
+	 */
+	public String getType() {
+		return type;
+	}
+	// =========================================================================================================================================
+
+	// =========================================================================================================================================
+	/**
+	 * Changes the type of this Room
+	 * @param type - the type to which the type of this Room should be changed
+	 */
+	public void setType(String type) {
+		this.type = type;
+	}
+	// =========================================================================================================================================
+
+	// =========================================================================================================================================
+	/**
+	 * Returns a string representation of this Room. The string representation consists of the string representation of the abbreviation 
+	 * for the building and the room number separated by a space. 
+	 */
+	public String toString(){
+		return this.buildingShort+" "+this.roomNumber;
+	}
+	// =========================================================================================================================================
+
+	// =========================================================================================================================================
+	/**
+	 * Writes a representation of the occupancy of this Room to the console. The representation consists of every half-hour block of time and 
+	 * the number of courses scheduled to use this Room during that time.
+	 */
+	private void printTimeTable() {
+		int k = 0;
+		for (int j =0;j<timesAssigned.length;j++) {
+			k=j/2;
+			if(j%2==0){
+				System.out.print(k+":00 ");
+			}
+			else System.out.print(k+":30 ");
+			for (int i=0;i<timesAssigned[i].length;i++) {
+				System.out.print("	"+timesAssigned[i][j]+"	");
+			}
+			System.out.println(" ");
+		}
+	}
+	// =========================================================================================================================================
 }//class Room
-//==========================================================================================================================================================================
+// =============================================================================================================================================
 

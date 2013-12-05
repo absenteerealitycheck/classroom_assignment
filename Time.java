@@ -28,7 +28,7 @@ public class Time implements Comparable<Time>{
 	int startTime; //use "military" time, i.e. 8:00am = 0800 = 800
 	int endTime;
 	//String token;
-	ArrayList<Course> courses; 
+	ArrayList<Course> courses= new ArrayList<Course>(); 
     // ===============================================================
 
     // ===============================================================
@@ -97,6 +97,29 @@ public class Time implements Comparable<Time>{
 		return startTime;
 	}// getStartTime
     // ===============================================================
+	
+	// ===============================================================
+	public int getStartHour(){
+		return Integer.parseInt((""+startTime).substring(0, (""+startTime).length()-2));
+	}
+	
+	public int getStartMinute(){
+		return Integer.parseInt((""+startTime).substring((""+startTime).length()-2));
+	}
+	
+	public int getEndHour(){
+		return Integer.parseInt((""+endTime).substring(0, (""+endTime).length()-2));
+	}
+	
+	public int getEndMinute(){
+		return Integer.parseInt((""+endTime).substring((""+endTime).length()-2));
+	}
+	
+	public int getBlocks(){
+		int h=this.getEndHour()-this.getStartHour();
+		int m=this.getEndMinute()-this.getStartMinute();
+		return (h*2)+(m/30);
+	}
 
 	// ===============================================================
 	// set startTime
@@ -141,9 +164,18 @@ public class Time implements Comparable<Time>{
 	public void setCourses(ArrayList<Course> c) {
 		this.courses=c;
 	}
+	public void addCourse(Course c){
+		this.courses.add(c);
+	}
 	
 	public String toString() {
 		return (dayOfWeek+": "+startTime+", "+endTime);
+	}
+
+	@Override
+	public int compareTo(Time arg0) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 	
 // ===================================================================
