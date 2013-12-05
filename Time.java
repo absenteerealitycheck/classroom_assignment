@@ -97,6 +97,29 @@ public class Time implements Comparable<Time>{
 		return startTime;
 	}// getStartTime
     // ===============================================================
+	
+	// ===============================================================
+	public int getStartHour(){
+		return Integer.parseInt((""+startTime).substring(0, (""+startTime).length()-2));
+	}
+	
+	public int getStartMinute(){
+		return Integer.parseInt((""+startTime).substring((""+startTime).length()-2));
+	}
+	
+	public int getEndHour(){
+		return Integer.parseInt((""+endTime).substring(0, (""+endTime).length()-2));
+	}
+	
+	public int getEndMinute(){
+		return Integer.parseInt((""+endTime).substring((""+endTime).length()-2));
+	}
+	
+	public int getBlocks(){
+		int h=this.getEndHour()-this.getStartHour();
+		int m=this.getEndMinute()-this.getStartMinute();
+		return (h*2)+(m/30);
+	}
 
 	// ===============================================================
 	// set startTime

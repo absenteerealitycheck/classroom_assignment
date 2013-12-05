@@ -54,6 +54,29 @@ public class Driver{
 		
 		boolean testing=false;
 		
+		
+		System.out.println("Hello World!");
+		Room sr=new Room("SMUD", "007");
+		System.out.println(sr);
+		
+		Course cr= new Course(-1,"Foobar","test");
+		cr.addShortName("COSC-0");
+		System.out.println(cr);
+		
+		String crs="Foobar ([COSC-0])*";
+		System.out.println(crs);
+		
+		sr.addCourse(cr);
+		System.out.println(sr.getCourses());
+		
+		
+		boolean giveUp=true;
+		if (giveUp){
+			return;
+		}
+		
+		
+		
 		generateTimes();
 		
 		
@@ -119,10 +142,7 @@ public class Driver{
 		ArrayList<Course> courses= generateCourses(courseSpreadsheet,roomsAndDeptsHash,roomsAndCoursesHash,courseHash,rooms, professorHash, timeHash,roomsAndProfsHash);
 		courses.trimToSize();
 			
-		boolean giveUp=true;
-		if (giveUp){
-			return;
-		}
+		
 		
 		boolean print=false;
 		for (Course c: courses) {
