@@ -6,13 +6,15 @@ public class FileManager {
 
 	private HashMap<String,File> files;
 	private HashMap<String,String[][]> spreadsheets;
-	private HashMap<String,Object> data;
+	private HashMap<String,Map<String,?>> data;
 
 	public FileManager(){
-
+		files=new HashMap<String,File>();
+		spreadsheets=new HashMap<String,String[][]>();
+		data=new HashMap<String,Map<String,?>>();
 	}
 	// ================================================================================================
-	
+
 	// ================================================================================================
 	/**
 	 * Adds a File f to the FileManager and associate it with the specified name.
@@ -23,7 +25,7 @@ public class FileManager {
 		files.put(name,f);
 	}
 	// ================================================================================================
-	
+
 	// ================================================================================================
 	/**
 	 * Adds a .csv File f to the FileManager and associate it with the specified name.
@@ -32,13 +34,25 @@ public class FileManager {
 	 * @throws IllegalArgumentException - if the specified File is not a .csv file
 	 */
 	public void addCSVFile(File f, String name){
+		System.out.println("Adding "+f.getName());
+		System.out.println("Does End with "+f.getName().endsWith(".csv"));
+		
 		if (!f.getName().endsWith(".csv")){
 			throw new IllegalArgumentException(f.getName()+" is the incorrect file type");
 		}
 		addFile(f,name);
 	}
 	// ================================================================================================
-	
+
+	// ================================================================================================
+	/**
+	 * TODO:Implement this?
+	 */
+	public void addAllCSVFile(File f, String name){
+	}
+	// ================================================================================================
+
+
 	// ================================================================================================
 	/**
 	 * Returns the File associated with the specified name, or null if no such File exists.
@@ -49,17 +63,27 @@ public class FileManager {
 		return files.get(name);
 	}
 	// ================================================================================================
-	
+
 	// ================================================================================================
 	/**
 	 * Returns the set of all the File names in FileManager.
 	 * @return the set of all the File names in FileManager
 	 */
-	public Set<String> getNames(){
+	public Set<String> getFileNames(){
 		return this.files.keySet();
 	}
 	// ================================================================================================
-	
+
+	// ================================================================================================
+	/**
+	 * Returns the set of all the File names in FileManager.
+	 * @return the set of all the File names in FileManager
+	 */
+	public Set<String> getSpreadsheetNames(){
+		return this.spreadsheets.keySet();
+	}
+	// ================================================================================================
+
 	// ================================================================================================
 	/**
 	 * Returns the spreadsheet representation associated with the specified name, or null if no such 
@@ -71,7 +95,7 @@ public class FileManager {
 		return spreadsheets.get(name);
 	}
 	// ================================================================================================
-	
+
 	// ================================================================================================
 	/**
 	 * Loads the File associated with the specified name into a two-dimensional array of Strings and 
@@ -87,7 +111,6 @@ public class FileManager {
 		} catch(IOException e){
 			return false;
 		}
-		
 	}
 	// ================================================================================================
 
@@ -112,7 +135,7 @@ public class FileManager {
 			}
 			b.close();
 			csv = new String[rows][cols];
-			
+
 			//Load the file into the two-dimensional array
 			BufferedReader readIn = new BufferedReader(new FileReader(file));
 			String line="";
@@ -138,59 +161,106 @@ public class FileManager {
 		return csv;
 	} // makeSpreadsheet
 	// ================================================================================================
-	
-	public void phaseOne(){
-		//process something
-		//write something
+
+	private enum Pill {
+		historical, room, course, professor, department;
 	}
-	
-	public void phaseTwo(){
-		
-	}
-	
-	private <E> void typeCheck(Class<E> type, Object o){
-		if (o!=null&&!type.isInstance(o)){
-			throw new ClassCastException(badElementMsg(type, o));
-		}
-	}
-	
-	private <E> String badElementMsg(Class<E> type, Object o){
-		return "Attempt to use "+o.getClass()+" element with element type "+type;
-	}
-	
-	public Object process(String name){
+
+	public Set<String> process(String name){
 		//TODO:Use reflection on name
-		generateRooms(name);
+		Pill p=Pill.valueOf(name);
+		switch(p){
+		case historical:
+			System.out.println("Processing Hisorical data");
+			data.put("roomsandcourses", associateFieldAndRooms(getSpreadsheet(name),1));
+			data.put("roomsanddepartments", associateFieldAndRooms(getSpreadsheet(name),2));
+			data.put("roomsandprofessors", associateFieldAndRooms(getSpreadsheet(name),3));
+			return data.keySet();
+		case course:
+			generateRooms(name);
+			break;
+		case department:
+			break;
+		case professor:
+			break;
+		default:
+			break;
+		}
+
 		return null;
 	}
 	
+	public void addData(String name, Map<String,?> d){
+		data.put(name, d);
+	}
+
+	@SuppressWarnings("unchecked")
+	public void write(String[] names){
+		for (String s:names){
+			File f = new File("new-"+s+"list.csv");
+			writeHashToCSV((TreeMap<String,ArrayList<String>>)data.get(s), f);
+		}
+	}
+
+	/**
+	 * Finds every room that a unique value in the historical spreadsheet has used. The field to search 
+	 * search for unique values is indicated by control.
+	 * @param cHS - the courseHistorySpreadsheet
+	 * @param control - indicates which field to associate with rooms
+	 * @return a map of every room this <?> has used
+	 */
+	private TreeMap<String,ArrayList<String>> associateFieldAndRooms(String[][] cHS, int control){
+		TreeMap<String,ArrayList<String>> h = new TreeMap<String,ArrayList<String>>();
+		for (int i=1; i<cHS.length; i++){
+			String field="";
+			String room=cHS[i][7];
+			switch(control){
+			case 1://course
+				field=cHS[i][1];
+			case 2://department
+				field=cHS[i][1].substring(0, 4);
+			case 3://professor
+				field=cHS[i][4];
+			}
+
+			String[] splitField = field.split("  ");
+			for (String f:splitField){
+				if (!h.containsKey(f)){
+					h.put(f, new ArrayList<String>());
+				}
+				if (!h.get(f).contains(room)){
+					h.get(f).add(room);
+				}
+			}
+		}
+		return h;
+	}
+
 	private void generateRooms(String name){
 		System.out.println("Generating Rooms");
 		String[][] rS = this.spreadsheets.get(name); 
-		ArrayList<Room> rooms= new ArrayList<Room>(rS.length);
+		TreeMap<String,Room> rooms= new TreeMap<String,Room>();
 		for(int row=1; row<rS.length; row++){
-			rooms.add(new Room(rS[row]));
+			Room r = new Room(rS[row]);
+			rooms.put(r.toString(),r);
 		}		
 		this.data.put(name, rooms);
 		System.out.println("Done Generating Rooms");
 	}
-	
-	public boolean writeHashToCSV(String name, String fileName){
+
+	/**
+	 * 
+	 * @param d
+	 * @param fileName
+	 * @return
+	 */
+	private boolean writeHashToCSV(Map<String,ArrayList<String>> d, File f){
 		try{
-			File f = new File(fileName);
-			Object o = this.data.get(name);
-			typeCheck(HashMap.class, o);
-			if (o instanceof HashMap<?,?>){
-				throw new ClassCastException();
-			}
-			@SuppressWarnings("unchecked")
-			HashMap<String,ArrayList<String>> hm=(HashMap<String,ArrayList<String>>) o;
-			
 			BufferedWriter bw=new BufferedWriter(new FileWriter(f));
-			for (Entry<String, ArrayList<String>> es :hm.entrySet()){
+			for (Entry<String, ArrayList<String>> es :d.entrySet()){
 				String ts2=es.getValue().toString();
 				ts2=ts2.substring(1,ts2.length()-1);
-				//System.out.println(ts.getFirst()+";"+ts2+"\n");
+				System.out.println(es.getKey()+";"+ts2+"\n");
 				bw.write(es.getKey()+";"+ts2+"\n");
 			}
 			bw.close();
@@ -200,7 +270,7 @@ public class FileManager {
 			return false;
 		}
 	}
-	
+
 	public String spreadsheetStringify(String[][] s){
 		String result="";
 		for(int row=1;row<s.length;row++){
@@ -211,6 +281,17 @@ public class FileManager {
 			result+="\n";
 		}
 		return result;
+	}
+
+	//TODO:Deprecate if never used
+	private <E> void typeCheck(Class<E> type, Object o){
+		if (o!=null&&!type.isInstance(o)){
+			throw new ClassCastException(badElementMsg(type, o));
+		}
+	}
+
+	private <E> String badElementMsg(Class<E> type, Object o){
+		return "Attempt to use "+o.getClass()+" element with element type "+type;
 	}
 }
 //================================================================================================
