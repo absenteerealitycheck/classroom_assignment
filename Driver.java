@@ -16,7 +16,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
+import java.util.Comparator;	
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -138,7 +138,10 @@ public class Driver{
 		ArrayList<Course> courses= generateCourses(courseSpreadsheet,roomsAndDeptsHash,roomsAndCoursesHash,courseHash,rooms, professorHash, timeHash,roomsAndProfsHash);
 		courses.trimToSize();
 			
-		
+		boolean giveUp=true;
+		if (giveUp){
+			return;
+		}
 		
 		//boolean print=false;
 		ArrayList<Time> tempTimes=null;
@@ -172,10 +175,7 @@ public class Driver{
 			System.out.print("\n");
 		}
 		
-		boolean giveUp=true;
-		if (giveUp){
-			return;
-		}
+	
 		//ArrayList<Course> setCourses= bruteForce(courses);
 		/*		
 		//shuffle to get different solutions
@@ -366,7 +366,7 @@ public class Driver{
 	 * @throws IOException 
 	 */
 	
-	//TODO: check for prev creation before seeing crosslists
+	//TODO: check for prev creation of sections -- for some stupid reasons, sections are listed multiple times
 		
 	public ArrayList<Course> generateCourses(String[][] cl, HashMap<String,ArrayList<Room>> drS,HashMap<String,ArrayList<Room>> crS,
 			Hashtable<String,Course> ch, ArrayList<Room> r, Hashtable<String,Professor> pH, Hashtable<String,Time> tH,HashMap<String,ArrayList<Room>> rapH) throws IOException{
@@ -384,28 +384,31 @@ public class Driver{
 			 */
 			
 			String shortname=cl[row][0];
+			
+			if(row+1<cl.length){
+				if (cl[row+1][0].equals(shortname))continue;
+			}
+					
 			String deptname=shortname.substring(0,4);
 			String longname=cl[row][1];
-			
-			
-			
-		
-			
+						
 			int capacity = (cl[row][8].isEmpty())?10:Integer.parseInt(cl[row][8]);
 			String type=cl[row][4]; //must parse L/D, LAB, LEC, DIS
 
 			temp= new Course(capacity,longname,type);
 			temp.addShortName(shortname);
 			
+			
+					
 			//Check for crosslisting
 			if(!cl[row][2].isEmpty()){
-				System.out.println("CROSSED");
 				String[] crossList=cl[row][2].split(",");
-				for (String s: crossList) {
-					System.out.print("["+s+"]");
+				for (String s: crossList) { //add each cross-listed shortname
+					//System.out.print("["+s+"]");
 					if (!s.equals(shortname)){temp.addShortName(s);}
 				}
-				System.out.print("\n");
+				//System.out.print("\n");
+				//a course of this name already exists, do not make a duplicate Object
 				if (ch.containsKey(temp.getLongName())) continue;
 			}
 
@@ -421,8 +424,7 @@ public class Driver{
 			}
 							
 			courseList.add(temp);
-			ch.put(longname, temp);
-			
+					
 			// TODO: handle tech please - must find out where getting info from
 			/*boolean[]tech=new boolean[5];
 			int slidesNeeded=0;
@@ -492,6 +494,7 @@ public class Driver{
 			int start=(Integer.parseInt(begin.substring(0, 2)))*100+Integer.parseInt(begin.substring(3,begin.length()-2));
 			int end=(Integer.parseInt(ending.substring(0, 2)))*100;
 			
+			//if after 12:00pm, adjust for military time
 			if(begin.substring((begin.length()-2)).equals("PM")&&!(begin.subSequence(0, 2).equals("12"))){
 				start+=1200;
 				startHours+=12;
@@ -502,15 +505,16 @@ public class Driver{
 			}
 			int numOfBlocks=(endHour-startHours)*2;
 			
+			//adjust to complete blocks for endtimes of XX:20 and XX:50
 			if(ending.subSequence(3,ending.length()-2).equals("20")){
 			//	System.out.println("end is 30");
 				end+=30;
-				numOfBlocks++;
+				numOfBlocks++; //add a half hour block
 			}
 			else if(ending.subSequence(3,ending.length()-2).equals("50")){
 			//	System.out.println("end is 00");
 				end+=100;
-				numOfBlocks+=2;
+				numOfBlocks+=2; //add an hour block
 			}
 			else if(ending.subSequence(3,ending.length()-2).equals("00")) {
 				end+=Integer.parseInt(ending.substring(3,ending.length()-2));
@@ -521,9 +525,7 @@ public class Driver{
 				end+=30;
 				numOfBlocks++;
 			}
-			
-
-			
+	
 			//System.out.println(" number of blocks: "+numOfBlocks);
 		/*	System.out.println(" start: "+start);
 			System.out.println(" end: "+end);*/
@@ -566,7 +568,7 @@ public class Driver{
 				//System.out.print("\n");
 			}
 			
-			//temp.setTime(t);//add Time to Course
+	
 			//preferredTimes	
 
 			//Making preferredRooms 
@@ -590,21 +592,21 @@ public class Driver{
 				for(int j=0;j<dRooms.size();j++){
 					//System.out.println("conatins c "+cRooms.contains(dRooms.get(j)));
 					//System.out.println("conatins p "+pRooms.contains(dRooms.get(j)));
+					//if room in dRooms is not in Courses rooms or Professors rooms, add to a deletion list
 					if(!cRooms.contains(dRooms.get(j))&&!pRooms.contains(dRooms.get(j))){
 						tempD2.add(dRooms.get(j));
 					}
-					
-					
+								
 				}
-				
-			
-			
+							
 			//System.out.println("tempD2 "+tempD2.size());
-			
+				
+			//delete rooms from department rooms that are not suitable for the course
 			for(Room r2:tempD2){
 				dRooms.remove(r2);
 			}
 			
+			//if the list of preferred rooms for a course is empty, just give it the department room list
 			if(dRooms.isEmpty()){
 				System.out.println("EMPTY");
 				dRooms.addAll(tempD);
@@ -613,12 +615,10 @@ public class Driver{
 			//dRooms=drS.get(deptname);
 			
 			//System.out.println("dRooms size again "+dRooms.size()+"\n");
-			
-			
-			
-			
+						
 			//End preferredRooms
-			
+			ch.put(longname,temp);
+	
 		}
 		courseList.trimToSize();
 
