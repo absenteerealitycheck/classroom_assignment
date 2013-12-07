@@ -157,10 +157,6 @@ public class Driver{
 			String deptname=shortname.substring(0,4);
 			String longname=cl[row][1];
 
-
-
-
-
 			int capacity = (cl[row][8].isEmpty())?10:Integer.parseInt(cl[row][8]);
 			String type=cl[row][4]; //must parse L/D, LAB, LEC, DIS
 
@@ -247,8 +243,6 @@ public class Driver{
 				else if(dow[i].equals("H")){
 					continue;
 				}
-
-
 			}
 			String[] time2=time.split("-",2);	
 			String begin=time2[0];
@@ -259,7 +253,6 @@ public class Driver{
 			int start=(Integer.parseInt(begin.substring(0, 2)))*100+Integer.parseInt(begin.substring(3,begin.length()-2));
 			int end=(Integer.parseInt(ending.substring(0, 2)))*100;
 			int numOfBlocks=(endHour-startHours)*2;
-
 			if(ending.subSequence(3,ending.length()-2).equals("20")){
 				System.out.println("end is 30");
 				end+=30;
@@ -287,7 +280,6 @@ public class Driver{
 
 				end+=1200;
 			}
-
 			System.out.println(" number of blocks: "+numOfBlocks);
 			System.out.println(" start: "+start);
 			System.out.println(" end: "+end);
@@ -302,7 +294,6 @@ public class Driver{
 				basicend=start+70;
 				numOfBlocks--;
 			}
-
 			int index=-1;
 			//System.out.println(t.toString());
 			System.out.println(" number of blocks2: "+numOfBlocks);
@@ -312,19 +303,14 @@ public class Driver{
 						index=times.indexOf(ti);	
 					}
 				}
-
-
 				for(int i=0;i<numOfBlocks;i++){
 					System.out.println("index: "+(index+i)+ "contains? "+times.get(index).toString());
 					times.get(index+i).addCourse(temp);//add to Time block in ArrayList of Times
 				}
 			}
-
 			//temp.setTime(t);//add Time to Course
 			//preferredTimes	
-
 			//Making preferredRooms 
-
 			ArrayList<Room> dRooms=new ArrayList<Room>();
 			dRooms.addAll(drS.get(deptname));
 			System.out.println(shortname+"\n");
@@ -347,30 +333,19 @@ public class Driver{
 				if(!cRooms.contains(dRooms.get(j))&&!pRooms.contains(dRooms.get(j))){
 					tempD2.add(dRooms.get(j));
 				}
-
-
 			}
 
-
-
 			System.out.println("tempD2 "+tempD2.size());
-
 			for(Room r2:tempD2){
 				dRooms.remove(r2);
 			}
-
 			if(dRooms.isEmpty()){
 				System.out.println("EMPTY");
 				dRooms.addAll(tempD);
 			}
 			temp.addPreferredRoomsList(dRooms);
 			//dRooms=drS.get(deptname);
-
 			//System.out.println("dRooms size again "+dRooms.size()+"\n");
-
-
-
-
 			//End preferredRooms
 
 		}
@@ -378,6 +353,24 @@ public class Driver{
 		System.out.println("Done courses");
 		return courseList;
 	}// generateCourses
+
+	// =================================================================================================================================================================================
+	/**
+	 * linkRoomsToCourses was an early solver
+	 * @param courses The list of all course objects for this semester
+	 * @param rooms The list of all room objects for this semester
+	 */
+	public void linkRoomsToCourses(ArrayList<Course> courses, ArrayList<Room> rooms){
+		//Collections.shuffle(courses);
+		/*courses.shuffle
+		//OH GOD DONT TOUCH IT
+		sort(courses,"getTypeCode",-1);
+		sort(courses,"getCapacity",1);
+		sort(courses,"getNumberOfPreferredTimes",1);
+		//OK THANK YOU
+		 */
+	}// linkRoomsToCourses
+	// =================================================================================================================================================================================
 
 	// =================================================================================================================================================================================
 	/**
@@ -416,24 +409,6 @@ public class Driver{
 			e.printStackTrace();
 		}
 	} // sort
-	
-	// =================================================================================================================================================================================
-	/**
-	 * linkRoomsToCourses was an early solver
-	 * @param courses The list of all course objects for this semester
-	 * @param rooms The list of all room objects for this semester
-	 */
-	public void linkRoomsToCourses(ArrayList<Course> courses, ArrayList<Room> rooms){
-		//Collections.shuffle(courses);
-		/*courses.shuffle
-		//OH GOD DONT TOUCH IT
-		sort(courses,"getTypeCode",-1);
-		sort(courses,"getCapacity",1);
-		sort(courses,"getNumberOfPreferredTimes",1);
-		//OK THANK YOU
-		 */
-	}// linkRoomsToCourses
-	// =================================================================================================================================================================================
 
 	// =====================================================================================================================================================================================
 } // class Driver

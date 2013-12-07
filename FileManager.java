@@ -48,19 +48,7 @@ public class FileManager {
 	/**
 	 * TODO:Implement this?
 	 */
-	public void addAllCSVFile(File f, String name){
-	}
-	// ================================================================================================
-
-
-	// ================================================================================================
-	/**
-	 * Returns the File associated with the specified name, or null if no such File exists.
-	 * @param name - the name whose associated File is to be returned
-	 * @return - the File associated with the specified name
-	 */
-	public File getFile(String name){
-		return files.get(name);
+	public void addAllCSVFiles(File f, String name){
 	}
 	// ================================================================================================
 
@@ -76,23 +64,55 @@ public class FileManager {
 
 	// ================================================================================================
 	/**
-	 * Returns the set of all the File names in FileManager.
-	 * @return the set of all the File names in FileManager
+	 * Returns the File associated with the specified name, or null if no such File exists.
+	 * @param name - the name whose associated File is to be returned
+	 * @return - the File associated with the specified name
 	 */
-	public Set<String> getSpreadsheetNames(){
-		return this.spreadsheets.keySet();
+	public File getFile(String name){
+		return files.get(name);
 	}
 	// ================================================================================================
 
 	// ================================================================================================
 	/**
+	 * Returns the set of all the spreadsheet names in FileManager.
+	 * @return the set of all the spreadsheet names in FileManager
+	 */
+	public Set<String> getSpreadsheetNames(){
+		return this.spreadsheets.keySet();
+	}
+	// ================================================================================================	
+	
+	// ================================================================================================
+	/**
 	 * Returns the spreadsheet representation associated with the specified name, or null if no such 
 	 * spreadsheet exists.
-	 * @param name - the name whose associated spreadsheet to be returned
+	 * @param name - the name whose associated spreadsheet is to be returned
 	 * @return - the two-dimensional array of Strings representation of the spreadsheet
 	 */
 	public String[][] getSpreadsheet(String name){
 		return spreadsheets.get(name);
+	}
+	// ================================================================================================
+
+	// ================================================================================================
+	/**
+	 * Returns the set of all the data names in FileManager.
+	 * @return the set of all the data names in FileManager
+	 */
+	public Set<String> getDataNames(){
+		return this.data.keySet();
+	}
+	// ================================================================================================
+
+	// ================================================================================================
+	/**
+	 * Returns the data map associated with the specified name, or null if no such data exists.
+	 * @param name - the name whose associated data map is to be returned
+	 * @return - the data map, which uses String keys to access its values
+	 */
+	public Map<String,?> getData(String name){
+		return data.get(name);
 	}
 	// ================================================================================================
 
@@ -121,7 +141,7 @@ public class FileManager {
 	 * @return
 	 * @throws IOException
 	 */
-	public static String[][] makeSpreadsheet(File file) throws IOException{
+	private static String[][] makeSpreadsheet(File file) throws IOException{
 		System.out.println("Reading "+file.getName());
 		String[][] csv = null;
 		try {
@@ -162,10 +182,31 @@ public class FileManager {
 	} // makeSpreadsheet
 	// ================================================================================================
 
+	// ================================================================================================
+	/**
+	 * Adds the specified custom data map to the File Manager. 
+	 * @param name - the name to associate with the specified data map
+	 * @param d - the custom data map
+	 */
+	public void addData(String name, Map<String,?> d){
+		data.put(name, d);
+	}
+	// ================================================================================================
+	
+	// ================================================================================================
 	private enum Pill {
 		historical, room, course, professor, department;
 	}
-
+	// ================================================================================================
+	
+	// ================================================================================================
+	/**
+	 * Transforms the spreadsheet associated with the specified name into some number of data maps, and
+	 * returns the set of keys needed to access the newly created data maps.
+	 * @param name - the name associated with the spreadsheet to process
+	 * @return the set of keys needed to access the newly created data maps.
+	 * @respect calls to data.put() are made directly inside process, not from the methods it calls
+	 */
 	public Set<String> process(String name){
 		//TODO:Use reflection on name
 		Pill p=Pill.valueOf(name);
@@ -177,8 +218,10 @@ public class FileManager {
 			data.put("roomsandprofessors", associateFieldAndRooms(getSpreadsheet(name),3));
 			return data.keySet();
 		case course:
-			generateRooms(name);
-			break;
+			data.put(name, generateRooms(getSpreadsheet(name)));
+			TreeSet<String> s = new TreeSet<String>();
+			s.add(name);
+			return s;
 		case department:
 			break;
 		case professor:
@@ -186,22 +229,11 @@ public class FileManager {
 		default:
 			break;
 		}
-
 		return null;
 	}
+	// ================================================================================================
 	
-	public void addData(String name, Map<String,?> d){
-		data.put(name, d);
-	}
-
-	@SuppressWarnings("unchecked")
-	public void write(String[] names){
-		for (String s:names){
-			File f = new File("new-"+s+"list.csv");
-			writeHashToCSV((TreeMap<String,ArrayList<String>>)data.get(s), f);
-		}
-	}
-
+	// ================================================================================================
 	/**
 	 * Finds every room that a unique value in the historical spreadsheet has used. The field to search 
 	 * search for unique values is indicated by control.
@@ -211,20 +243,35 @@ public class FileManager {
 	 */
 	private TreeMap<String,ArrayList<String>> associateFieldAndRooms(String[][] cHS, int control){
 		TreeMap<String,ArrayList<String>> h = new TreeMap<String,ArrayList<String>>();
+		ArrayList<String> forbiddenRooms = new ArrayList<String>();
+		forbiddenRooms.add("NEWP 100");
+		forbiddenRooms.add("CPRD 101A");
+		forbiddenRooms.add("FROS BARKER");
+		forbiddenRooms.add("GROS 11");
+		forbiddenRooms.add("GROS 12");
+		forbiddenRooms.add("PRDT LR");
+		forbiddenRooms.add("MERR");
 		for (int i=1; i<cHS.length; i++){
 			String field="";
 			String room=cHS[i][7];
+			if (forbiddenRooms.contains(room)){
+				continue;
+			}
 			switch(control){
 			case 1://course
 				field=cHS[i][1];
+				break;
 			case 2://department
 				field=cHS[i][1].substring(0, 4);
+				break;
 			case 3://professor
 				field=cHS[i][4];
+				break;
 			}
-
+			
 			String[] splitField = field.split("  ");
 			for (String f:splitField){
+				
 				if (!h.containsKey(f)){
 					h.put(f, new ArrayList<String>());
 				}
@@ -234,33 +281,44 @@ public class FileManager {
 			}
 		}
 		return h;
-	}
-
-	private void generateRooms(String name){
+	} // associateFieldAndRooms
+	// ================================================================================================
+	
+	// ================================================================================================
+	/**
+	 * Creates the map of Room objects, using the toString() method of each Room as its key.
+	 * @param rS - the spreadsheet of rooms to use to generate Rooms
+	 * @return the data map which uses Room.toString() keys to access Room objects
+	 */
+	private Map<String,?> generateRooms(String[][] rS){
 		System.out.println("Generating Rooms");
-		String[][] rS = this.spreadsheets.get(name); 
 		TreeMap<String,Room> rooms= new TreeMap<String,Room>();
 		for(int row=1; row<rS.length; row++){
 			Room r = new Room(rS[row]);
 			rooms.put(r.toString(),r);
 		}		
-		this.data.put(name, rooms);
 		System.out.println("Done Generating Rooms");
+		return rooms;
+	}
+	// ================================================================================================
+	
+	// ================================================================================================
+	@SuppressWarnings("unchecked")
+	public void write(String[] names){
+		for (String s:names){
+			File f = new File("proto-"+s+"list.csv");
+			writeHashToCSV((TreeMap<String,ArrayList<String>>)data.get(s), f);
+		}
 	}
 
-	/**
-	 * 
-	 * @param d
-	 * @param fileName
-	 * @return
-	 */
+	
 	private boolean writeHashToCSV(Map<String,ArrayList<String>> d, File f){
 		try{
 			BufferedWriter bw=new BufferedWriter(new FileWriter(f));
 			for (Entry<String, ArrayList<String>> es :d.entrySet()){
 				String ts2=es.getValue().toString();
 				ts2=ts2.substring(1,ts2.length()-1);
-				System.out.println(es.getKey()+";"+ts2+"\n");
+				//System.out.println(es.getKey()+";"+ts2+"\n");
 				bw.write(es.getKey()+";"+ts2+"\n");
 			}
 			bw.close();
