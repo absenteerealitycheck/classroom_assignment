@@ -207,25 +207,27 @@ public class FileManager {
 	 * @return the set of keys needed to access the newly created data maps.
 	 * @respect calls to data.put() are made directly inside process, not from the methods it calls
 	 */
-	public Set<String> process(String name){
+	public Set<String> process(int phase){
 		//TODO:Use reflection on name
-		Pill p=Pill.valueOf(name);
-		switch(p){
-		case historical:
+		String name="";
+		switch(phase){
+		case 1:
+			name="historical";
 			System.out.println("Processing Hisorical data");
 			data.put("roomsandcourses", associateFieldAndRooms(getSpreadsheet(name),1));
 			data.put("roomsanddepartments", associateFieldAndRooms(getSpreadsheet(name),2));
 			data.put("roomsandprofessors", associateFieldAndRooms(getSpreadsheet(name),3));
 			return data.keySet();
-		case course:
+		case 2:
+			String spreadsheetNames="roomsandprofessors,roomsandcourses,roomsanddepartments,workingcourselist,workingroomlist";
+			data.put("recommendedroomslist",generateRecommendedRooms(spreadsheetNames));
+			return data.keySet();
+		case 3:
+			name="";
 			data.put(name, generateRooms(getSpreadsheet(name)));
 			TreeSet<String> s = new TreeSet<String>();
 			s.add(name);
-			return s;
-		case department:
-			break;
-		case professor:
-			break;
+			return s;			
 		default:
 			break;
 		}
@@ -268,10 +270,8 @@ public class FileManager {
 				field=cHS[i][4];
 				break;
 			}
-			
 			String[] splitField = field.split("  ");
 			for (String f:splitField){
-				
 				if (!h.containsKey(f)){
 					h.put(f, new ArrayList<String>());
 				}
@@ -283,6 +283,66 @@ public class FileManager {
 		return h;
 	} // associateFieldAndRooms
 	// ================================================================================================
+	
+	@SuppressWarnings("unchecked")
+	private TreeMap<String,?> generateRecommendedRooms(String spreadsheetNames){
+		String[] names = spreadsheetNames.split(",");
+		String[][] roomsAndProfessors=getSpreadsheet(names[0]);
+		String[][] roomsAndCourses=getSpreadsheet(names[1]);
+		String[][] roomsAndDepartments=getSpreadsheet(names[2]);
+		String[][] workingCourseList=getSpreadsheet(names[3]);
+		String[][] workingRoomList=getSpreadsheet(names[4]);
+		
+		String[][] recommendedRoomList=new String[workingCourseList.length][8];
+		
+		TreeMap<String,ArrayList<String>> t=new TreeMap<String,ArrayList<String>>(); 
+		ArrayList<String> info=new ArrayList<String>();
+		
+		for(int i=0; i<workingCourseList.length; i++){
+			info.add(workingCourseList[i][1]+";");
+			info.add(workingCourseList[i][2]+";");
+			info.add(workingCourseList[i][3]+";");
+			
+			TreeSet<String> pList=findRooms(workingCourseList[i][3],roomsAndProfessors);
+			TreeSet<String> cList=findRooms(workingCourseList[i][0],roomsAndCourses);
+			TreeSet<String> dList=findRooms(workingCourseList[i][0].substring(0,4),roomsAndDepartments);
+			TreeSet<String> cup =new TreeSet<String>();
+			cup.addAll(cList);
+			cup.addAll(pList);
+			TreeSet<String> notdncup = new TreeSet<String>();
+			TreeSet<String> rList = new TreeSet<String>();
+			notdncup.addAll(dList);
+			rList.addAll(dList);
+			notdncup.removeAll(cup);
+			rList.removeAll(notdncup);
+			
+			info.add(rList.toString().substring(1,rList.toString().length()-1)+";");			
+			info.add(pList.toString().substring(1,pList.toString().length()-1)+";");
+			info.add(cList.toString().substring(1,cList.toString().length()-1)+";");
+			info.add(dList.toString().substring(1,dList.toString().length()-1)+";");
+			
+			t.put(workingCourseList[i][0], ((ArrayList<String>)info.clone()));
+			info.clear();
+		}
+		return t;
+	}
+	
+	private TreeSet<String> findRooms(String key, String[][] source){
+		TreeSet<String> rooms = new TreeSet<String>();
+		String[] keys = key.split("  ");
+		for (String k:keys){
+			for (String[] row:source){
+				if (row[0].equals(k)){
+					String[] qux = row[1].split(", ");
+					for (String quux:qux){
+						rooms.add(quux);
+					}
+				}
+			}
+		}
+		//remove last , from rooms 
+		return rooms;
+	}
 	
 	// ================================================================================================
 	/**

@@ -40,24 +40,43 @@ public class Driver{
 	public void go() throws IOException{
 		boolean testing=false;
 		FileManager fm=new FileManager();
-		fm.addCSVFile(new File("proto-coursehistory.csv"), "historical");
-		fm.loadFile("historical");
-		Set<String> keys=fm.process("historical");
+		int phase=2;
+		switch(phase){
+		case 1:
+			System.out.println("Starting phase 1");
+			fm.addCSVFile(new File("proto-coursehistory.csv"), "historical");
+			fm.loadFile("historical");
+			
+			break;
+		case 2:
+			System.out.println("Starting phase 2");
+			fm.addCSVFile(new File("proto-roomsandprofslist.csv"), "roomsandprofessors");
+			fm.addCSVFile(new File("proto-roomsanddeptslist.csv"), "roomsanddepartments");
+			fm.addCSVFile(new File("proto-roomsandcourseslist.csv"), "roomsandcourses");
+			fm.addCSVFile(new File("workingCourseList.csv"), "workingcourselist");
+			fm.addCSVFile(new File("proto-roomslist.csv"), "workingroomslist");
+			String qux = "roomsandprofessors,roomsanddepartments,roomsandcourses,workingcourselist,workingroomslist";
+			String[] quux = qux.split(",");
+			for (String quuux:quux){
+				fm.loadFile(quuux);
+			}
+			System.out.println("About to process...");
+			System.in.read();
+			break;
+		case 3:
+			break;
+		default:
+			System.out.println(phase+ " is not a valid phase");
+			break;
+		}
+		Set<String> keys=fm.process(phase);
 		fm.write(keys.toArray(new String[0]));
-	
+
 		System.out.println("Done!");
 		boolean giveUp=true;
 		if (giveUp){
 			return;
 		}
-
-		fm.addCSVFile(new File("proto-roomsandprofslist.csv"), "historical");
-		fm.addCSVFile(new File("proto-roomsanddeptslist.csv"), "historical");
-		fm.addCSVFile(new File("proto-roomsandcourseslist.csv"), "historical");
-		fm.addCSVFile(new File("proto-workingCourseList.csv"), "historical");
-		fm.addCSVFile(new File("proto-profslist.csv"), "historical");
-		fm.addCSVFile(new File("proto-deptrooms.csv"), "historical");
-		fm.addCSVFile(new File("proto-courselist-easy.csv"), "historical");
 		
 		//load data
 		
