@@ -21,8 +21,9 @@ public class FileManager {
 	 * @param f - the File to add
 	 * @param name - the name to associate with the File
 	 */
-	public void addFile(File f, String name){
+	public String addFile(File f, String name){
 		files.put(name,f);
+		return name;
 	}
 	// ================================================================================================
 
@@ -33,14 +34,12 @@ public class FileManager {
 	 * @param name - the name to associate with the File
 	 * @throws IllegalArgumentException - if the specified File is not a .csv file
 	 */
-	public void addCSVFile(File f, String name){
+	public String addCSVFile(File f, String name){
 		System.out.println("Adding "+f.getName());
-		System.out.println("Does End with "+f.getName().endsWith(".csv"));
-		
 		if (!f.getName().endsWith(".csv")){
 			throw new IllegalArgumentException(f.getName()+" is the incorrect file type");
 		}
-		addFile(f,name);
+		return addFile(f,name);
 	}
 	// ================================================================================================
 
@@ -82,7 +81,7 @@ public class FileManager {
 		return this.spreadsheets.keySet();
 	}
 	// ================================================================================================	
-	
+
 	// ================================================================================================
 	/**
 	 * Returns the spreadsheet representation associated with the specified name, or null if no such 
@@ -192,13 +191,13 @@ public class FileManager {
 		data.put(name, d);
 	}
 	// ================================================================================================
-	
+
 	// ================================================================================================
 	private enum Pill {
 		historical, room, course, professor, department;
 	}
 	// ================================================================================================
-	
+
 	// ================================================================================================
 	/**
 	 * Transforms the spreadsheet associated with the specified name into some number of data maps, and
@@ -223,11 +222,14 @@ public class FileManager {
 			data.put("recommendedroomslist",generateRecommendedRooms(spreadsheetNames));
 			return data.keySet();
 		case 3:
-			name="";
-			data.put(name, generateRooms(getSpreadsheet(name)));
-			TreeSet<String> s = new TreeSet<String>();
-			s.add(name);
-			return s;			
+			//data has the "times" key already, see Driver
+			data.put("workingroomlist", generateRooms(getSpreadsheet("workingroomlist")));
+			data.put("workingcourselist",generateCourses(getSpreadsheet("workingcourselist")));
+			data.put("recommendedroomslist", readRecs(getSpreadsheet("recommendedroomslist")));
+			
+			drawEdges("workingcourselist", "workingroomlist", "recommendedroomslist", "times");
+
+			return data.keySet();
 		default:
 			break;
 		}
@@ -283,7 +285,12 @@ public class FileManager {
 		return h;
 	} // associateFieldAndRooms
 	// ================================================================================================
-	
+
+	/**
+	 * 
+	 * @param spreadsheetNames
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	private TreeMap<String,?> generateRecommendedRooms(String spreadsheetNames){
 		String[] names = spreadsheetNames.split(",");
@@ -292,17 +299,17 @@ public class FileManager {
 		String[][] roomsAndDepartments=getSpreadsheet(names[2]);
 		String[][] workingCourseList=getSpreadsheet(names[3]);
 		String[][] workingRoomList=getSpreadsheet(names[4]);
-		
+
 		String[][] recommendedRoomList=new String[workingCourseList.length][8];
-		
+
 		TreeMap<String,ArrayList<String>> t=new TreeMap<String,ArrayList<String>>(); 
 		ArrayList<String> info=new ArrayList<String>();
-		
+
 		for(int i=0; i<workingCourseList.length; i++){
 			info.add(workingCourseList[i][1]+";");
 			info.add(workingCourseList[i][2]+";");
 			info.add(workingCourseList[i][3]+";");
-			
+
 			TreeSet<String> pList=findRooms(workingCourseList[i][3],roomsAndProfessors);
 			TreeSet<String> cList=findRooms(workingCourseList[i][0],roomsAndCourses);
 			TreeSet<String> dList=findRooms(workingCourseList[i][0].substring(0,4),roomsAndDepartments);
@@ -315,18 +322,24 @@ public class FileManager {
 			rList.addAll(dList);
 			notdncup.removeAll(cup);
 			rList.removeAll(notdncup);
-			
+
 			info.add(rList.toString().substring(1,rList.toString().length()-1)+";");			
 			info.add(pList.toString().substring(1,pList.toString().length()-1)+";");
 			info.add(cList.toString().substring(1,cList.toString().length()-1)+";");
 			info.add(dList.toString().substring(1,dList.toString().length()-1)+";");
-			
+
 			t.put(workingCourseList[i][0], ((ArrayList<String>)info.clone()));
 			info.clear();
 		}
 		return t;
 	}
 	
+	/**
+	 * 
+	 * @param key
+	 * @param source
+	 * @return
+	 */
 	private TreeSet<String> findRooms(String key, String[][] source){
 		TreeSet<String> rooms = new TreeSet<String>();
 		String[] keys = key.split("  ");
@@ -343,14 +356,14 @@ public class FileManager {
 		//remove last , from rooms 
 		return rooms;
 	}
-	
+
 	// ================================================================================================
 	/**
 	 * Creates the map of Room objects, using the toString() method of each Room as its key.
 	 * @param rS - the spreadsheet of rooms to use to generate Rooms
 	 * @return the data map which uses Room.toString() keys to access Room objects
 	 */
-	private Map<String,?> generateRooms(String[][] rS){
+	private Map<String,Room> generateRooms(String[][] rS){
 		System.out.println("Generating Rooms");
 		TreeMap<String,Room> rooms= new TreeMap<String,Room>();
 		for(int row=1; row<rS.length; row++){
@@ -361,23 +374,100 @@ public class FileManager {
 		return rooms;
 	}
 	// ================================================================================================
-	
-	
+
+
 	// ================================================================================================
-		private Map<String,?> generateCourses(String[][] cS) {
-			System.out.println("Generating Courses");
-			TreeMap<String,Course> courses= new TreeMap<String,Course>();
-			for(int row=1; row<cS.length; row++){
-				Course c = new Course(cS[row]);
-				courses.put(c.toString(),c);
-			}		
-			System.out.println("Done Generating Courses");
-			return courses;	
-		}
-	
+	private Map<String,Course> generateCourses(String[][] cS) {
+		System.out.println("Generating Courses");
+		TreeMap<String,Course> courses= new TreeMap<String,Course>();
+		for(int row=1; row<cS.length; row++){
+			Course c = new Course(cS[row]);
+			courses.put(c.toString(),c);
+		}		
+		System.out.println("Done Generating Courses");
+		return courses;	
+	}
+
 	// ================================================================================================
 
+	// ================================================================================================
+	/**
+	 * 
+	 * @param rS
+	 * @return
+	 */
+	private Map<String,HashSet<String>> readRecs(String[][] rS){
+		TreeMap<String,HashSet<String>> recs = new TreeMap<String,HashSet<String>>();
+		for (String[] row:rS){
+			recs.put(row[0], new HashSet<String>(Arrays.asList(row)));
+		}
+		return recs;
+	}
 	
+	// ================================================================================================
+	
+	
+	// ================================================================================================
+	/**
+	 * Populates the Sets inside each of the data objects whose names are specified.
+	 * @param courses
+	 * @param rooms
+	 * @param times
+	 */	
+	@SuppressWarnings("unchecked")
+	private void drawEdges(String workingcourselist, String workingroomlist, String recommendedroomslist, String times){
+		TreeMap<String,Course> courseMap = (TreeMap<String, Course>) data.get(workingcourselist); 
+		TreeMap<String,Room> roomMap = (TreeMap<String, Room>) data.get(workingroomlist);
+		TreeMap<String,HashSet<String>> recMap = (TreeMap<String, HashSet<String>>) data.get(recommendedroomslist);
+		TreeMap<String,Time> timeMap = (TreeMap<String, Time>) data.get(times);
+		
+		for (Room r:roomMap.values()){
+			TreeMap<String,Room> tmr=((TreeMap<String,Room>)roomMap.clone());
+			tmr.remove(r.toString());
+			r.addRooms((Set<Room>)tmr.values());
+		}
+
+		for (Course c:courseMap.values()){
+			double startTime=c.getStartTime();
+			double endTime=c.getEndTime();
+			double blocks=0;
+			ArrayList<Integer> dow = c.getDow();
+			if(startTime%100==30){
+				startTime+=20;
+			}
+			if(endTime%100==30){
+				endTime+=20;
+			} else if(endTime%100==20){
+				endTime+=30;
+			} else if(endTime%100==50){
+				endTime+=50;
+			}
+			blocks=(endTime-startTime)/50;
+			startTime=c.getStartTime();
+			for (int i=0; i<blocks; i++){				
+				for (Integer j:dow){	
+					Time t=timeMap.get(j+":"+startTime);
+					t.addCourse(c.addTime(t));
+				}
+				startTime+=30;
+				if (startTime%100==60){
+					startTime+=40;
+				}
+			}
+			
+			TreeMap<String,Room> cRoomMap=(TreeMap<String,Room>) roomMap.clone();
+			Set<String> keys = roomMap.keySet();
+			keys.removeAll(recMap.get(c));
+			for (String k:keys){
+				Room r=roomMap.get(k);
+				r.addCourse(c.addPreferredRoom(r));
+			}
+			
+		}
+	}
+
+	// ================================================================================================
+
 	// ================================================================================================
 	@SuppressWarnings("unchecked")
 	public void write(String[] names){
@@ -387,14 +477,17 @@ public class FileManager {
 		}
 	}
 
-	
+
 	private boolean writeHashToCSV(Map<String,ArrayList<String>> d, File f){
 		try{
 			BufferedWriter bw=new BufferedWriter(new FileWriter(f));
 			for (Entry<String, ArrayList<String>> es :d.entrySet()){
 				String ts2=es.getValue().toString();
 				ts2=ts2.substring(1,ts2.length()-1);
+				System.out.println("[1]"+ts2);
 				//System.out.println(es.getKey()+";"+ts2+"\n");
+				ts2=ts2.replace(";, ", ";");
+				System.out.println("[2]"+ts2);
 				bw.write(es.getKey()+";"+ts2+"\n");
 			}
 			bw.close();

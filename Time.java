@@ -64,7 +64,7 @@ public final class Time implements Comparable<Time>{
 	}
 	
 	public String toString() {
-		return (dayOfWeek+": "+this.getStartTime());
+		return (dayOfWeek+":"+this.getStartTime());
 	}
 
 	/**

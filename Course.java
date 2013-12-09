@@ -15,19 +15,23 @@ public class Course{
 // ========================================================
 	
 	private String longName;
-	private ArrayList<String> shortName; 
-	private ArrayList<String> departments;
+	private HashSet<String> shortName=new HashSet<String>(); 
+	private HashSet<String> departments=new HashSet<String>();
 	private String timeString; 
-	private ArrayList<Time> times; 
-	private ArrayList<Room> preferredRooms;
-	private ArrayList<String> professors; 
+	private int startTime;
+	private int endTime;
+	private ArrayList<Integer> dow=new ArrayList<Integer>();
+	private HashSet<Time> timeBlocks=new HashSet<Time>(); 
+	private int numOfBlocks;
+	private HashSet<Room> preferredRooms=new HashSet<Room>();
+	private HashSet<String> professors=new HashSet<String>(); 
 	private int capacity;
 	private boolean discussionCourse;
 	private boolean labCourse;
 	private boolean lectureCourse;
 	private boolean seminarCourse;
 	private Room assignment;
-	private ArrayList<Course> edges;
+	private HashSet<Course> edges=new HashSet<Course>();
 	private boolean[] tech;//list of tech booleans
 	//0=needsProjecter
 	//1=needsDVD
@@ -61,15 +65,35 @@ public class Course{
 	
 		//L/D, DIS, LAB, LEC?
 		
-		this.times=makeTimes(parameters[5]); //TODO: BUILD LATER
+		 //TODO:Do Not Use MakeTimes::: add method to build an ArrayList of Times for edge making.
 		
+		String[] dayandTime=parameters[5].split(" ");
+		//String[] dow=dayandTime[0].split("");
+		String[] dayStrings=dayandTime[1].replace("F","4").replace("TH","3").replace("W","2").replace("T","1").replace("M","0").split("");
+		for(String dS:dayStrings){
+			this.dow.add(Integer.parseInt(dS));
+		}
+		
+		String[] times=dayandTime[1].split("-");
+		int start=0;
+		int end=0;
+		start=Integer.parseInt(times[0].substring(0,times[0].length()-2).replace(":", ""));
+		end=Integer.parseInt(times[1].substring(0,times[1].length()-2).replace(":", ""));
+		if (!((start-1200)>=0)&&times[0].charAt(times[0].length()-2)=='P'){
+			start+=1200;
+		}
+		if (!((end-1200)>=0)&&times[1].charAt(times[1].length()-2)=='P'){
+			end+=1200;
+		}
+		this.startTime=start;
+		this.endTime=end;
 		this.capacity=Integer.parseInt(parameters[8]);
 		
 	}
 	// ====================================================
 
-	public ArrayList<Time> makeTimes(String s) {
-		ArrayList<Time> setTimes = null;
+	public void makeTimes(String s) {
+		
 		String[] dayandTime=s.split(" ");
 		String[] dow=dayandTime[0].split("");
 
@@ -126,7 +150,7 @@ public class Course{
 			numOfBlocks+=2;
 		}
 		
-		int start = startHr+endMin;
+		int start = startHr+startMin;
 		int end = endHr+endMin;
 		
 		
@@ -139,36 +163,55 @@ public class Course{
 				
 		//TODO: get String keys, get Times from Time data in FileManager - associate Time and Course
 		//key will look like "0: 1430"
+		//We'll be handling this elsewhere/when
 		
-			
+		this.numOfBlocks=numOfBlocks;
+		this.startTime=start;
+		this.endTime=end;
 		
-		return setTimes;
+		
 	}
 
 	// ====================================================
 	// Getters and Setters
 	
-	public Time getTime() {
-		return time;
+	public HashSet<Time> getTimes() {
+		return this.timeBlocks;
+	}
+	
+	public void setTime(HashSet<Time> t) {
+		this.timeBlocks = t;
+	}
+	
+	public Course addTime(Time t){
+		this.timeBlocks.add(t);
+		return this;
+	}
+	
+	public ArrayList<Integer> getDow() {
+		return dow;
 	}
 
+	public void setDow(Integer dow) {
+		this.dow.add(dow);
+	}
 
-	public void setTime(Time time) {
-		this.time = time;
+	public int getStartTime() {
+		return startTime;
 	}
-	
-	public ArrayList<Time> getTimes() {
-		return times;
+
+	public void setStartTime(int startTime) {
+		this.startTime = startTime;
 	}
-	
-	public void setTime(ArrayList<Time> t) {
-		this.times = t;
+
+	public int getEndTime() {
+		return endTime;
 	}
-	
-	public void addTime(Time t){
-		this.times.add(t);
+
+	public void setEndTime(int endTime) {
+		this.endTime = endTime;
 	}
-	
+
 	/**
 	 * 
 	 * @return all technology requirements
@@ -451,15 +494,17 @@ public class Course{
 	
 	// ====================================================
 	// add individual room to preferredRooms
-	public void addPreferredRoom(Room preferredRoom) {
+	public Course addPreferredRoom(Room preferredRoom) {
 		this.preferredRooms.add(preferredRoom);
+		return this;
 	}
 
 	// add a list of rooms to preferredRooms
-	public void addPreferredRoomsList(ArrayList<Room> pR){
+	public Course addPreferredRoomsList(ArrayList<Room> pR){
 		for (Room r:pR){
 			addPreferredRoom(r);
 		}
+		return this;
 	}
 	// ====================================================
 	

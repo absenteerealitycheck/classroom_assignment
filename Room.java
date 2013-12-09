@@ -24,7 +24,8 @@ public class Room{
 	private boolean[] tech;
 	private int numberOfSlides;
 	private int[][] timesAssigned = new int[5][48]; //boolean[day][half-hour]
-	private ArrayList<Course> courses;
+	private HashSet<Course> courses=new HashSet<Course>();
+	private HashSet<Room> rooms;
 	// =================================================================================================
 
 	/**
@@ -37,7 +38,6 @@ public class Room{
 		this.buildingShort=buildingShort;
 		this.roomNumber=roomNumber;
 		this.initRoomAvailable();
-		this.courses=new ArrayList<Course>();
 	}
 	// =================================================================================================
 
@@ -141,15 +141,21 @@ public class Room{
 	}
 	// =================================================================================================
 
+	public void addRooms(Set<Room> rooms){
+		this.rooms.addAll(rooms);
+	}
+	
+	public void removeRooms(Set<Room> rooms){
+		this.rooms.removeAll(rooms);
+	}
+	
 	// =================================================================================================
 	/**
 	 * Ensures that this Room contains the specified Course.
 	 * @param course - the Course whose presence in this Room is to be ensured
 	 */
 	public void addCourse(Course course) {
-		if (!this.courses.contains(course)){
-			this.courses.add(course);
-		}
+		this.courses.add(course);
 		//TODO:update3:make call to setTimeTable here
 	}
 	// =================================================================================================
@@ -162,10 +168,7 @@ public class Room{
 	 * @return true if an Course was removed as a result of this call
 	 */
 	public boolean removeCourse(Course course){
-		if (!this.courses.contains(course)){
-			return this.courses.remove(course);
-		}
-		return false;
+		return this.courses.remove(course);
 		//TODO:Call unscheduleRoomForTimes()
 	}
 	// =================================================================================================
@@ -175,7 +178,7 @@ public class Room{
 	 * Returns the list of Courses scheduled to be in this room.
 	 * @return the list of Courses
 	 */
-	public ArrayList<Course> getCourses() {
+	public HashSet<Course> getCourses() {
 		return this.courses;
 	}
 	// =================================================================================================

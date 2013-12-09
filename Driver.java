@@ -40,38 +40,39 @@ public class Driver{
 	public void go() throws IOException{
 		boolean testing=false;
 		FileManager fm=new FileManager();
-		int phase=1;
+		int phase=2;
+		String qux ="";
 		switch(phase){
 		case 1:
 			System.out.println("Starting phase 1");
-			fm.addCSVFile(new File("proto-coursehistory.csv"), "historical");
-			fm.loadFile("historical");
-			
+			qux=qux.concat(fm.addCSVFile(new File("proto-coursehistory.csv"), "historical"));
 			break;
 		case 2:
 			System.out.println("Starting phase 2");
-			fm.addCSVFile(new File("proto-roomsandprofslist.csv"), "roomsandprofessors");
-			fm.addCSVFile(new File("proto-roomsanddeptslist.csv"), "roomsanddepartments");
-			fm.addCSVFile(new File("proto-roomsandcourseslist.csv"), "roomsandcourses");
-			fm.addCSVFile(new File("workingCourseList.csv"), "workingcourselist");
-			fm.addCSVFile(new File("proto-roomslist.csv"), "workingroomslist");
-			String qux = "roomsandprofessors,roomsanddepartments,roomsandcourses,workingcourselist,workingroomslist";
-			String[] quux = qux.split(",");
-			for (String quuux:quux){
-				fm.loadFile(quuux);
-			}
-			System.out.println("About to process...");
-			System.in.read();
+			qux=qux.concat(fm.addCSVFile(new File("proto-roomsandprofslist.csv"), "roomsandprofessors")+",");
+			qux=qux.concat(fm.addCSVFile(new File("proto-roomsanddeptslist.csv"), "roomsanddepartments")+",");
+			qux=qux.concat(fm.addCSVFile(new File("proto-roomsandcourseslist.csv"), "roomsandcourses")+",");
+			qux=qux.concat(fm.addCSVFile(new File("workingCourseList.csv"), "workingcourselist")+",");
+			qux=qux.concat(fm.addCSVFile(new File("proto-roomslist.csv"), "workingroomslist"));
 			break;
 		case 3:
+			qux=qux.concat(fm.addCSVFile(new File("proto-recommendedroomslist.csv"), "recommendedroomslist")+",");
+			qux=qux.concat(fm.addCSVFile(new File("workingCourseList.csv"), "workingcourselist")+",");
+			qux=qux.concat(fm.addCSVFile(new File("proto-roomsList.csv"), "workingroomslist"));
+			fm.addData("times", generateTimes());
 			break;
 		default:
 			System.out.println(phase+ " is not a valid phase");
 			break;
 		}
+		System.out.println("Qux is "+qux);
+		String[] quux = qux.split(",");
+		for (String quuux:quux){
+			System.out.println("Loading "+quuux);
+			fm.loadFile(quuux);
+		}
 		Set<String> keys=fm.process(phase);
 		fm.write(keys.toArray(new String[0]));
-
 		System.out.println("Done!");
 		boolean giveUp=true;
 		if (giveUp){
@@ -81,7 +82,7 @@ public class Driver{
 		//load data
 		
 		//process data		
-		fm.addData("times", generateTimes());
+		
 
 		
 		//ArrayList<Professor> professors= generateProfessors(roomsAndProfsSpreadsheet,professorHash, rooms);
