@@ -362,7 +362,22 @@ public class FileManager {
 	}
 	// ================================================================================================
 	
+	
+	// ================================================================================================
+		private Map<String,?> generateCourses(String[][] cS) {
+			System.out.println("Generating Courses");
+			TreeMap<String,Course> courses= new TreeMap<String,Course>();
+			for(int row=1; row<cS.length; row++){
+				Course c = new Course(cS[row]);
+				courses.put(c.toString(),c);
+			}		
+			System.out.println("Done Generating Rooms");
+			return courses;	
+		}
+	
+	// ================================================================================================
 
+	
 	// ================================================================================================
 	@SuppressWarnings("unchecked")
 	public void write(String[] names){

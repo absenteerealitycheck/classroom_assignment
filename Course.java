@@ -5,7 +5,6 @@
 // ========================================================
 
 import java.util.*;
-import java.lang.*;
 import java.lang.reflect.Array;
 import java.io.*;
 
@@ -17,12 +16,11 @@ public class Course{
 	
 	private String longName;
 	private ArrayList<String> shortName; 
-	private ArrayList<String> department;
-	private Time time;
+	private ArrayList<String> departments;
 	private ArrayList<Time> times; 
-	private int capacity;
 	private ArrayList<Room> preferredRooms;
-	private ArrayList<Professor> professors;
+	private ArrayList<String> professors; 
+	private int capacity;
 	private boolean discussionCourse;
 	private boolean labCourse;
 	private boolean lectureCourse;
@@ -45,26 +43,188 @@ public class Course{
 	 * @param name - full course title
 	 * @param type - course type (lab, seminar, discussion, lecture)
 	 */
-	public Course(int capacity, String name, String type){
-		this.capacity=capacity;
-		this.longName=name;
+	public Course(String[] parameters){
+		this.shortName.add(parameters[0]);
+		this.longName=parameters[1];
+		if (!parameters[2].isEmpty()) {
+			String[] crosslisted=parameters[2].split(",");
+			for(String s:crosslisted) {
+				this.shortName.add(s);
+			}
+		}
+		String[] profs=parameters[3].split("  ");
+		for(String s:profs){
+			this.professors.add(s);
+		}
 	
-		this.preferredRooms= new ArrayList<Room>(50);
-		this.shortName=new ArrayList<String>(5);
-		this.time = null;
-		this.times = new ArrayList<Time>();
-		this.professors = new ArrayList<Professor>(2);
-
-		// Course type setter.
-		discussionCourse=labCourse=lectureCourse=seminarCourse=false;
-		if (type.equals("discussion")){discussionCourse=true;}
-		if (type.equals("lab")){labCourse=true;}
-		if (type.equals("lecture")){lectureCourse=true;}
-		if (type.equals("seminar")){seminarCourse=true;}
+		//L/D, DIS, LAB, LEC?
+		
+		this.times=makeTimes(parameters[5]); //TODO: BUILD LATER
+		
+		this.capacity=Integer.parseInt(parameters[8]);
+		
 	}
 	// ====================================================
 
+	public ArrayList<Time> makeTimes(String s) {
+		ArrayList<Time> setTimes = null;
+		String[] dayandTime=s.split(" ");
+		String[] dow=dayandTime[0].split("");
+
+		
+		ArrayList<Integer> dayOf=new ArrayList<Integer>(dow.length) ;
+		
+		for (int i=0;i<dow.length;i++){
+			if(dow[i].equals("M")){
+				dayOf.add(0);
+			}
+			else if(dow[i].equals("T")){
+				if ((i+1)!=dow.length) {
+					if (dow[i+1].equals("H")){
+						dayOf.add(3);
+					}
+					else{
+						dayOf.add(1);
+					}
+				}
+				else{
+					dayOf.add(1);
+				}
+			}
+			else if(dow[i].equals("W")){
+				dayOf.add(2);
+			}
+			else if(dow[i].equals("F")){
+				dayOf.add( 4);
+			}
+			else if(dow[i].equals("H")){
+				continue;
+			}
+		}//end dayOfWeek
+		
+		String[] times=dayandTime[1].split("-");
+		
+		String startHour = times[0].substring(0,2);
+		String endHour = times[1].substring(0,2);
+		
+		if(times[0].substring(times[0].length()-3,times[0].length()).equals("PM")) startHour+=12;
+		if(times[1].substring(times[1].length()-3,times[1].length()).equals("PM")) endHour+=12;
+				
+		//TODO: get String keys, get Times from Time data in FileManager - associate Time and Course
+		//key will look like "0: 1430"
+		return setTimes;
+	}
+
+	//PULL FROM THIS METHOD TO CREATE NEW METHODS TO CONSTRUCT COURSE
+	public ArrayList<Course> generateCourses(String[][] cl, HashMap<String,ArrayList<Room>> drS,HashMap<String,ArrayList<Room>> crS,
+			Hashtable<String,Course> ch, ArrayList<Room> r, Hashtable<String,Professor> pH, Hashtable<String,Time> tH,HashMap<String,ArrayList<Room>> rapH) throws IOException{
 	
+		System.out.println("Generating Courses");
+		ArrayList<Course> courseList=new ArrayList<Course>();
+		Course temp;
+
+		for(int row=0;row<cl.length;row++){
+
+			/*
+			 * Create all local variables
+			 */
+
+			String shortname=cl[row][0];
+			if(row+1<cl.length){//ignore repeated sections
+				if (cl[row+1][0].equals(shortname)) {
+					System.out.println("SKIPPING REPEAT "+shortname);
+					continue;
+				}
+			}
+			String deptname=shortname.substring(0,4);
+			String longname=cl[row][1];
+			int capacity = (cl[row][8].isEmpty())?10:Integer.parseInt(cl[row][8]);
+			String type=cl[row][4]; //must parse L/D, LAB, LEC, DIS
+	
+			temp= new Course(capacity,longname,type);
+			temp.addShortName(shortname);
+			//Check for crosslisting
+			if(!cl[row][2].isEmpty()){
+				System.out.println("CROSSLISTED: "+cl[row][2]);
+				String[] crossList=cl[row][2].split(",");
+				for (String s: crossList) { //add each cross-listed shortname
+					if (!temp.getShortName().contains(s)) temp.addShortName(s);
+				}
+				//a course of this name already exists, do not make a duplicate Object
+				//TODO: FIX FOR CROSSLISTS - CHECK MAP FOR LONG(?) KEY; IF EXISTS, CONTINUE
+			/*	if (!!!) {
+					System.out.println("ALREADY CONTAINS "+temp.toString());
+					continue;
+				}*/
+			}
+	
+			//Check professors
+			String prof=(cl[row][3].isEmpty())?"Scott Kaplan":cl[row][3];
+			String[] profs = prof.split("  ");
+			for (String s:profs){
+				Professor p = pH.get(s);
+				temp.addProfessor(p);
+				p.addCourse(temp);
+			}
+
+			courseList.add(temp);
+			ch.put(longname, temp);
+			// TODO: handle tech please - must find out where getting info from
+			/*boolean[]tech=new boolean[5];
+			int slidesNeeded=0;
+			for(int i=0;i<tech.length;i++){
+				tech[i]=cl[row][i+9].isEmpty();
+				if(i==3&&!(cl[row][i+9].isEmpty())){
+					 slidesNeeded=Integer.parseInt(cl[row][12]);
+				}
+			}
+			temp.setTech(tech);
+			temp.setNumberOfSlides(slidesNeeded);
+			 */
+
+			//Making preferred Times Begins
+			
+			//Making preferredRooms 
+			ArrayList<Room> dRooms=new ArrayList<Room>();
+			dRooms.addAll(drS.get(deptname));
+			//System.out.println(shortname+"\n");
+			//System.out.println("dRooms size: "+ dRooms.size());
+			//System.out.println(crS.containsKey(shortname.substring(0, shortname.length()-3))+" for course "+shortname);
+			ArrayList<Room> cRooms=crS.get(shortname.substring(0, shortname.length()-3));
+			ArrayList<Room> pRooms=new ArrayList<Room>();
+			//System.out.println(temp.getProfessors().size());
+			for(Professor p:temp.getProfessors()){
+				//System.out.println("prof rooms "+rapH.get(p.getName()));
+				pRooms.addAll(rapH.get(p.getName()));
+			}
+			//System.out.println("sizes "+pRooms.size()+" "+cRooms.size());
+			ArrayList<Room> tempD2=new ArrayList<Room>();
+			ArrayList<Room> tempD=new ArrayList<Room>();
+			tempD.addAll(dRooms);
+				for(int j=0;j<dRooms.size();j++){
+					//if room in dRooms is not in Courses rooms or Professors rooms, add to a deletion list
+					if(!cRooms.contains(dRooms.get(j))&&!pRooms.contains(dRooms.get(j))){
+						tempD2.add(dRooms.get(j));
+					}
+				}
+			//System.out.println("tempD2 "+tempD2.size());
+			//delete rooms from department rooms that are not suitable for the course
+			for(Room r2:tempD2){
+				dRooms.remove(r2);
+			}
+			//if the list of preferred rooms for a course is empty, give it the department room list
+			if(dRooms.isEmpty()){
+				dRooms.addAll(tempD);
+			}
+			temp.addPreferredRoomsList(dRooms);
+			//End preferredRooms
+		}
+		courseList.trimToSize();
+	
+		System.out.println("Done courses");
+		return courseList;
+	}// generateCourses
+
 	// ====================================================
 	// Getters and Setters
 	
