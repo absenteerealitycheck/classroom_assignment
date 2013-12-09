@@ -17,6 +17,7 @@ public class Course{
 	private String longName;
 	private ArrayList<String> shortName; 
 	private ArrayList<String> departments;
+	private String timeString; 
 	private ArrayList<Time> times; 
 	private ArrayList<Room> preferredRooms;
 	private ArrayList<String> professors; 
@@ -46,6 +47,7 @@ public class Course{
 	public Course(String[] parameters){
 		this.shortName.add(parameters[0]);
 		this.longName=parameters[1];
+		this.timeString=parameters[2];
 		if (!parameters[2].isEmpty()) {
 			String[] crosslisted=parameters[2].split(",");
 			for(String s:crosslisted) {

@@ -371,7 +371,7 @@ public class FileManager {
 				Course c = new Course(cS[row]);
 				courses.put(c.toString(),c);
 			}		
-			System.out.println("Done Generating Rooms");
+			System.out.println("Done Generating Courses");
 			return courses;	
 		}
 	
