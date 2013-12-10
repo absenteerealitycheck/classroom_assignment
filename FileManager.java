@@ -437,9 +437,9 @@ public class FileManager {
 		TreeSet<Node> nodeSet=new TreeSet<Node>(new Comparator<Node>(){
 			public int compare(Node a, Node b){
 				if (a.getNeighborCount()>b.getNeighborCount()){
-					return 1;
+					return -1;
 				}
-				return -1;
+				return 1;
 			}
 		});
 		
