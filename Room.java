@@ -12,7 +12,7 @@ import java.io.*;
 /**
  * An object that holds information about rooms on Amherst College campus.
  */
-public class Room{
+public class Room extends Node{
 	// =================================================================================================	
 	private String roomNumber; 
 	private int capacity;
@@ -25,7 +25,7 @@ public class Room{
 	private int numberOfSlides;
 	private int[][] timesAssigned = new int[5][48]; //boolean[day][half-hour]
 	private HashSet<Course> courses=new HashSet<Course>();
-	private HashSet<Room> rooms;
+	private HashSet<Room> rooms=new HashSet<Room>();
 	// =================================================================================================
 
 	/**
@@ -80,67 +80,6 @@ public class Room{
 	}
 	// =================================================================================================
 
-	// =================================================================================================
-	/**
-	 * Returns true if this Room is occupied by at least one other course during the specified Time.
-	 * @param t - the Time to check
-	 * @return true if this Room is occupied
-	 */
-	public boolean isAssigned(Time t) {
-		boolean assigned=false;
-		int day=t.getDayOfWeek();
-		int startHalfHour=t.getStartHour()*2;
-		if (t.getStartMinute()==30){startHalfHour++;}
-		int blocks=t.getBlocks();
-		for(int i=0;i<blocks;startHalfHour++){
-			if (timesAssigned[day][startHalfHour]>0){
-				assigned=true;
-				break;
-			}
-		}
-		return assigned;
-	}
-	// =================================================================================================
-
-	// =================================================================================================
-	/**
-	 * Marks this Room as being occupied by one more course for each Time in the specified list of Times.
-	 * @param times - the list of Times
-	 */
-	private void scheduleRoomForTimes(ArrayList<Time> times){
-		for(Time t:times){
-			int dayIndex=t.getDayOfWeek();
-			int startHalfHour=t.getStartHour()*2;
-			if (t.getStartMinute()==30){startHalfHour++;}
-			int blocks=t.getBlocks();
-			for(int i=0;i<blocks;startHalfHour++){
-				timesAssigned[dayIndex][startHalfHour]++;
-
-			}
-		}
-	}
-	// =================================================================================================
-
-	// =================================================================================================
-	/**
-	 * Marks this Room as being occupied by one less course for each Time in the specified list of Times.
-	 * @param times - the list of Times
-	 */
-	private void unscheduleRoomForTimes(ArrayList<Time> times){
-		for(Time t:times){
-			int dayIndex=t.getDayOfWeek();
-			int startHalfHour=t.getStartHour()*2;
-			if (t.getStartMinute()==30){startHalfHour++;}
-			int blocks=t.getBlocks();
-			for(int i=0;i<blocks;startHalfHour++){
-				if (--timesAssigned[dayIndex][startHalfHour]<0){
-					throw new IllegalStateException(this.toString()+" not occupied at "+t.toString());
-				}
-			}
-		}
-	}
-	// =================================================================================================
-
 	public void addRooms(Set<Room> rooms){
 		this.rooms.addAll(rooms);
 	}
@@ -156,7 +95,7 @@ public class Room{
 	 */
 	public void addCourse(Course course) {
 		this.courses.add(course);
-		//TODO:update3:make call to setTimeTable here
+		
 	}
 	// =================================================================================================
 
@@ -196,6 +135,8 @@ public class Room{
 	}
 	// =================================================================================================
 
+	
+	//TODO:ARe we still using buildings? if no get rid of building code
 	// =================================================================================================
 	/**
 	 * Returns the four-letter abbreviation of this Room's building.
@@ -278,7 +219,7 @@ public class Room{
 		this.roomNumber = roomNumber;
 	}
 	// =================================================================================================
-
+	//TODO: implement Technology for new time and course structure
 	// =================================================================================================
 	/**
 	 * Sets the boolean values for what technology the Room has available
@@ -340,7 +281,7 @@ public class Room{
 		return isAccessible;
 	}
 	// =================================================================================================
-
+	//TODO: do we have this info????
 	// =================================================================================================
 	/**
 	 * Changes the value indicating if this Room is handicap accessible.
@@ -371,6 +312,20 @@ public class Room{
 	}
 	// =================================================================================================
 
+	public int getNeighborCount(){
+		return this.rooms.size()+this.courses.size();
+	}
+	
+	public Set<Node> getNeighbors(){
+		Set<Node> tmp= new HashSet<Node>(this.rooms);
+		tmp.addAll(this.courses);
+		return tmp;
+	}
+	
+	public boolean isNeighbor(Node n){
+		return this.getNeighbors().contains(n);
+	}
+	
 	// =================================================================================================
 	/**
 	 * Returns a string representation of this Room. The string representation consists of the string 

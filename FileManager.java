@@ -135,9 +135,9 @@ public class FileManager {
 
 	// ================================================================================================
 	/**
-	 * Takes a file and reads it into a spreadsheet for us to use
-	 * @param file
-	 * @return
+	 * Converts the contents of a .csv file to a String [][]
+	 * @param file - the file to convert
+	 * @return the String[][] representation of file
 	 * @throws IOException
 	 */
 	private static String[][] makeSpreadsheet(File file) throws IOException{
@@ -192,11 +192,7 @@ public class FileManager {
 	}
 	// ================================================================================================
 
-	// ================================================================================================
-	private enum Pill {
-		historical, room, course, professor, department;
-	}
-	// ================================================================================================
+	
 
 	// ================================================================================================
 	/**
@@ -206,7 +202,7 @@ public class FileManager {
 	 * @return the set of keys needed to access the newly created data maps.
 	 * @respect calls to data.put() are made directly inside process, not from the methods it calls
 	 */
-	public Set<String> process(int phase){
+	public <N> Set<String> process(int phase){
 		//TODO:Use reflection on name
 		String name="";
 		switch(phase){
@@ -223,12 +219,32 @@ public class FileManager {
 			return data.keySet();
 		case 3:
 			//data has the "times" key already, see Driver
-			data.put("workingroomlist", generateRooms(getSpreadsheet("workingroomlist")));
+			System.out.println("[FM-P1]"+"Spreadsheets are "+this.spreadsheets.size()+" many");
+			System.out.println("[FM-P2]"+"Spreadsheets are "+this.getSpreadsheetNames());
+			data.put("workingroomlist", generateRooms(getSpreadsheet("workingroomslist")));
 			data.put("workingcourselist",generateCourses(getSpreadsheet("workingcourselist")));
 			data.put("recommendedroomslist", readRecs(getSpreadsheet("recommendedroomslist")));
 			
 			drawEdges("workingcourselist", "workingroomlist", "recommendedroomslist", "times");
 
+			TreeMap<String,Course> courseMap = (TreeMap<String, Course>) data.get("workingcourselist"); 
+			System.out.println("[P1]"+"number of course nodes is "+courseMap.size());
+			TreeMap<String,Room> roomMap = (TreeMap<String, Room>) data.get("workingroomlist");
+			System.out.println("[P2]"+"number of room nodes is "+roomMap.size());
+			//TODO:Make a Node class
+			//TODO:Make a getNodeMap method
+			//TODO:Make a getMapMap method
+			TreeMap<String,Node> nodeMap = new TreeMap<String,Node>(roomMap);
+			nodeMap.putAll(courseMap);
+			System.out.println("[P3]"+"number of graph nodes is "+nodeMap.size());
+			HashMap<Course,Room> ans=LF(nodeMap);
+			System.out.println("Hello "+ans.size());
+			for (Entry e :ans.entrySet()){
+				System.out.println(e);
+			}
+			
+			System.out.println(ans);
+			
 			return data.keySet();
 		default:
 			break;
@@ -287,9 +303,9 @@ public class FileManager {
 	// ================================================================================================
 
 	/**
-	 * 
-	 * @param spreadsheetNames
-	 * @return
+	 * Returns a map of recommended rooms to courses where the Course.toString() is the key
+	 * @param spreadsheetNames - a comma separated list of "spreadsheets" to run this method on
+	 * @return a map of Courses to their recommended rooms with Course.toString() as the key
 	 */
 	@SuppressWarnings("unchecked")
 	private TreeMap<String,?> generateRecommendedRooms(String spreadsheetNames){
@@ -336,9 +352,9 @@ public class FileManager {
 	
 	/**
 	 * 
-	 * @param key
-	 * @param source
-	 * @return
+	 * @param key - String representation of the Object to associate courses with
+	 * @param source - a String[][] of Objects associated with their historical room data
+	 * @return a Set of rooms associated with key in historical data
 	 */
 	private TreeSet<String> findRooms(String key, String[][] source){
 		TreeSet<String> rooms = new TreeSet<String>();
@@ -377,6 +393,11 @@ public class FileManager {
 
 
 	// ================================================================================================
+	/**
+	 * Creates the map of Course objects, using the toString() method of each Course as its key.
+	 * @param cS - the spreadsheet of rooms to use to generate Course objects
+	 * @return the data map which uses Room.toString() keys to access Room objects
+	 */
 	private Map<String,Course> generateCourses(String[][] cS) {
 		System.out.println("Generating Courses");
 		TreeMap<String,Course> courses= new TreeMap<String,Course>();
@@ -399,21 +420,102 @@ public class FileManager {
 	private Map<String,HashSet<String>> readRecs(String[][] rS){
 		TreeMap<String,HashSet<String>> recs = new TreeMap<String,HashSet<String>>();
 		for (String[] row:rS){
-			recs.put(row[0], new HashSet<String>(Arrays.asList(row)));
+			recs.put(row[0], new HashSet<String>(Arrays.asList(row[4])));
 		}
 		return recs;
 	}
 	
 	// ================================================================================================
+	// ================================================================================================
+	private HashMap<Course,Room> LF(Map<String,Node> nodeMap){
+		HashMap<Course,Room> assignments = new HashMap<Course,Room>();//C
+		int color=0;//col
+		
+		HashMap<Node,Integer> colorMap = new HashMap<Node,Integer>();//C
+		HashSet<Node> coloredSet=new HashSet<Node>();
+		
+		TreeSet<Node> nodeSet=new TreeSet<Node>(new Comparator<Node>(){
+			public int compare(Node a, Node b){
+				if (a.getNeighborCount()>b.getNeighborCount()){
+					return 1;
+				}
+				return -1;
+			}
+		});
+		
+		Collection<Node> col=nodeMap.values();
+		System.out.println("=================================================");
+		for (Node blivit: col){
+			System.out.println(blivit.getNeighborCount()+","+blivit);
+			nodeSet.add(blivit);
+		}
+		System.out.println("=================================================");
+		
+		System.out.println("=================================================");
+		for (Node blivit: nodeSet){
+			System.out.println(blivit.getNeighborCount()+","+blivit);
+		}
+		System.out.println("=================================================");
+		
+		boolean roomColored=false;
+		while(!nodeSet.isEmpty()){
+			Node room=null;
+			for(Node n:nodeSet){
+				if (n instanceof Room){
+					room=n;
+					roomColored=true;
+					colorMap.put(n,color);
+					coloredSet.add(n);
+					break;
+				}
+			}
+			if (!roomColored){
+				//System.out.println("[FM1]"+nodeSet.size());
+				//System.out.println("[FM2]"+nodeSet);
+				break;
+			}
+			for (Node n:nodeSet){
+				//System.out.println("[LF1]"+"n is "+n);
+				if (n instanceof Room){
+					//System.out.println("[LF3]"+"Skipping the room");
+					continue;
+				}
+					
+				for (Node m:coloredSet){
+					//System.out.println("[LF2]"+"m is "+m);
+					//System.out.println("[LF4]"+"neighbors are "+n.getNeighbors());
+					if (!n.isNeighbor(m)){
+						assignments.put((Course)n, (Room)room);
+						//System.out.println("[LF4]"+"ans size is "+assignments.size());
+						colorMap.put(n,color);
+						coloredSet.add(n);
+					}
+				}		
+				roomColored=false;
+				room=null;
+			}
+			nodeSet.removeAll(coloredSet);
+			color++;
+		}
+		
+		return assignments;
+	}
 	
-	
+	// ================================================================================================
+	/* 		
+  		TreeMap<Node,Integer> neighborMap= new TreeMap<Node,Integer>();
+		for (Node n: nodeMap.values()){
+			neighborMap.put(n, n.getNeighborCount());			
+		}
+	*/
 	// ================================================================================================
 	/**
 	 * Populates the Sets inside each of the data objects whose names are specified.
-	 * @param courses
-	 * @param rooms
-	 * @param times
-	 */	
+	 * @param workingcourselist - map of Course.toString to Course object
+	 * @param workingroomlist - map of Room.toString() to Room object
+	 * @param recommendedroomslist - the results of phase 2
+	 * @param times - a map of all Times with a key of Time.toString()
+	 */
 	@SuppressWarnings("unchecked")
 	private void drawEdges(String workingcourselist, String workingroomlist, String recommendedroomslist, String times){
 		TreeMap<String,Course> courseMap = (TreeMap<String, Course>) data.get(workingcourselist); 
@@ -424,7 +526,8 @@ public class FileManager {
 		for (Room r:roomMap.values()){
 			TreeMap<String,Room> tmr=((TreeMap<String,Room>)roomMap.clone());
 			tmr.remove(r.toString());
-			r.addRooms((Set<Room>)tmr.values());
+			Set<Room> rooms = new HashSet<Room>(tmr.values());
+			r.addRooms(rooms);
 		}
 
 		for (Course c:courseMap.values()){
@@ -446,28 +549,52 @@ public class FileManager {
 			startTime=c.getStartTime();
 			for (int i=0; i<blocks; i++){				
 				for (Integer j:dow){	
-					Time t=timeMap.get(j+":"+startTime);
+					String timeName=j+":"+(int)startTime;
+					//System.out.println("[FM-DE1]"+"name of time is "+timeName);
+					Time t=timeMap.get(j+":"+(int)startTime);
+					//System.out.println("[FM-DE2]"+"Newly gotten time is "+t);
 					t.addCourse(c.addTime(t));
+					for(Course course:t.getCourses()){
+						if(course!=c){
+							course.addEdge(c);
+							c.addEdge(course);
+						}
+					}
 				}
 				startTime+=30;
 				if (startTime%100==60){
 					startTime+=40;
 				}
 			}
+			//System.out.println("[FM-DE1]"+c+": "+c.getTimes());
+			//System.out.println("[FM-DE2]"+c+": "+c.getDow()+"|"+c.getStartTime()+"|"+c.getEndTime());
 			
-			TreeMap<String,Room> cRoomMap=(TreeMap<String,Room>) roomMap.clone();
-			Set<String> keys = roomMap.keySet();
-			keys.removeAll(recMap.get(c));
+			
+			Set<String> keys = new HashSet<String>(roomMap.keySet());
+			keys.removeAll(recMap.get(c.getShortName().toArray()[0]));
 			for (String k:keys){
 				Room r=roomMap.get(k);
 				r.addCourse(c.addPreferredRoom(r));
 			}
-			
 		}
 	}
 
 	// ================================================================================================
-
+	// ================================================================================================
+	public void colorNode(Course c){//Removes all of the edges to the course and assigns a color(room)
+		
+	}
+	// ================================================================================================
+	// ================================================================================================
+	public Object makeU1(){
+		return null;
+	}
+	// ================================================================================================
+	// ================================================================================================
+	public Object makeU2(){
+		return null;
+	}
+	// ================================================================================================
 	// ================================================================================================
 	@SuppressWarnings("unchecked")
 	public void write(String[] names){
@@ -477,7 +604,14 @@ public class FileManager {
 		}
 	}
 
-
+	// ================================================================================================
+	// ================================================================================================
+	/**
+	 * Writes Map d to File f as a .csv
+	 * @param d - the data to write 
+	 * @param f - the file to be written to
+	 * @return a boolean which is true if the file wrote correctly and false otherwise
+	 */
 	private boolean writeHashToCSV(Map<String,ArrayList<String>> d, File f){
 		try{
 			BufferedWriter bw=new BufferedWriter(new FileWriter(f));
@@ -497,7 +631,13 @@ public class FileManager {
 			return false;
 		}
 	}
-
+	// ================================================================================================
+	// ================================================================================================
+	/**
+	 * 
+	 * @param s
+	 * @return
+	 */
 	public String spreadsheetStringify(String[][] s){
 		String result="";
 		for(int row=1;row<s.length;row++){
@@ -509,14 +649,16 @@ public class FileManager {
 		}
 		return result;
 	}
-
+	// ================================================================================================
+	// ================================================================================================
 	//TODO:Deprecate if never used
 	private <E> void typeCheck(Class<E> type, Object o){
 		if (o!=null&&!type.isInstance(o)){
 			throw new ClassCastException(badElementMsg(type, o));
 		}
 	}
-
+	// ================================================================================================
+	// ================================================================================================
 	private <E> String badElementMsg(Class<E> type, Object o){
 		return "Attempt to use "+o.getClass()+" element with element type "+type;
 	}

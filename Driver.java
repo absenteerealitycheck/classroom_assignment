@@ -40,7 +40,7 @@ public class Driver{
 	public void go() throws IOException{
 		boolean testing=false;
 		FileManager fm=new FileManager();
-		int phase=2;
+		int phase=3;
 		String qux ="";
 		switch(phase){
 		case 1:
@@ -56,24 +56,24 @@ public class Driver{
 			qux=qux.concat(fm.addCSVFile(new File("proto-roomslist.csv"), "workingroomslist"));
 			break;
 		case 3:
-			qux=qux.concat(fm.addCSVFile(new File("proto-recommendedroomslist.csv"), "recommendedroomslist")+",");
+			qux=qux.concat(fm.addCSVFile(new File("proto-recommendedroomslistlist.csv"), "recommendedroomslist")+",");
 			qux=qux.concat(fm.addCSVFile(new File("workingCourseList.csv"), "workingcourselist")+",");
-			qux=qux.concat(fm.addCSVFile(new File("proto-roomsList.csv"), "workingroomslist"));
+			qux=qux.concat(fm.addCSVFile(new File("proto-roomslist.csv"), "workingroomslist"));
 			fm.addData("times", generateTimes());
 			break;
 		default:
 			System.out.println(phase+ " is not a valid phase");
 			break;
 		}
-		System.out.println("Qux is "+qux);
+		System.out.println("[DR1]"+"Qux is "+qux);
 		String[] quux = qux.split(",");
 		for (String quuux:quux){
-			System.out.println("Loading "+quuux);
+			System.out.println("[DR2]"+"Loading "+quuux);
 			fm.loadFile(quuux);
 		}
 		Set<String> keys=fm.process(phase);
 		fm.write(keys.toArray(new String[0]));
-		System.out.println("Done!");
+		System.out.println("[DR3]"+"Done!");
 		boolean giveUp=true;
 		if (giveUp){
 			return;
@@ -100,9 +100,9 @@ public class Driver{
 	/**
 	 * makes times for each of the days in 30 min increments
 	 */
-	public HashMap<String,Time> generateTimes(){
+	public TreeMap<String,Time> generateTimes(){
 		System.out.println("Generating Times");
-		HashMap<String,Time> times=new HashMap<String,Time>();
+		TreeMap<String,Time> times=new TreeMap<String,Time>();
 		Time temp=null;
 		for (int i=0;i<5;i++) {
 			for (int j=800;j<1900;j+=100){

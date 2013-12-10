@@ -11,7 +11,7 @@ import java.io.*;
 // ========================================================
 // Contains information for courses for room assignment 
 // problem.
-public class Course{
+public class Course extends Node{
 // ========================================================
 	
 	private String longName;
@@ -69,9 +69,9 @@ public class Course{
 		
 		String[] dayandTime=parameters[5].split(" ");
 		//String[] dow=dayandTime[0].split("");
-		String[] dayStrings=dayandTime[1].replace("F","4").replace("TH","3").replace("W","2").replace("T","1").replace("M","0").split("");
-		for(String dS:dayStrings){
-			this.dow.add(Integer.parseInt(dS));
+		String[] dayStrings=dayandTime[0].replace("SU","").replace("S","").replace("F","4").replace("TH","3").replace("W","2").replace("T","1").replace("M","0").split("");
+		for(int i=1; i<dayStrings.length; i++){
+			this.dow.add(Integer.parseInt(dayStrings[i]));
 		}
 		
 		String[] times=dayandTime[1].split("-");
@@ -248,7 +248,7 @@ public class Course{
 	 * 
 	 * @return preferredRooms list
 	 */
-	public ArrayList<Room> getPreferredRooms() {
+	public HashSet<Room> getPreferredRooms() {
 		return this.preferredRooms;
 	}
 	
@@ -388,7 +388,7 @@ public class Course{
 	 * 
 	 * @return course abbreviation shortName
 	 */
-	public ArrayList<String> getShortName() {
+	public HashSet<String> getShortName() {
 		return shortName;
 	}
 
@@ -404,8 +404,8 @@ public class Course{
 	 * 
 	 * @return associated departments list
 	 */
-	public ArrayList<String> getDepartment() {
-		return department;
+	public HashSet<String> getDepartment() {
+		return departments;
 	}
 
 	/**
@@ -413,14 +413,14 @@ public class Course{
 	 * @param department added to associated departments list
 	 */
 	public void addDepartment(String department) {
-		this.department.add(department);
+		this.departments.add(department);
 	}
 
 	/**
 	 * 
 	 * @return list of professors teaching this course
 	 */
-	public ArrayList<Professor> getProfessors() {
+	public HashSet<String> getProfessors() {
 		return professors;
 	}
 
@@ -429,13 +429,30 @@ public class Course{
 	 * @param professor added to list of professors 
 	 * teaching this course
 	 */
-	public void addProfessor(Professor professor) {
+	public void addProfessor(String professor) {
 		this.professors.add(professor);
 	}
 
 	// ====================================================
 	
+	public boolean addEdge(Course c){
+		return this.edges.add(c);
+	}
 	
+	public int getNeighborCount(){
+		return this.edges.size()+this.preferredRooms.size();
+	}
+	
+	public Set<Node> getNeighbors(){
+		Set<Node> tmp= new HashSet<Node>(this.edges);
+		tmp.addAll(this.preferredRooms);
+		return tmp;
+		
+	}
+	
+	public boolean isNeighbor(Node n){
+		return getNeighbors().contains(n);
+	}
 	
 	// ====================================================
 	// techFilterRooms
