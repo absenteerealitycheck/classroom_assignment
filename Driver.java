@@ -40,7 +40,7 @@ public class Driver{
 	public void go() throws IOException{
 		boolean testing=false;
 		FileManager fm=new FileManager();
-		int phase=3;
+		int phase=1;
 		String qux ="";
 		switch(phase){
 		case 1:

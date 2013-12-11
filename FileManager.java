@@ -318,6 +318,11 @@ public class FileManager {
 				}
 			}
 		}
+		for (ArrayList<String> rooms:h.values()){
+			if (rooms.size()==1){
+				rooms.set(0,rooms.get(0).concat(";1"));
+			}
+		}
 		return h;
 	} // associateFieldAndRooms
 	// ================================================================================================
@@ -348,6 +353,7 @@ public class FileManager {
 
 			TreeSet<String> pList=findRooms(workingCourseList[i][3],roomsAndProfessors);
 			TreeSet<String> cList=findRooms(workingCourseList[i][0],roomsAndCourses);
+			//TODO: Handle dLists for Cross listed Courses
 			TreeSet<String> dList=findRooms(workingCourseList[i][0].substring(0,4),roomsAndDepartments);
 			TreeSet<String> cup =new TreeSet<String>();
 			cup.addAll(cList);
