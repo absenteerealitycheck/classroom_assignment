@@ -21,17 +21,15 @@ public class Course extends Node{
 	private int startTime;
 	private int endTime;
 	private ArrayList<Integer> dow=new ArrayList<Integer>();
-	private HashSet<Time> timeBlocks=new HashSet<Time>(); 
+	private TreeSet<Time> timeBlocks=new TreeSet<Time>(); 
 	private int numOfBlocks;
-	private HashSet<Room> preferredRooms=new HashSet<Room>();
+	private HashSet<String> preferredRooms=new HashSet<String>(); //actually inverse(PreferredRooms) ie the Room edges
 	private HashSet<String> professors=new HashSet<String>(); 
 	private int capacity;
-	private boolean discussionCourse;
-	private boolean labCourse;
-	private boolean lectureCourse;
-	private boolean seminarCourse;
+	private String type;
 	private Room assignment;
-	private HashSet<Course> edges=new HashSet<Course>();
+	private HashSet<Room> roomEdges=new HashSet<Room>(); //only Room edges
+	private HashSet<Course> courseEdges=new HashSet<Course>(); //only Course edges
 	private boolean[] tech;//list of tech booleans
 	//0=needsProjecter
 	//1=needsDVD
@@ -63,6 +61,11 @@ public class Course extends Node{
 			this.professors.add(s);
 		}
 	
+		if (parameters[4].equals("LAB")){
+			this.type="lab";
+		} else {
+			this.type="N/A";
+		}
 		//L/D, DIS, LAB, LEC?
 		
 		 //TODO:Do Not Use MakeTimes::: add method to build an ArrayList of Times for edge making.
@@ -175,11 +178,11 @@ public class Course extends Node{
 	// ====================================================
 	// Getters and Setters
 	
-	public HashSet<Time> getTimes() {
+	public TreeSet<Time> getTimes() {
 		return this.timeBlocks;
 	}
 	
-	public void setTime(HashSet<Time> t) {
+	public void setTime(TreeSet<Time> t) {
 		this.timeBlocks = t;
 	}
 	
@@ -248,7 +251,7 @@ public class Course extends Node{
 	 * 
 	 * @return preferredRooms list
 	 */
-	public HashSet<Room> getPreferredRooms() {
+	public HashSet<String> getPreferredRooms() {
 		return this.preferredRooms;
 	}
 	
@@ -284,92 +287,14 @@ public class Course extends Node{
 		this.capacity = capacity;
 	}
 	
-	
-	/**
-	 * 
-	 * @return course type (lab, lecture, discussion, seminar)
-	 */
-	public boolean isLabCourse() {
-		return labCourse;
-	}
 
-	/**
-	 * 
-	 * @param labCourse determines whether course is lab 
-	 */
-	public void setLabCourse(boolean labCourse) {
-		this.labCourse = labCourse;
-	}
-
-	/**
-	 * 
-	 * @return true if course is seminar
-	 */
-	public boolean isSeminarCourse() {
-		return seminarCourse;
-	}
-
-	/**
-	 * 
-	 * @param seminarCourse determines whether course is seminar
-	 */
-	public void setSeminarCourse(boolean seminarCourse) {
-		this.seminarCourse = seminarCourse;
-	}
-
-	/**
-	 * 
-	 * @return true if course is lecture
-	 */
-	public boolean isLectureCourse() {
-		return lectureCourse;
-	}
-
-	/**
-	 * 
-	 * @param lectureCourse determines whether course is lecture
-	 */
-	public void setLectureCourse(boolean lectureCourse) {
-		this.lectureCourse = lectureCourse;
-	}
-
-	/**
-	 * 
-	 * @return true if course is discussion
-	 */
-	public boolean isDiscussionCourse() {
-		return discussionCourse;
-	}
-
-	/**
-	 * 
-	 * @param discussionCourse determines whether course is discussion
-	 */
-	public void setDiscussionCourse(boolean discussionCourse) {
-		this.discussionCourse = discussionCourse;
-	}
-	
-	/**
-	 * 
-	 * @return courses type (discussion, lab, lecture, seminar) or Unlisted
-	 */
 	public String getType(){
-		if (isDiscussionCourse()){return "Discussion";}
-		if (isLabCourse()){return "Lab";}
-		if (isLectureCourse()){return "Lecture";}
-		if (isSeminarCourse()){return "Seminar";}
-		return "Unlisted";
+		return this.type;
 	}
 
 	// numeric conversion for course type for constant 
 	// search/comparison
-	public int getTypeCode(){
-		if (isDiscussionCourse()){return -4;}
-		if (isLabCourse()){return -1;}
-		if (isLectureCourse()){return -2;}
-		if (isSeminarCourse()){return -3;}
-		return -5;
-	}
+
 
 	// course title/name
 	public String getLongName() {
@@ -435,17 +360,23 @@ public class Course extends Node{
 
 	// ====================================================
 	
-	public boolean addEdge(Course c){
-		return this.edges.add(c);
+	public Course addEdge(Node n){
+		if (n instanceof Course){
+			this.courseEdges.add((Course)n);
+		} 
+		else if (n instanceof Room){
+			this.roomEdges.add((Room)n);
+		}
+		return this;
 	}
 	
 	public int getNeighborCount(){
-		return this.edges.size()+this.preferredRooms.size();
+		return this.courseEdges.size()+this.roomEdges.size();
 	}
 	
 	public Set<Node> getNeighbors(){
-		Set<Node> tmp= new HashSet<Node>(this.edges);
-		tmp.addAll(this.preferredRooms);
+		Set<Node> tmp= new HashSet<Node>(this.courseEdges);
+		tmp.addAll(this.roomEdges);
 		return tmp;
 		
 	}
@@ -511,14 +442,14 @@ public class Course extends Node{
 	
 	// ====================================================
 	// add individual room to preferredRooms
-	public Course addPreferredRoom(Room preferredRoom) {
+	public Course addPreferredRoom(String preferredRoom) {
 		this.preferredRooms.add(preferredRoom);
 		return this;
 	}
 
 	// add a list of rooms to preferredRooms
-	public Course addPreferredRoomsList(ArrayList<Room> pR){
-		for (Room r:pR){
+	public Course addPreferredRoomsList(ArrayList<String> pR){
+		for (String r:pR){
 			addPreferredRoom(r);
 		}
 		return this;
@@ -538,14 +469,7 @@ public class Course extends Node{
 	// ====================================================
 	// checks rooms in preferredRooms list for compatibility
 	// based on accessibility of course to room 
-	public void cleanse(){
-		for(Iterator<Room> it=this.getPreferredRooms().iterator();it.hasNext();){
-			Room r=it.next();
-			if(!r.isAccessible()){
-				it.remove();			
-			}
-		}
-	}
+	
 	// ====================================================
 
 	

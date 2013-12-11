@@ -192,7 +192,7 @@ public class FileManager {
 	}
 	// ================================================================================================
 
-	
+
 
 	// ================================================================================================
 	/**
@@ -224,11 +224,28 @@ public class FileManager {
 			data.put("workingroomlist", generateRooms(getSpreadsheet("workingroomslist")));
 			data.put("workingcourselist",generateCourses(getSpreadsheet("workingcourselist")));
 			data.put("recommendedroomslist", readRecs(getSpreadsheet("recommendedroomslist")));
-			
+
 			drawEdges("workingcourselist", "workingroomlist", "recommendedroomslist", "times");
 
 			TreeMap<String,Course> courseMap = (TreeMap<String, Course>) data.get("workingcourselist"); 
 			System.out.println("[P1]"+"number of course nodes is "+courseMap.size());
+
+			try {
+				BufferedWriter bw=new BufferedWriter(new FileWriter(new File("test-drawnedges.csv")));
+				for (Course n:courseMap.values()){
+					String foo = n.getPreferredRooms().toString();
+					String bar= n.getShortName().toString();
+					//bw.write(bar.substring(1,bar.length()-1)+";"+foo.substring(1,foo.length()-1));
+					//bw.newLine();
+					//bw.write(n.getShortName()+";"+n.getPreferredRooms());
+				}
+				bw.close();
+				//System.in.read();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
 			TreeMap<String,Room> roomMap = (TreeMap<String, Room>) data.get("workingroomlist");
 			System.out.println("[P2]"+"number of room nodes is "+roomMap.size());
 			//TODO:Make a Node class
@@ -237,14 +254,17 @@ public class FileManager {
 			TreeMap<String,Node> nodeMap = new TreeMap<String,Node>(roomMap);
 			nodeMap.putAll(courseMap);
 			System.out.println("[P3]"+"number of graph nodes is "+nodeMap.size());
-			HashMap<Course,Room> ans=LF(nodeMap);
+			HashMap<Course,Room> ansLF=LF((TreeMap<String,Node>)nodeMap.clone());
+			//HashMap<Course,Room> ansRND=RND((TreeMap<String,Node>)nodeMap.clone());
+			HashMap<Course,Room> ans=ansLF;
+			//HashMap<Course,Room> ansAMIS=AMIS((TreeMap<String,Node>)nodeMap.clone());
 			System.out.println("Hello "+ans.size());
 			for (Entry e :ans.entrySet()){
 				System.out.println(e);
 			}
-			
+
 			System.out.println(ans);
-			
+
 			return data.keySet();
 		default:
 			break;
@@ -252,7 +272,7 @@ public class FileManager {
 		return null;
 	}
 	// ================================================================================================
-	
+
 	// ================================================================================================
 	/**
 	 * Finds every room that a unique value in the historical spreadsheet has used. The field to search 
@@ -336,9 +356,10 @@ public class FileManager {
 			TreeSet<String> rList = new TreeSet<String>();
 			notdncup.addAll(dList);
 			rList.addAll(dList);
-			notdncup.removeAll(cup);
-			rList.removeAll(notdncup);
-
+			if (!cup.isEmpty()){
+				notdncup.removeAll(cup);
+				rList.removeAll(notdncup);
+			}
 			info.add(rList.toString().substring(1,rList.toString().length()-1)+";");			
 			info.add(pList.toString().substring(1,pList.toString().length()-1)+";");
 			info.add(cList.toString().substring(1,cList.toString().length()-1)+";");
@@ -349,7 +370,7 @@ public class FileManager {
 		}
 		return t;
 	}
-	
+
 	/**
 	 * 
 	 * @param key - String representation of the Object to associate courses with
@@ -424,16 +445,14 @@ public class FileManager {
 		}
 		return recs;
 	}
-	
-	// ================================================================================================
-	// ================================================================================================
+
+	private HashMap<Course,Room> RND(Map<String,Node> nodeMap){
+		HashSet<Node> nodeSet=new HashSet<Node>(nodeMap.values());
+		SequentialColoring(nodeSet);
+		return null;
+	}
+
 	private HashMap<Course,Room> LF(Map<String,Node> nodeMap){
-		HashMap<Course,Room> assignments = new HashMap<Course,Room>();//C
-		int color=0;//col
-		
-		HashMap<Node,Integer> colorMap = new HashMap<Node,Integer>();//C
-		HashSet<Node> coloredSet=new HashSet<Node>();
-		
 		TreeSet<Node> nodeSet=new TreeSet<Node>(new Comparator<Node>(){
 			public int compare(Node a, Node b){
 				if (a.getNeighborCount()>b.getNeighborCount()){
@@ -442,21 +461,203 @@ public class FileManager {
 				return 1;
 			}
 		});
-		
+		Collection<Node> col=nodeMap.values();
+		for (Node blivit: col){
+			nodeSet.add(blivit);
+		}
+		SequentialColoring(nodeSet);
+
+		return null;
+	}
+
+
+	// ================================================================================================
+	private HashMap<Course,Room> SequentialColoring(Set<Node> nodeSet){				
+		int color=0;
+		for(Node n:nodeSet){
+			//System.out.println("[SC1]"+"Looking at Node ("+n.getNeighborCount()+") "+n);
+			color=0;
+			Set<Node> neighbors = n.getNeighbors();
+
+			boolean assignedColor=false;
+			while(!assignedColor){
+				boolean reset=false;
+				if (n instanceof Course){
+					int roomCount=0;
+					//System.out.print("[SC2]"+n+"room neighbor count is ");
+					for (Node thud:neighbors){
+						if (thud instanceof Room){
+							roomCount++;
+						}
+					}
+					//System.out.println(roomCount);
+				}
+				for (Node m:neighbors){
+					if (m.getColor()==color){
+						color++;
+						reset=true;
+						break;
+					}
+				}				
+				if (!reset){
+					//System.out.println("[SC3]"+"Assigning color "+color);
+					n.setColor(color);
+					assignedColor=true;
+				}
+			}
+		}
+
+		HashMap<Integer,ArrayList<Node>> sol = new HashMap<Integer,ArrayList<Node>>();
+		ArrayList<Course> overflow = new ArrayList<Course>();
+		ArrayList<Course> skipped = new ArrayList<Course>();
+		for (Node n:nodeSet){
+			if (n instanceof Room){
+				sol.put(n.getColor(), new ArrayList<Node>());
+				sol.get(n.getColor()).add(n);
+			}
+		}
+		TreeMap<String,Room> roomMap = (TreeMap<String, Room>) data.get("workingroomlist");
+		for (Node n:nodeSet){
+			if (n instanceof Course){
+				if (sol.containsKey(n.getColor())){
+					sol.get(n.getColor()).add(n);
+				} else {
+					int countBadsRooms=0;
+					for (String pr:((Course)n).getPreferredRooms()){
+						if (roomMap.get(pr)==null){
+							countBadsRooms++;
+						}
+					}
+					if (((Course)n).getPreferredRooms().size()==countBadsRooms){
+						skipped.add((Course)n);
+						//System.out.println("[SCCheck]"+"phantom room case");
+					} else {
+						overflow.add((Course)n);
+					}
+				}
+			}
+		}
+		boolean overlapError=true;
+		if (overlapError){
+
+			//System.out.println("[SCEnd]"+"overflow is "+overflow);
+			System.out.println("[SCEnd]"+"overflow is "+overflow.size()+" long");
+
+			int countBad=0;
+			for (Node bad:overflow){
+
+				int countBadsRooms=0;
+				for (String pr:((Course)bad).getPreferredRooms()){
+					if (roomMap.get(pr)==null){
+						countBadsRooms++;
+						//System.out.println("\t[SCEnd]"+pr+ " is not a room");
+					}
+				}
+				if (((Course)bad).getPreferredRooms().size()!=countBadsRooms){
+					System.out.println("[SCEnd]"+"("+bad.getColor()+") "+bad
+							+":("+((Course)bad).getDow()+")"
+							+":"+((Course)bad).getStartTime()+"-"+((Course)bad).getEndTime()
+							+":"+((Course)bad).getCapacity()
+							+":"+((Course)bad).getType());
+					System.out.print("[SCEnd]"+"\t\t[");
+					for (String waldo:((Course)bad).getPreferredRooms()){
+						if (roomMap.get(waldo)==null){
+							System.out.print("X:"+waldo+"\n\t\t");
+						} else if (false){
+							
+							System.out.print(waldo);
+							Room waldoRoom =roomMap.get(waldo); 
+							int rColor=waldoRoom.getColor();
+							System.out.print("("+rColor+"):"+waldoRoom.getCapacity()+":"+waldoRoom.getType());
+							TreeSet<Time> times = ((Course)bad).getTimes();
+
+							ArrayList<Node> ralph = sol.get(rColor);
+							for (Node ral:ralph){
+								if (ral instanceof Course){
+									System.out.print("\n\t\t\t\t["
+											+((Course)ral).getShortName().toArray()[0]+"]"
+											+":("+((Course)ral).getDow()+")"
+											+":"+((Course)ral).getStartTime()+"-"+((Course)ral).getEndTime());
+								}
+							}
+
+
+							System.out.println("\n\t\t\t\t====================================");
+							for (Time t:times){
+								ArrayList<Course> concCourses=t.getCourses();
+								for (Course cc:concCourses){
+									if (cc.getColor()==rColor){
+										System.out.print("\n\t\t\t\t["+cc.getShortName().toArray()[0]+"/"+t+"]");
+									}
+								}
+							}
+
+
+							System.out.print("\n\t\t");
+						}
+
+					}
+					System.out.println("]");
+
+
+				} else {
+					countBad++;
+					System.out.println("[SCEnd]"+"(skipping) "+bad+":"+((Course)bad).getPreferredRooms());
+				}
+
+				/*for (Room thud:((Course)bad).getPreferredRooms()){
+				int foo = thud.getColor();
+				System.out.println("[SCEnd]"+"\t"+thud+" has color "+foo);
+				System.out.print("[SCEnd]"+"\t\t"+foo+" colored things are ");
+				for (Node bar:nodeSet){
+					if (bar instanceof Course && bar.getColor()==foo){
+						System.out.print(((Course)bar).getShortName()+", ");
+					}
+				}
+				System.out.println();
+			}*/
+			}
+		}
+		System.out.println("[SCEnd]"+"overflow is "+overflow.size()+" long");
+		System.out.println("[SCEnd]"+"skipped is "+skipped.size()+" long");
+		return null;
+	}
+
+
+
+
+	// ================================================================================================
+	private HashMap<Course,Room> AMIS(Map<String,Node> nodeMap){
+		HashMap<Course,Room> assignments = new HashMap<Course,Room>();//C
+		int color=0;//col
+
+		HashMap<Node,Integer> colorMap = new HashMap<Node,Integer>();//C
+		HashSet<Node> coloredSet=new HashSet<Node>();
+
+		TreeSet<Node> nodeSet=new TreeSet<Node>(new Comparator<Node>(){
+			public int compare(Node a, Node b){
+				if (a.getNeighborCount()>b.getNeighborCount()){
+					return 1;
+				}
+				return -1;
+			}
+		});
+
 		Collection<Node> col=nodeMap.values();
 		System.out.println("=================================================");
+		int count=0;
 		for (Node blivit: col){
-			System.out.println(blivit.getNeighborCount()+","+blivit);
+			System.out.println("[AMIS]"+(count++)+"."+blivit.getNeighborCount()+","+blivit);
 			nodeSet.add(blivit);
 		}
 		System.out.println("=================================================");
-		
+		count=0;
 		System.out.println("=================================================");
 		for (Node blivit: nodeSet){
-			System.out.println(blivit.getNeighborCount()+","+blivit);
+			System.out.println("[AMIS]"+(count++)+"."+blivit.getNeighborCount()+","+blivit);
 		}
 		System.out.println("=================================================");
-		
+
 		boolean roomColored=false;
 		while(!nodeSet.isEmpty()){
 			Node room=null;
@@ -480,7 +681,7 @@ public class FileManager {
 					//System.out.println("[LF3]"+"Skipping the room");
 					continue;
 				}
-					
+
 				for (Node m:coloredSet){
 					//System.out.println("[LF2]"+"m is "+m);
 					//System.out.println("[LF4]"+"neighbors are "+n.getNeighbors());
@@ -497,17 +698,17 @@ public class FileManager {
 			nodeSet.removeAll(coloredSet);
 			color++;
 		}
-		
+
 		return assignments;
 	}
-	
+
 	// ================================================================================================
 	/* 		
   		TreeMap<Node,Integer> neighborMap= new TreeMap<Node,Integer>();
 		for (Node n: nodeMap.values()){
 			neighborMap.put(n, n.getNeighborCount());			
 		}
-	*/
+	 */
 	// ================================================================================================
 	/**
 	 * Populates the Sets inside each of the data objects whose names are specified.
@@ -522,7 +723,7 @@ public class FileManager {
 		TreeMap<String,Room> roomMap = (TreeMap<String, Room>) data.get(workingroomlist);
 		TreeMap<String,HashSet<String>> recMap = (TreeMap<String, HashSet<String>>) data.get(recommendedroomslist);
 		TreeMap<String,Time> timeMap = (TreeMap<String, Time>) data.get(times);
-		
+
 		for (Room r:roomMap.values()){
 			TreeMap<String,Room> tmr=((TreeMap<String,Room>)roomMap.clone());
 			tmr.remove(r.toString());
@@ -531,6 +732,49 @@ public class FileManager {
 		}
 
 		for (Course c:courseMap.values()){
+			Set<String> keys = new HashSet<String>(roomMap.keySet());
+			//System.out.println("[DE-C1]"+c.getShortName());
+			//System.out.println("[DE-C1]"+c.getShortName().contains("ARHA-226-01"));
+			String[] recKeys=((String)(recMap.get(c.getShortName().toArray()[0]).toArray()[0])).split(", ");
+
+			for (String rk:recKeys){
+				c.addPreferredRoom(rk);
+			}
+
+			for (String k:recKeys){
+				//System.out.println("[DE-] Trying to remove "+k+" from recKeys of size "+recKeys.length);
+				Room r=roomMap.get(k);
+				if (r!=null){
+					boolean removeEdge=true;
+					if (c.getType().equals("lab") && !r.getType().equals("lab")){
+						removeEdge=false;
+					}
+
+					if (r.getCapacity()!=-1 && c.getCapacity()>r.getCapacity()){
+						removeEdge=false;
+						//System.out.println("[DE2]"+"Course can't go in this room");						
+					}
+					if (c.getShortName().contains("GEOL-111L-02")){
+						//System.out.println("[DE1]"+c);
+						//System.out.println("[DE2]"+r);
+						//System.out.println("[DE3]"+"removing r is "+removeEdge);
+					}
+					
+					//System.out.println("[DE3]"+"keys is size "+keys.size());
+					if (removeEdge){
+						keys.remove(k); //no edge ie possible coloring
+					}
+					//System.out.println("[DE4]"+"keys is now size "+keys.size());
+				}
+			}
+			//System.out.println("[DE3]"+keys.size()+" keys is now"+keys);
+			for (String k:keys){
+				Room r=roomMap.get(k);
+				r.addCourse(c.addEdge(r));
+			}
+
+			
+
 			double startTime=c.getStartTime();
 			double endTime=c.getEndTime();
 			double blocks=0;
@@ -548,12 +792,13 @@ public class FileManager {
 			blocks=(endTime-startTime)/50;
 			startTime=c.getStartTime();
 			for (int i=0; i<blocks; i++){				
-				for (Integer j:dow){	
+				for (Integer j:dow){
 					String timeName=j+":"+(int)startTime;
 					//System.out.println("[FM-DE1]"+"name of time is "+timeName);
-					Time t=timeMap.get(j+":"+(int)startTime);
+					Time t=timeMap.get(timeName);
 					//System.out.println("[FM-DE2]"+"Newly gotten time is "+t);
 					t.addCourse(c.addTime(t));
+					//System.out.println("[FM-DE3]"+"List of times is "+c.getTimes());
 					for(Course course:t.getCourses()){
 						if(course!=c){
 							course.addEdge(c);
@@ -566,23 +811,19 @@ public class FileManager {
 					startTime+=40;
 				}
 			}
-			//System.out.println("[FM-DE1]"+c+": "+c.getTimes());
-			//System.out.println("[FM-DE2]"+c+": "+c.getDow()+"|"+c.getStartTime()+"|"+c.getEndTime());
-			
-			
-			Set<String> keys = new HashSet<String>(roomMap.keySet());
-			keys.removeAll(recMap.get(c.getShortName().toArray()[0]));
-			for (String k:keys){
-				Room r=roomMap.get(k);
-				r.addCourse(c.addPreferredRoom(r));
-			}
+			//System.out.println("[FM-DE4]"+c+": "+c.getTimes());
+			//System.out.println("[FM-DE5]"+c+": "+c.getDow()+"|"+c.getStartTime()+"|"+c.getEndTime());
+
+
+
+
 		}
 	}
 
 	// ================================================================================================
 	// ================================================================================================
 	public void colorNode(Course c){//Removes all of the edges to the course and assigns a color(room)
-		
+
 	}
 	// ================================================================================================
 	// ================================================================================================

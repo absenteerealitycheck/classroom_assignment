@@ -60,7 +60,9 @@ public final class Time implements Comparable<Time>{
 		this.courses=c;
 	}
 	public void addCourse(Course c){
-		this.courses.add(c);
+		if (!this.courses.contains(c)){			
+			this.courses.add(c);
+		}
 	}
 	
 	public String toString() {
@@ -77,7 +79,9 @@ public final class Time implements Comparable<Time>{
 	 * (signed comparison).
 	 */
 	public int compareTo(Time t) {
-		return (new Integer(this.getStartTime()+(this.getDayOfWeek()*10000))).compareTo(new Integer(t.getStartTime()+(this.getDayOfWeek()*10000)));
+		Integer a = new Integer(this.getStartTime()+(this.getDayOfWeek()*10000));
+		Integer b = new Integer(t.getStartTime()+(t.getDayOfWeek()*10000));
+		return a.compareTo(b);
 	}
 	
 // ===================================================================
