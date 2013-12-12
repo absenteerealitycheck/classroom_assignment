@@ -948,7 +948,7 @@ public class FileManager {
 	@SuppressWarnings("unchecked")
 	public void write(String[] names){
 		for (String s:names){
-			File f = new File("proto-"+s+"list.csv");
+			File f = new File("gen-"+s+"list.csv");
 			writeHashToCSV((TreeMap<String,ArrayList<String>>)data.get(s), f);
 		}
 	}
