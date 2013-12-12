@@ -212,6 +212,8 @@ public class FileManager {
 			data.put("roomsandcourses", associateFieldAndRooms(getSpreadsheet(name),1));
 			data.put("roomsanddepartments", associateFieldAndRooms(getSpreadsheet(name),2));
 			data.put("roomsandprofessors", associateFieldAndRooms(getSpreadsheet(name),3));
+			//generateUnionSpecs(getSpreadsheet("workingcourselist"));
+			data.put("unionspecs", generateUnionSpecs(getSpreadsheet("workingcourselist"), data.keySet()));
 			return data.keySet();
 		case 2:
 			String spreadsheetNames="roomsandprofessors,roomsandcourses,roomsanddepartments,workingcourselist,workingroomlist";
@@ -299,7 +301,8 @@ public class FileManager {
 			}
 			switch(control){
 			case 1://course
-				field=cHS[i][1];
+				//field=cHS[i][1].substring(0,7);
+				field=cHS[i][2].replaceAll("&", " and ").replaceAll("[^a-zA-Z]", "").toLowerCase();
 				break;
 			case 2://department
 				field=cHS[i][1].substring(0, 4);
@@ -312,14 +315,115 @@ public class FileManager {
 			for (String f:splitField){
 				if (!h.containsKey(f)){
 					h.put(f, new ArrayList<String>());
+					if(control==1){
+						String cshort = cHS[i][1];
+						String[] cShortList = cshort.split("-");
+						h.get(f).add(cShortList[0]+"-"+cShortList[1]+";");
+					}
+				} else {
+					if(control==1){
+						boolean toAdd=true;
+						String cshort = cHS[i][1];
+						String[] cShortList = cshort.split("-");
+						String newCourse = cShortList[0]+"-"+cShortList[1];
+						String[] courseList=h.get(f).get(0).split(";|,");
+						String soFar="";
+						for (String cL:courseList){
+							soFar=soFar+cL+",";
+							if (cL.equals(newCourse)){
+								toAdd=false;
+							}
+						}
+						if (toAdd){
+							h.get(f).set(0,soFar+newCourse+";");
+						}
+					}
 				}
 				if (!h.get(f).contains(room)){
 					h.get(f).add(room);
 				}
 			}
 		}
-		return h;
+		if (control==1){
+			TreeMap<String,ArrayList<String>> g = new TreeMap<String,ArrayList<String>>();
+			Set<String> oldKeys = h.keySet();
+			for (String oldKey:oldKeys){
+				ArrayList<String> oldValues = h.get(oldKey);
+				String newKeys = oldValues.get(0);
+				ArrayList<String> newValuesList = new ArrayList<String>();
+				for (int i=1; i<oldValues.size(); i++){
+					String newValue = oldValues.get(i);
+					newValuesList.add(newValue);
+				}
+				newKeys=newKeys.substring(0,newKeys.length()-1);
+				String[] newKeysList = newKeys.split(",");
+				for (String newKey:newKeysList){
+					String[] newKeyParts = newKey.split("-");
+					if (newKeyParts[1].length()!=2){
+						g.put(newKey,newValuesList);
+					}
+				}
+			}
+			return g;
+		} else {
+			return h;
+		}
 	} // associateFieldAndRooms
+	// ================================================================================================
+	
+	
+	// ================================================================================================
+	/**
+	 * 
+	 * @param wCL - workingCourseList
+	 * @return
+	 */
+	private TreeMap<String,ArrayList<String>> generateUnionSpecs(String[][] wCL, Set<String> dataKeys){
+		//System.out.println(dataKeys);
+		Map<String,?> rc=data.get("roomsandcourses");
+		Map<String,?> rd=data.get("roomsanddepartments");
+		Map<String,?> rp=data.get("roomsandprofessors");
+		TreeMap<String,ArrayList<String>> unionSpecs = new TreeMap<String,ArrayList<String>>();
+		for (String[] course:wCL){
+			String specs="";
+			String courseName=course[0];
+			String cSpec=checkLength(courseName,rc,1);
+			specs=specs.concat(cSpec+";");
+			String profName=course[3];
+			String[] profs = profName.split("  ");
+			String pSpec="";
+			for (String p:profs){
+				pSpec=checkLength(p,rp,1);
+				if (pSpec.equals("1")){
+					break;
+				}
+			}
+			specs=specs.concat(pSpec+";");
+			String dSpec="";
+			specs=specs.concat(dSpec+";");
+			//System.out.println(courseName+";"+profName+";"+specs);
+			ArrayList<String> allSpecs = new ArrayList<String>();
+			allSpecs.add(profName+";"+specs);
+			unionSpecs.put(courseName, allSpecs);
+			//System.out.println(rc.get(courseName));
+		}
+		
+		return unionSpecs;
+	}
+	
+	private String checkLength(String key, Map<String,?> map, int length){
+		String spec="";
+		if (map.containsKey(key)){
+			//System.out.println(((ArrayList<String>) map.get(key)).size());
+			if (((ArrayList<String>) map.get(key)).size()==length){
+				spec="1";
+			}
+		}
+		return spec;
+	}
+	
+	// ================================================================================================
+	
 	// ================================================================================================
 
 	/**
@@ -569,7 +673,7 @@ public class FileManager {
 							Room waldoRoom =roomMap.get(waldo); 
 							int rColor=waldoRoom.getColor();
 							System.out.print("("+rColor+"):"+waldoRoom.getCapacity()+":"+waldoRoom.getType());
-							TreeSet<Time> times = ((Course)bad).getTimes();
+							TreeSet<Time> times = new TreeSet<Time>(((Course)bad).getTimes());
 
 							ArrayList<Node> ralph = sol.get(rColor);
 							for (Node ral:ralph){
@@ -728,7 +832,10 @@ public class FileManager {
 			TreeMap<String,Room> tmr=((TreeMap<String,Room>)roomMap.clone());
 			tmr.remove(r.toString());
 			Set<Room> rooms = new HashSet<Room>(tmr.values());
-			r.addRooms(rooms);
+			for (Node n:rooms){
+				r.addNeighbor(n);
+			}
+			
 		}
 
 		for (Course c:courseMap.values()){
@@ -770,7 +877,7 @@ public class FileManager {
 			//System.out.println("[DE3]"+keys.size()+" keys is now"+keys);
 			for (String k:keys){
 				Room r=roomMap.get(k);
-				r.addCourse(c.addEdge(r));
+				r.addNeighbor(c.addNeighbor(r));
 			}
 
 			
@@ -801,8 +908,7 @@ public class FileManager {
 					//System.out.println("[FM-DE3]"+"List of times is "+c.getTimes());
 					for(Course course:t.getCourses()){
 						if(course!=c){
-							course.addEdge(c);
-							c.addEdge(course);
+							c.addNeighbor(course.addNeighbor(c));
 						}
 					}
 				}
@@ -859,10 +965,10 @@ public class FileManager {
 			for (Entry<String, ArrayList<String>> es :d.entrySet()){
 				String ts2=es.getValue().toString();
 				ts2=ts2.substring(1,ts2.length()-1);
-				System.out.println("[1]"+ts2);
+				//System.out.println("[1]"+ts2);
 				//System.out.println(es.getKey()+";"+ts2+"\n");
 				ts2=ts2.replace(";, ", ";");
-				System.out.println("[2]"+ts2);
+				System.out.println("[1]"+es.getKey()+";"+ts2);
 				bw.write(es.getKey()+";"+ts2+"\n");
 			}
 			bw.close();

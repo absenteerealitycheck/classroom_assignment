@@ -40,12 +40,13 @@ public class Driver{
 	public void go() throws IOException{
 		boolean testing=false;
 		FileManager fm=new FileManager();
-		int phase=3;
+		int phase=1;
 		String qux ="";
 		switch(phase){
 		case 1:
 			System.out.println("Starting phase 1");
-			qux=qux.concat(fm.addCSVFile(new File("proto-coursehistory.csv"), "historical"));
+			qux=qux.concat(fm.addCSVFile(new File("proto-coursehistory.csv"), "historical")+",");
+			qux=qux.concat(fm.addCSVFile(new File("workingCourseList.csv"), "workingcourselist"));
 			break;
 		case 2:
 			System.out.println("Starting phase 2");
