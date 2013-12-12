@@ -344,6 +344,7 @@ public class FileManager {
 				}
 			}
 		}
+
 		if (control==1){
 			TreeMap<String,ArrayList<String>> g = new TreeMap<String,ArrayList<String>>();
 			Set<String> oldKeys = h.keySet();
@@ -452,6 +453,7 @@ public class FileManager {
 
 			TreeSet<String> pList=findRooms(workingCourseList[i][3],roomsAndProfessors);
 			TreeSet<String> cList=findRooms(workingCourseList[i][0],roomsAndCourses);
+			//TODO: Handle dLists for Cross listed Courses
 			TreeSet<String> dList=findRooms(workingCourseList[i][0].substring(0,4),roomsAndDepartments);
 			TreeSet<String> cup =new TreeSet<String>();
 			cup.addAll(cList);
