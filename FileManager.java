@@ -301,7 +301,6 @@ public class FileManager {
 			}
 			switch(control){
 			case 1://course
-				//field=cHS[i][1].substring(0,7);
 				field=cHS[i][2].replaceAll("&", " and ").replaceAll("[^a-zA-Z]", "").toLowerCase();
 				break;
 			case 2://department
@@ -321,13 +320,13 @@ public class FileManager {
 						h.get(f).add(cShortList[0]+"-"+cShortList[1]+";");
 					}
 				} else {
-					if(control==1){
+					if(control==1){ //group by long name
 						boolean toAdd=true;
 						String cshort = cHS[i][1];
 						String[] cShortList = cshort.split("-");
 						String newCourse = cShortList[0]+"-"+cShortList[1];
 						String[] courseList=h.get(f).get(0).split(";|,");
-						String soFar="";
+						String soFar=""; //keep track of short names
 						for (String cL:courseList){
 							soFar=soFar+cL+",";
 							if (cL.equals(newCourse)){
@@ -345,7 +344,7 @@ public class FileManager {
 			}
 		}
 
-		if (control==1){
+		if (control==1){ //convert long name into short name
 			TreeMap<String,ArrayList<String>> g = new TreeMap<String,ArrayList<String>>();
 			Set<String> oldKeys = h.keySet();
 			for (String oldKey:oldKeys){
@@ -360,7 +359,7 @@ public class FileManager {
 				String[] newKeysList = newKeys.split(",");
 				for (String newKey:newKeysList){
 					String[] newKeyParts = newKey.split("-");
-					if (newKeyParts[1].length()!=2){
+					if (newKeyParts[1].length()!=2){ //dont include old 2 digit course codes
 						g.put(newKey,newValuesList);
 					}
 				}
@@ -385,10 +384,13 @@ public class FileManager {
 		Map<String,?> rd=data.get("roomsanddepartments");
 		Map<String,?> rp=data.get("roomsandprofessors");
 		TreeMap<String,ArrayList<String>> unionSpecs = new TreeMap<String,ArrayList<String>>();
+		System.out.println("[GUS]"+"keys are "+rc.keySet());
 		for (String[] course:wCL){
 			String specs="";
 			String courseName=course[0];
-			String cSpec=checkLength(courseName,rc,1);
+			System.out.println("[GUS]start course "+courseName.substring(0,7));
+			String cSpec=checkLength(courseName.substring(0,8),rc,1);
+			System.out.println("[GUS]end course");
 			specs=specs.concat(cSpec+";");
 			String profName=course[3];
 			String[] profs = profName.split("  ");
@@ -402,7 +404,9 @@ public class FileManager {
 			specs=specs.concat(pSpec+";");
 			String dSpec="";
 			specs=specs.concat(dSpec+";");
-			//System.out.println(courseName+";"+profName+";"+specs);
+			if (cSpec.equals("1")){
+				System.out.println("[GUS]"+courseName+";"+profName+";"+cSpec);
+			}
 			ArrayList<String> allSpecs = new ArrayList<String>();
 			allSpecs.add(profName+";"+specs);
 			unionSpecs.put(courseName, allSpecs);
@@ -415,7 +419,7 @@ public class FileManager {
 	private String checkLength(String key, Map<String,?> map, int length){
 		String spec="";
 		if (map.containsKey(key)){
-			//System.out.println(((ArrayList<String>) map.get(key)).size());
+			System.out.println("[CL]"+((ArrayList<String>) map.get(key)).size()+"\t\t"+map.get(key));
 			if (((ArrayList<String>) map.get(key)).size()==length){
 				spec="1";
 			}
@@ -946,10 +950,18 @@ public class FileManager {
 	// ================================================================================================
 	// ================================================================================================
 	@SuppressWarnings("unchecked")
-	public void write(String[] names){
-		for (String s:names){
+	public void write(String[] header, String[] names) throws Exception{
+		if (header.length!=names.length){
+			throw new IllegalArgumentException("The parameters for write() do not match.");
+		}
+		for (int i=0; i<names.length; i++){
+			String s = names[i];
 			File f = new File("gen-"+s+"list.csv");
-			writeHashToCSV((TreeMap<String,ArrayList<String>>)data.get(s), f);
+			BufferedWriter bw=new BufferedWriter(new FileWriter(f));
+			bw.write(header[i]);
+			writeHashToCSV((TreeMap<String,ArrayList<String>>)data.get(s), bw);
+			System.out.println("[W ]Done writing to file "+f.getName());
+			bw.close();
 		}
 	}
 
@@ -961,20 +973,17 @@ public class FileManager {
 	 * @param f - the file to be written to
 	 * @return a boolean which is true if the file wrote correctly and false otherwise
 	 */
-	private boolean writeHashToCSV(Map<String,ArrayList<String>> d, File f){
+	private boolean writeHashToCSV(Map<String,ArrayList<String>> d, BufferedWriter bw){
 		try{
-			BufferedWriter bw=new BufferedWriter(new FileWriter(f));
 			for (Entry<String, ArrayList<String>> es :d.entrySet()){
 				String ts2=es.getValue().toString();
 				ts2=ts2.substring(1,ts2.length()-1);
 				//System.out.println("[1]"+ts2);
 				//System.out.println(es.getKey()+";"+ts2+"\n");
 				ts2=ts2.replace(";, ", ";");
-				System.out.println("[1]"+es.getKey()+";"+ts2);
+				System.out.println("[W1]"+es.getKey()+";"+ts2);
 				bw.write(es.getKey()+";"+ts2+"\n");
 			}
-			bw.close();
-			System.out.println("Done writing to file "+f.getName());
 			return true;
 		} catch (IOException e){
 			return false;
