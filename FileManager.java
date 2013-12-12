@@ -261,9 +261,9 @@ public class FileManager {
 			HashMap<Course,Room> ans=ansLF;
 			//HashMap<Course,Room> ansAMIS=AMIS((TreeMap<String,Node>)nodeMap.clone());
 			System.out.println("Hello "+ans.size());
-			for (Entry e :ans.entrySet()){
-				System.out.println(e);
-			}
+				for (Entry e :ans.entrySet()){
+					System.out.println(e);
+				}	
 
 			System.out.println(ans);
 
@@ -644,12 +644,14 @@ public class FileManager {
 			}
 		}
 		boolean overlapError=true;
+		ArrayList<Course> haveDumbRooms = new ArrayList<Course>();
 		if (overlapError){
 
 			//System.out.println("[SCEnd]"+"overflow is "+overflow);
 			System.out.println("[SCEnd]"+"overflow is "+overflow.size()+" long");
 
 			int countBad=0;
+			
 			for (Node bad:overflow){
 
 				int countBadsRooms=0;
@@ -668,8 +670,14 @@ public class FileManager {
 					System.out.print("[SCEnd]"+"\t\t[");
 					for (String waldo:((Course)bad).getPreferredRooms()){
 						if (roomMap.get(waldo)==null){
-							System.out.print("X:"+waldo+"\n\t\t");
-						} else if (false){
+								if(!haveDumbRooms.contains((Course)bad)) haveDumbRooms.add((Course)bad);
+								System.out.print("X:"+waldo+" does not exist \n\t\t");
+						} 
+						else {
+							System.out.print("!:"+waldo+" has potential conflicts. \n\t\t");
+						
+						}
+						/*else if (false){
 							
 							System.out.print(waldo);
 							Room waldoRoom =roomMap.get(waldo); 
@@ -700,7 +708,7 @@ public class FileManager {
 
 
 							System.out.print("\n\t\t");
-						}
+						}*/
 
 					}
 					System.out.println("]");
@@ -726,6 +734,9 @@ public class FileManager {
 		}
 		System.out.println("[SCEnd]"+"overflow is "+overflow.size()+" long");
 		System.out.println("[SCEnd]"+"skipped is "+skipped.size()+" long");
+		System.out.println("[SCEnd]"+"number of bad courses with dumb rooms is "+haveDumbRooms.size());
+		
+
 		return null;
 	}
 
