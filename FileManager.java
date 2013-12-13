@@ -370,8 +370,8 @@ public class FileManager {
 		}
 	} // associateFieldAndRooms
 	// ================================================================================================
-	
-	
+
+
 	// ================================================================================================
 	/**
 	 * 
@@ -412,10 +412,10 @@ public class FileManager {
 			unionSpecs.put(courseName, allSpecs);
 			//System.out.println(rc.get(courseName));
 		}
-		
+
 		return unionSpecs;
 	}
-	
+
 	private String checkLength(String key, Map<String,?> map, int length){
 		String spec="";
 		if (map.containsKey(key)){
@@ -426,9 +426,9 @@ public class FileManager {
 		}
 		return spec;
 	}
-	
+
 	// ================================================================================================
-	
+
 	// ================================================================================================
 
 	/**
@@ -449,14 +449,17 @@ public class FileManager {
 
 		TreeMap<String,ArrayList<String>> t=new TreeMap<String,ArrayList<String>>(); 
 		ArrayList<String> info=new ArrayList<String>();
-
+		System.out.println(spreadsheetStringify(roomsAndCourses));
 		for(int i=0; i<workingCourseList.length; i++){
 			info.add(workingCourseList[i][1]+";");
 			info.add(workingCourseList[i][2]+";");
 			info.add(workingCourseList[i][3]+";");
 
 			TreeSet<String> pList=findRooms(workingCourseList[i][3],roomsAndProfessors);
-			TreeSet<String> cList=findRooms(workingCourseList[i][0],roomsAndCourses);
+			String[] courseKeyParts=workingCourseList[i][0].split("-");
+			String courseKey=courseKeyParts[0]+"-"+courseKeyParts[1];
+			TreeSet<String> cList=findRooms(courseKey,roomsAndCourses);
+			System.out.println("[GRR]"+workingCourseList[i][0]);
 			//TODO: Handle dLists for Cross listed Courses
 			TreeSet<String> dList=findRooms(workingCourseList[i][0].substring(0,4),roomsAndDepartments);
 			TreeSet<String> cup =new TreeSet<String>();
@@ -470,6 +473,7 @@ public class FileManager {
 				notdncup.removeAll(cup);
 				rList.removeAll(notdncup);
 			}
+			System.out.println("[GRR]"+cList);
 			info.add(rList.toString().substring(1,rList.toString().length()-1)+";");			
 			info.add(pList.toString().substring(1,pList.toString().length()-1)+";");
 			info.add(cList.toString().substring(1,cList.toString().length()-1)+";");
@@ -489,8 +493,12 @@ public class FileManager {
 	 */
 	private TreeSet<String> findRooms(String key, String[][] source){
 		TreeSet<String> rooms = new TreeSet<String>();
+		//if (key.contains("-")){
+		//	System.out.println(spreadsheetStringify(source));
+		//}
 		String[] keys = key.split("  ");
 		for (String k:keys){
+
 			for (String[] row:source){
 				if (row[0].equals(k)){
 					String[] qux = row[1].split(", ");
@@ -582,7 +590,7 @@ public class FileManager {
 
 
 	// ================================================================================================
-	private HashMap<Course,Room> SequentialColoring(Set<Node> nodeSet){				
+	private HashMap<Course,Room> SequentialColoring(Set<Node> nodeSet){                                
 		int color=0;
 		for(Node n:nodeSet){
 			//System.out.println("[SC1]"+"Looking at Node ("+n.getNeighborCount()+") "+n);
@@ -608,7 +616,7 @@ public class FileManager {
 						reset=true;
 						break;
 					}
-				}				
+				}                                
 				if (!reset){
 					//System.out.println("[SC3]"+"Assigning color "+color);
 					n.setColor(color);
@@ -674,7 +682,7 @@ public class FileManager {
 						if (roomMap.get(waldo)==null){
 							System.out.print("X:"+waldo+"\n\t\t");
 						} else if (false){
-							
+
 							System.out.print(waldo);
 							Room waldoRoom =roomMap.get(waldo); 
 							int rColor=waldoRoom.getColor();
@@ -716,16 +724,16 @@ public class FileManager {
 				}
 
 				/*for (Room thud:((Course)bad).getPreferredRooms()){
-				int foo = thud.getColor();
-				System.out.println("[SCEnd]"+"\t"+thud+" has color "+foo);
-				System.out.print("[SCEnd]"+"\t\t"+foo+" colored things are ");
-				for (Node bar:nodeSet){
-					if (bar instanceof Course && bar.getColor()==foo){
-						System.out.print(((Course)bar).getShortName()+", ");
-					}
-				}
-				System.out.println();
-			}*/
+                        int foo = thud.getColor();
+                        System.out.println("[SCEnd]"+"\t"+thud+" has color "+foo);
+                        System.out.print("[SCEnd]"+"\t\t"+foo+" colored things are ");
+                        for (Node bar:nodeSet){
+                                if (bar instanceof Course && bar.getColor()==foo){
+                                        System.out.print(((Course)bar).getShortName()+", ");
+                                }
+                        }
+                        System.out.println();
+                }*/
 			}
 		}
 		System.out.println("[SCEnd]"+"overflow is "+overflow.size()+" long");
@@ -841,7 +849,7 @@ public class FileManager {
 			for (Node n:rooms){
 				r.addNeighbor(n);
 			}
-			
+
 		}
 
 		for (Course c:courseMap.values()){
@@ -851,7 +859,17 @@ public class FileManager {
 			String[] recKeys=((String)(recMap.get(c.getShortName().toArray()[0]).toArray()[0])).split(", ");
 
 			for (String rk:recKeys){
-				c.addPreferredRoom(rk);
+				Room r=roomMap.get(rk);
+				if (r!=null){
+					if (!c.getType().equals("lab")){
+						c.addPreferredRoom(rk);
+					}
+					else if (c.getType().equals("lab") && r.getType().equals("lab")){
+						c.addPreferredRoom(rk);
+					}
+				} else {
+					c.addPreferredRoom(rk);
+				}
 			}
 
 			for (String k:recKeys){
@@ -872,7 +890,7 @@ public class FileManager {
 						//System.out.println("[DE2]"+r);
 						//System.out.println("[DE3]"+"removing r is "+removeEdge);
 					}
-					
+
 					//System.out.println("[DE3]"+"keys is size "+keys.size());
 					if (removeEdge){
 						keys.remove(k); //no edge ie possible coloring
@@ -886,7 +904,7 @@ public class FileManager {
 				r.addNeighbor(c.addNeighbor(r));
 			}
 
-			
+
 
 			double startTime=c.getStartTime();
 			double endTime=c.getEndTime();
@@ -950,18 +968,10 @@ public class FileManager {
 	// ================================================================================================
 	// ================================================================================================
 	@SuppressWarnings("unchecked")
-	public void write(String[] header, String[] names) throws Exception{
-		if (header.length!=names.length){
-			throw new IllegalArgumentException("The parameters for write() do not match.");
-		}
-		for (int i=0; i<names.length; i++){
-			String s = names[i];
+	public void write(String[] names){
+		for (String s:names){
 			File f = new File("gen-"+s+"list.csv");
-			BufferedWriter bw=new BufferedWriter(new FileWriter(f));
-			bw.write(header[i]);
-			writeHashToCSV((TreeMap<String,ArrayList<String>>)data.get(s), bw);
-			System.out.println("[W ]Done writing to file "+f.getName());
-			bw.close();
+			writeHashToCSV((TreeMap<String,ArrayList<String>>)data.get(s), f);
 		}
 	}
 
@@ -973,17 +983,20 @@ public class FileManager {
 	 * @param f - the file to be written to
 	 * @return a boolean which is true if the file wrote correctly and false otherwise
 	 */
-	private boolean writeHashToCSV(Map<String,ArrayList<String>> d, BufferedWriter bw){
+	private boolean writeHashToCSV(Map<String,ArrayList<String>> d, File f){
 		try{
+			BufferedWriter bw=new BufferedWriter(new FileWriter(f));
 			for (Entry<String, ArrayList<String>> es :d.entrySet()){
 				String ts2=es.getValue().toString();
 				ts2=ts2.substring(1,ts2.length()-1);
 				//System.out.println("[1]"+ts2);
 				//System.out.println(es.getKey()+";"+ts2+"\n");
 				ts2=ts2.replace(";, ", ";");
-				System.out.println("[W1]"+es.getKey()+";"+ts2);
+				System.out.println("[1]"+es.getKey()+";"+ts2);
 				bw.write(es.getKey()+";"+ts2+"\n");
 			}
+			bw.close();
+			System.out.println("Done writing to file "+f.getName());
 			return true;
 		} catch (IOException e){
 			return false;
