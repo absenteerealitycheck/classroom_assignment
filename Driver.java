@@ -40,7 +40,7 @@ public class Driver{
 	public void go() throws IOException{
 		boolean testing=false;
 		FileManager fm=new FileManager();
-		int phase=1;
+		int phase=3;
 		String qux ="";
 		switch(phase){
 		case 1:
@@ -73,12 +73,17 @@ public class Driver{
 			fm.loadFile(quuux);
 		}
 		Set<String> keys=fm.process(phase);
-		fm.write(keys.toArray(new String[0]));
+		//fm.write(keys.toArray(new String[0]));
 		System.out.println("[DR3]"+"Done!");
+		
+
 		boolean giveUp=true;
 		if (giveUp){
 			return;
 		}
+		
+
+		
 		
 		//load data
 		
