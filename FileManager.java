@@ -584,6 +584,7 @@ public class FileManager {
 	// ================================================================================================
 	private HashMap<Course,Room> SequentialColoring(Set<Node> nodeSet){				
 		int color=0;
+		int countLabs=0;
 		for(Node n:nodeSet){
 			//System.out.println("[SC1]"+"Looking at Node ("+n.getNeighborCount()+") "+n);
 			color=0;
@@ -643,25 +644,30 @@ public class FileManager {
 						//System.out.println("[SCCheck]"+"phantom room case");
 					} else {
 						overflow.add((Course)n);
+						if ( ((Course)n).getType().equals("lab")) {
+							countLabs++;
+						}
 					}
 				}
 			}
 		}
 		boolean overlapError=true;
+		
 		ArrayList<Course> haveDumbRooms = new ArrayList<Course>();
 		if (overlapError){
 
 			//System.out.println("[SCEnd]"+"overflow is "+overflow);
 			System.out.println("[SCEnd]"+"overflow is "+overflow.size()+" long");
 
+		
 			int countBad=0;
-			
 			for (Node bad:overflow){
 
 				int countBadsRooms=0;
 				for (String pr:((Course)bad).getPreferredRooms()){
 					if (roomMap.get(pr)==null){
 						countBadsRooms++;
+					
 						//System.out.println("\t[SCEnd]"+pr+ " is not a room");
 					}
 				}
@@ -675,12 +681,10 @@ public class FileManager {
 					for (String waldo:((Course)bad).getPreferredRooms()){
 						if (roomMap.get(waldo)==null){
 								if(!haveDumbRooms.contains((Course)bad)) haveDumbRooms.add((Course)bad);
-								System.out.print("X:"+waldo+" does not exist \n\t\t");
+								System.out.print("X:"+waldo+" \n\t\t");
 						} 
-						else {
-							System.out.print("!:"+waldo+" has potential conflicts. \n\t\t");
 						
-						}
+					}
 						/*else if (false){
 							
 							System.out.print(waldo);
@@ -714,7 +718,7 @@ public class FileManager {
 							System.out.print("\n\t\t");
 						}*/
 
-					}
+					
 					System.out.println("]");
 
 
@@ -738,7 +742,9 @@ public class FileManager {
 		}
 		System.out.println("[SCEnd]"+"overflow is "+overflow.size()+" long");
 		System.out.println("[SCEnd]"+"skipped is "+skipped.size()+" long");
-		System.out.println("[SCEnd]"+"number of bad courses with dumb rooms is "+haveDumbRooms.size());
+		System.out.println("[SCEnd]"+"number of labs "+countLabs);
+		System.out.println("[SCEnd]"+"k="+color);
+
 		
 
 		return null;
