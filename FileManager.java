@@ -267,9 +267,9 @@ public class FileManager {
 			HashMap<Course,Room> ans=ansLF;
 			//HashMap<Course,Room> ansAMIS=AMIS((TreeMap<String,Node>)nodeMap.clone());
 			System.out.println("Hello "+ans.size());
-			for (Entry e :ans.entrySet()){
-				System.out.println(e);
-			}
+				for (Entry e :ans.entrySet()){
+					System.out.println(e);
+				}	
 
 			System.out.println(ans);
 
@@ -456,7 +456,7 @@ public class FileManager {
 
 		TreeMap<String,ArrayList<String>> t=new TreeMap<String,ArrayList<String>>(); 
 		ArrayList<String> info=new ArrayList<String>();
-
+		System.out.println(spreadsheetStringify(roomsAndCourses));
 		for(int i=0; i<workingCourseList.length; i++){
 			if (!workingCourseList[i][0].equals(unionSpecs[i][0])){
 				throw new IllegalStateException(getFile(names[4]).getName()+" and "+getFile(names[3]).getName()+" are not in the same order.");
@@ -467,7 +467,10 @@ public class FileManager {
 			info.add(workingCourseList[i][3]+";");
 
 			TreeSet<String> pList=findRooms(workingCourseList[i][3],roomsAndProfessors);
-			TreeSet<String> cList=findRooms(workingCourseList[i][0],roomsAndCourses);
+			String[] courseKeyParts=workingCourseList[i][0].split("-");
+			String courseKey=courseKeyParts[0]+"-"+courseKeyParts[1];
+			TreeSet<String> cList=findRooms(courseKey,roomsAndCourses);
+			System.out.println("[GRR]"+workingCourseList[i][0]);
 			//TODO: Handle dLists for Cross listed Courses
 			TreeSet<String> dList=findRooms(workingCourseList[i][0].substring(0,4),roomsAndDepartments);
 			boolean cSpec=(unionSpecs[i][2].trim().equals(""))?false:true;
@@ -486,6 +489,7 @@ public class FileManager {
 				notdncup.removeAll(cup);
 				rList.removeAll(notdncup);
 			}
+			System.out.println("[GRR]"+cList);
 			info.add(rList.toString().substring(1,rList.toString().length()-1)+";");			
 			info.add(pList.toString().substring(1,pList.toString().length()-1)+";");
 			info.add(cList.toString().substring(1,cList.toString().length()-1)+";");
@@ -505,8 +509,12 @@ public class FileManager {
 	 */
 	private TreeSet<String> findRooms(String key, String[][] source){
 		TreeSet<String> rooms = new TreeSet<String>();
+		//if (key.contains("-")){
+		//	System.out.println(spreadsheetStringify(source));
+		//}
 		String[] keys = key.split("  ");
 		for (String k:keys){
+
 			for (String[] row:source){
 				if (row[0].equals(k)){
 					String[] qux = row[1].split(", ");
@@ -600,8 +608,9 @@ public class FileManager {
 
 
 	// ================================================================================================
-	private HashMap<Course,Room> SequentialColoring(Set<Node> nodeSet){				
+	private HashMap<Course,Room> SequentialColoring(Set<Node> nodeSet){                                
 		int color=0;
+		int countLabs=0;
 		for(Node n:nodeSet){
 			//System.out.println("[SC1]"+"Looking at Node ("+n.getNeighborCount()+") "+n);
 			color=0;
@@ -626,7 +635,7 @@ public class FileManager {
 						reset=true;
 						break;
 					}
-				}				
+				}                                
 				if (!reset){
 					//System.out.println("[SC3]"+"Assigning color "+color);
 					n.setColor(color);
@@ -661,16 +670,22 @@ public class FileManager {
 						//System.out.println("[SCCheck]"+"phantom room case");
 					} else {
 						overflow.add((Course)n);
+						if ( ((Course)n).getType().equals("lab")) {
+							countLabs++;
+						}
 					}
 				}
 			}
 		}
 		boolean overlapError=true;
+		
+		ArrayList<Course> haveDumbRooms = new ArrayList<Course>();
 		if (overlapError){
 
 			//System.out.println("[SCEnd]"+"overflow is "+overflow);
 			System.out.println("[SCEnd]"+"overflow is "+overflow.size()+" long");
 
+		
 			int countBad=0;
 			for (Node bad:overflow){
 
@@ -690,15 +705,19 @@ public class FileManager {
 					System.out.print("[SCEnd]"+"\t\t[");
 					for (String waldo:((Course)bad).getPreferredRooms()){
 						if (roomMap.get(waldo)==null){
+						} 
+						else if (false){
 							System.out.print("X:"+waldo+"\n\t\t");
 						} else if (false){
+<<<<<<< HEAD
 
+=======
+>>>>>>> 3218f487968f65702885c7547034d4637e3b60d3
 							System.out.print(waldo);
 							Room waldoRoom =roomMap.get(waldo); 
 							int rColor=waldoRoom.getColor();
 							System.out.print("("+rColor+"):"+waldoRoom.getCapacity()+":"+waldoRoom.getType());
 							TreeSet<Time> times = new TreeSet<Time>(((Course)bad).getTimes());
-
 							ArrayList<Node> ralph = sol.get(rColor);
 							for (Node ral:ralph){
 								if (ral instanceof Course){
@@ -708,8 +727,6 @@ public class FileManager {
 											+":"+((Course)ral).getStartTime()+"-"+((Course)ral).getEndTime());
 								}
 							}
-
-
 							System.out.println("\n\t\t\t\t====================================");
 							for (Time t:times){
 								ArrayList<Course> concCourses=t.getCourses();
@@ -718,37 +735,39 @@ public class FileManager {
 										System.out.print("\n\t\t\t\t["+cc.getShortName().toArray()[0]+"/"+t+"]");
 									}
 								}
-							}
-
-
+							}//for
 							System.out.print("\n\t\t");
-						}
-
-					}
-					System.out.println("]");
-
-
-				} else {
+						}//if
+						//System.out.println("]");
+					} //for
+					
+				}//if
+				
+				else {
 					countBad++;
 					System.out.println("[SCEnd]"+"(skipping) "+bad+":"+((Course)bad).getPreferredRooms());
 				}
 
 				/*for (Room thud:((Course)bad).getPreferredRooms()){
-				int foo = thud.getColor();
-				System.out.println("[SCEnd]"+"\t"+thud+" has color "+foo);
-				System.out.print("[SCEnd]"+"\t\t"+foo+" colored things are ");
-				for (Node bar:nodeSet){
-					if (bar instanceof Course && bar.getColor()==foo){
-						System.out.print(((Course)bar).getShortName()+", ");
-					}
-				}
-				System.out.println();
-			}*/
+                        int foo = thud.getColor();
+                        System.out.println("[SCEnd]"+"\t"+thud+" has color "+foo);
+                        System.out.print("[SCEnd]"+"\t\t"+foo+" colored things are ");
+                        for (Node bar:nodeSet){
+                                if (bar instanceof Course && bar.getColor()==foo){
+                                        System.out.print(((Course)bar).getShortName()+", ");
+                                }
+                        }
+                        System.out.println();
+                	}
+				}*/
 			}
-		}
+		
 		System.out.println("[SCEnd]"+"overflow is "+overflow.size()+" long");
 		System.out.println("[SCEnd]"+"skipped is "+skipped.size()+" long");
+		
+
 		return null;
+		}
 	}
 
 
@@ -859,6 +878,10 @@ public class FileManager {
 			for (Node n:rooms){
 				r.addNeighbor(n);
 			}
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3218f487968f65702885c7547034d4637e3b60d3
 		}
 
 		for (Course c:courseMap.values()){
@@ -868,7 +891,17 @@ public class FileManager {
 			String[] recKeys=((String)(recMap.get(c.getShortName().toArray()[0]).toArray()[0])).split(", ");
 
 			for (String rk:recKeys){
-				c.addPreferredRoom(rk);
+				Room r=roomMap.get(rk);
+				if (r!=null){
+					if (!c.getType().equals("lab")){
+						c.addPreferredRoom(rk);
+					}
+					else if (c.getType().equals("lab") && r.getType().equals("lab")){
+						c.addPreferredRoom(rk);
+					}
+				} else {
+					c.addPreferredRoom(rk);
+				}
 			}
 
 			for (String k:recKeys){
@@ -984,6 +1017,7 @@ public class FileManager {
 	 */
 	private boolean writeHashToCSV(Map<String,ArrayList<String>> d, File f){
 		try{
+<<<<<<< HEAD
 			System.out.println(f.getName());
 			BufferedWriter bw=new BufferedWriter(new FileWriter(f));
 			System.out.println(d.get("header"));
@@ -999,6 +1033,17 @@ public class FileManager {
 					System.out.println("[1]"+es.getKey()+";"+ts2);
 					bw.write(es.getKey()+";"+ts2+"\n");
 				}
+=======
+			BufferedWriter bw=new BufferedWriter(new FileWriter(f));
+			for (Entry<String, ArrayList<String>> es :d.entrySet()){
+				String ts2=es.getValue().toString();
+				ts2=ts2.substring(1,ts2.length()-1);
+				//System.out.println("[1]"+ts2);
+				//System.out.println(es.getKey()+";"+ts2+"\n");
+				ts2=ts2.replace(";, ", ";");
+				System.out.println("[1]"+es.getKey()+";"+ts2);
+				bw.write(es.getKey()+";"+ts2+"\n");
+>>>>>>> 3218f487968f65702885c7547034d4637e3b60d3
 			}
 			bw.close();
 			System.out.println("Done writing to file "+f.getName());
