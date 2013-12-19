@@ -40,7 +40,7 @@ public class Driver{
 	public void go() throws IOException{
 		boolean testing=false;
 		FileManager fm=new FileManager();
-		int phase=1;
+		int phase=3;
 		String qux ="";
 		switch(phase){
 		case 1:
@@ -53,11 +53,12 @@ public class Driver{
 			qux=qux.concat(fm.addCSVFile(new File("proto-roomsandprofslist.csv"), "roomsandprofessors")+",");
 			qux=qux.concat(fm.addCSVFile(new File("proto-roomsanddeptslist.csv"), "roomsanddepartments")+",");
 			qux=qux.concat(fm.addCSVFile(new File("proto-roomsandcourseslist.csv"), "roomsandcourses")+",");
+			qux=qux.concat(fm.addCSVFile(new File("gen-unionspecslist.csv"), "unionspecs")+",");
 			qux=qux.concat(fm.addCSVFile(new File("workingCourseList.csv"), "workingcourselist")+",");
 			qux=qux.concat(fm.addCSVFile(new File("proto-roomslist.csv"), "workingroomslist"));
 			break;
 		case 3:
-			qux=qux.concat(fm.addCSVFile(new File("proto-recommendedroomslistlist.csv"), "recommendedroomslist")+",");
+			qux=qux.concat(fm.addCSVFile(new File("proto-recommendedroomslistlist.csv"), "recommendedrooms")+",");
 			qux=qux.concat(fm.addCSVFile(new File("workingCourseList.csv"), "workingcourselist")+",");
 			qux=qux.concat(fm.addCSVFile(new File("proto-roomslist.csv"), "workingroomslist"));
 			fm.addData("times", generateTimes());

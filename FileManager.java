@@ -202,7 +202,7 @@ public class FileManager {
 	 * @return the set of keys needed to access the newly created data maps.
 	 * @respect calls to data.put() are made directly inside process, not from the methods it calls
 	 */
-	public <N> Set<String> process(int phase){
+	public Set<String> process(int phase){
 		//TODO:Use reflection on name
 		String name="";
 		switch(phase){
@@ -210,24 +210,30 @@ public class FileManager {
 			name="historical";
 			System.out.println("Processing Hisorical data");
 			data.put("roomsandcourses", associateFieldAndRooms(getSpreadsheet(name),1));
+			((Map<String,ArrayList<String>>)data.get("roomsandcourses")).put("header", new ArrayList<String>(){{add("Course;Rooms");}});
 			data.put("roomsanddepartments", associateFieldAndRooms(getSpreadsheet(name),2));
+			((Map<String,ArrayList<String>>)data.get("roomsanddepartments")).put("header", new ArrayList<String>(){{add("Department;Rooms");}});
 			data.put("roomsandprofessors", associateFieldAndRooms(getSpreadsheet(name),3));
+			((Map<String,ArrayList<String>>)data.get("roomsandprofessors")).put("header", new ArrayList<String>(){{add("Professor;Rooms");}});
 			//generateUnionSpecs(getSpreadsheet("workingcourselist"));
 			data.put("unionspecs", generateUnionSpecs(getSpreadsheet("workingcourselist"), data.keySet()));
+			((Map<String,ArrayList<String>>)data.get("unionspecs")).put("header", new ArrayList<String>(){{add("Course Name;Professor;Course;Professor;Department");}});
 			return data.keySet();
 		case 2:
-			String spreadsheetNames="roomsandprofessors,roomsandcourses,roomsanddepartments,workingcourselist,workingroomlist";
-			data.put("recommendedroomslist",generateRecommendedRooms(spreadsheetNames));
+			String spreadsheetNames="roomsandprofessors,roomsandcourses,roomsanddepartments,unionspecs,workingcourselist,workingroomlist";
+			data.put("recommendedrooms",generateRecommendedRooms(spreadsheetNames));
+			((Map<String,ArrayList<String>>)data.get("recommendedrooms")).put("header", new ArrayList<String>(){{add("Course Number;Course Title;Cross Listings;Professors;Recommended Rooms;Professor Rooms;Course Rooms;Department Rooms");}});
 			return data.keySet();
 		case 3:
 			//data has the "times" key already, see Driver
 			System.out.println("[FM-P1]"+"Spreadsheets are "+this.spreadsheets.size()+" many");
 			System.out.println("[FM-P2]"+"Spreadsheets are "+this.getSpreadsheetNames());
 			data.put("workingroomlist", generateRooms(getSpreadsheet("workingroomslist")));
+			System.out.println("[P  ]"+getFile("workingcourselist").getName());
 			data.put("workingcourselist",generateCourses(getSpreadsheet("workingcourselist")));
-			data.put("recommendedroomslist", readRecs(getSpreadsheet("recommendedroomslist")));
+			data.put("recommendedrooms", readRecs(getSpreadsheet("recommendedrooms")));
 
-			drawEdges("workingcourselist", "workingroomlist", "recommendedroomslist", "times");
+			drawEdges("workingcourselist", "workingroomlist", "recommendedrooms", "times");
 
 			TreeMap<String,Course> courseMap = (TreeMap<String, Course>) data.get("workingcourselist"); 
 			System.out.println("[P1]"+"number of course nodes is "+courseMap.size());
@@ -274,7 +280,7 @@ public class FileManager {
 		return null;
 	}
 	// ================================================================================================
-
+	
 	// ================================================================================================
 	/**
 	 * Finds every room that a unique value in the historical spreadsheet has used. The field to search 
@@ -370,8 +376,8 @@ public class FileManager {
 		}
 	} // associateFieldAndRooms
 	// ================================================================================================
-	
-	
+
+
 	// ================================================================================================
 	/**
 	 * 
@@ -412,10 +418,10 @@ public class FileManager {
 			unionSpecs.put(courseName, allSpecs);
 			//System.out.println(rc.get(courseName));
 		}
-		
+
 		return unionSpecs;
 	}
-	
+
 	private String checkLength(String key, Map<String,?> map, int length){
 		String spec="";
 		if (map.containsKey(key)){
@@ -426,9 +432,9 @@ public class FileManager {
 		}
 		return spec;
 	}
-	
+
 	// ================================================================================================
-	
+
 	// ================================================================================================
 
 	/**
@@ -442,8 +448,9 @@ public class FileManager {
 		String[][] roomsAndProfessors=getSpreadsheet(names[0]);
 		String[][] roomsAndCourses=getSpreadsheet(names[1]);
 		String[][] roomsAndDepartments=getSpreadsheet(names[2]);
-		String[][] workingCourseList=getSpreadsheet(names[3]);
-		String[][] workingRoomList=getSpreadsheet(names[4]);
+		String[][] unionSpecs=getSpreadsheet(names[3]);
+		String[][] workingCourseList=getSpreadsheet(names[4]);
+		String[][] workingRoomList=getSpreadsheet(names[5]);
 
 		String[][] recommendedRoomList=new String[workingCourseList.length][8];
 
@@ -451,6 +458,10 @@ public class FileManager {
 		ArrayList<String> info=new ArrayList<String>();
 
 		for(int i=0; i<workingCourseList.length; i++){
+			if (!workingCourseList[i][0].equals(unionSpecs[i][0])){
+				throw new IllegalStateException(getFile(names[4]).getName()+" and "+getFile(names[3]).getName()+" are not in the same order.");
+			}
+			
 			info.add(workingCourseList[i][1]+";");
 			info.add(workingCourseList[i][2]+";");
 			info.add(workingCourseList[i][3]+";");
@@ -459,6 +470,11 @@ public class FileManager {
 			TreeSet<String> cList=findRooms(workingCourseList[i][0],roomsAndCourses);
 			//TODO: Handle dLists for Cross listed Courses
 			TreeSet<String> dList=findRooms(workingCourseList[i][0].substring(0,4),roomsAndDepartments);
+			boolean cSpec=(unionSpecs[i][2].trim().equals(""))?false:true;
+			boolean pSpec=(unionSpecs[i][3].trim().equals(""))?false:true;
+			boolean dSpec=(unionSpecs[i][4].trim().equals(""))?false:true;
+			
+			
 			TreeSet<String> cup =new TreeSet<String>();
 			cup.addAll(cList);
 			cup.addAll(pList);
@@ -534,8 +550,10 @@ public class FileManager {
 		TreeMap<String,Course> courses= new TreeMap<String,Course>();
 		for(int row=1; row<cS.length; row++){
 			Course c = new Course(cS[row]);
+			if (courses.containsKey(c.toString())){
+			}
 			courses.put(c.toString(),c);
-		}		
+		}
 		System.out.println("Done Generating Courses");
 		return courses;	
 	}
@@ -674,7 +692,7 @@ public class FileManager {
 						if (roomMap.get(waldo)==null){
 							System.out.print("X:"+waldo+"\n\t\t");
 						} else if (false){
-							
+
 							System.out.print(waldo);
 							Room waldoRoom =roomMap.get(waldo); 
 							int rColor=waldoRoom.getColor();
@@ -841,7 +859,6 @@ public class FileManager {
 			for (Node n:rooms){
 				r.addNeighbor(n);
 			}
-			
 		}
 
 		for (Course c:courseMap.values()){
@@ -872,7 +889,7 @@ public class FileManager {
 						//System.out.println("[DE2]"+r);
 						//System.out.println("[DE3]"+"removing r is "+removeEdge);
 					}
-					
+
 					//System.out.println("[DE3]"+"keys is size "+keys.size());
 					if (removeEdge){
 						keys.remove(k); //no edge ie possible coloring
@@ -886,7 +903,7 @@ public class FileManager {
 				r.addNeighbor(c.addNeighbor(r));
 			}
 
-			
+
 
 			double startTime=c.getStartTime();
 			double endTime=c.getEndTime();
@@ -950,18 +967,10 @@ public class FileManager {
 	// ================================================================================================
 	// ================================================================================================
 	@SuppressWarnings("unchecked")
-	public void write(String[] header, String[] names) throws Exception{
-		if (header.length!=names.length){
-			throw new IllegalArgumentException("The parameters for write() do not match.");
-		}
-		for (int i=0; i<names.length; i++){
-			String s = names[i];
+	public void write(String[] names){
+		for (String s:names){
 			File f = new File("gen-"+s+"list.csv");
-			BufferedWriter bw=new BufferedWriter(new FileWriter(f));
-			bw.write(header[i]);
-			writeHashToCSV((TreeMap<String,ArrayList<String>>)data.get(s), bw);
-			System.out.println("[W ]Done writing to file "+f.getName());
-			bw.close();
+			writeHashToCSV((TreeMap<String,ArrayList<String>>)data.get(s), f);
 		}
 	}
 
@@ -973,17 +982,26 @@ public class FileManager {
 	 * @param f - the file to be written to
 	 * @return a boolean which is true if the file wrote correctly and false otherwise
 	 */
-	private boolean writeHashToCSV(Map<String,ArrayList<String>> d, BufferedWriter bw){
+	private boolean writeHashToCSV(Map<String,ArrayList<String>> d, File f){
 		try{
+			System.out.println(f.getName());
+			BufferedWriter bw=new BufferedWriter(new FileWriter(f));
+			System.out.println(d.get("header"));
+			String head=d.get("header").toString();
+			bw.write(head.substring(1,head.length()-1)+"\n");
 			for (Entry<String, ArrayList<String>> es :d.entrySet()){
-				String ts2=es.getValue().toString();
-				ts2=ts2.substring(1,ts2.length()-1);
-				//System.out.println("[1]"+ts2);
-				//System.out.println(es.getKey()+";"+ts2+"\n");
-				ts2=ts2.replace(";, ", ";");
-				System.out.println("[W1]"+es.getKey()+";"+ts2);
-				bw.write(es.getKey()+";"+ts2+"\n");
+				if(!es.getKey().equals("header")){
+					String ts2=es.getValue().toString();
+					ts2=ts2.substring(1,ts2.length()-1);
+					//System.out.println("[1]"+ts2);
+					//System.out.println(es.getKey()+";"+ts2+"\n");
+					ts2=ts2.replace(";, ", ";");
+					System.out.println("[1]"+es.getKey()+";"+ts2);
+					bw.write(es.getKey()+";"+ts2+"\n");
+				}
 			}
+			bw.close();
+			System.out.println("Done writing to file "+f.getName());
 			return true;
 		} catch (IOException e){
 			return false;

@@ -13,7 +13,7 @@ import java.io.*;
 // problem.
 public class Course extends Node{
 // ========================================================
-	private Set<String> shortName=new HashSet<String>(); 
+	private Set<String> shortName=new TreeSet<String>(); 
 	private int startTime;
 	private int endTime;
 	private ArrayList<Integer> dow=new ArrayList<Integer>();
