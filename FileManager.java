@@ -266,11 +266,11 @@ public class FileManager {
 			HashMap<String,ArrayList<String>> ans=ansLF;
 			//HashMap<Course,Room> ansAMIS=AMIS((TreeMap<String,Node>)nodeMap.clone());
 			System.out.println("Hello "+ans.size());
-				for (Entry e :ans.entrySet()){
-					System.out.println(e);
-				}	
+			for (Entry e :ans.entrySet()){
+				System.out.println(e);
+			}	
 
-						System.out.println(ans);
+			System.out.println(ans);
 			data.put("LFsolutions", ans);
 			((Map<String,ArrayList<String>>)data.get("LFsolutions")).put("header", new ArrayList<String>(){{add("Course Name;Room Assigned");}});
 			System.out.println(data.keySet());
@@ -283,7 +283,7 @@ public class FileManager {
 		return null;
 	}
 	// ================================================================================================
-	
+
 	// ================================================================================================
 	/**
 	 * Finds every room that a unique value in the historical spreadsheet has used. The field to search 
@@ -459,47 +459,53 @@ public class FileManager {
 
 		TreeMap<String,ArrayList<String>> t=new TreeMap<String,ArrayList<String>>(); 
 		ArrayList<String> info=new ArrayList<String>();
-		System.out.println(spreadsheetStringify(roomsAndCourses));
-		for(int i=0; i<workingCourseList.length; i++){
-			if (!workingCourseList[i][0].equals(unionSpecs[i][0])){
-				throw new IllegalStateException(getFile(names[4]).getName()+" and "+getFile(names[3]).getName()+" are not in the same order.");
-			}
-			
-			info.add(workingCourseList[i][1]+";");
-			info.add(workingCourseList[i][2]+";");
-			info.add(workingCourseList[i][3]+";");
+		//System.out.println(spreadsheetStringify(roomsAndCourses));
+		int wcSpot=0;
+		for(int i=0; i<unionSpecs.length; i++){
+			boolean work=true;
+			while(work&&wcSpot<695){
+				if (!workingCourseList[wcSpot][0].equals(unionSpecs[i][0])){
+					break;
+					//throw new IllegalStateException(getFile(names[4]).getName()+" and "+getFile(names[3]).getName()+" are not in the same order.");
+				}
 
-			TreeSet<String> pList=findRooms(workingCourseList[i][3],roomsAndProfessors);
-			String[] courseKeyParts=workingCourseList[i][0].split("-");
-			String courseKey=courseKeyParts[0]+"-"+courseKeyParts[1];
-			TreeSet<String> cList=findRooms(courseKey,roomsAndCourses);
-			System.out.println("[GRR]"+workingCourseList[i][0]);
-			//TODO: Handle dLists for Cross listed Courses
-			TreeSet<String> dList=findRooms(workingCourseList[i][0].substring(0,4),roomsAndDepartments);
-			boolean cSpec=(unionSpecs[i][2].trim().equals(""))?false:true;
-			boolean pSpec=(unionSpecs[i][3].trim().equals(""))?false:true;
-			boolean dSpec=(unionSpecs[i][4].trim().equals(""))?false:true;
-			
-			
-			TreeSet<String> cup =new TreeSet<String>();
-			cup.addAll(cList);
-			cup.addAll(pList);
-			TreeSet<String> notdncup = new TreeSet<String>();
-			TreeSet<String> rList = new TreeSet<String>();
-			notdncup.addAll(dList);
-			rList.addAll(dList);
-			if (!cup.isEmpty()){
-				notdncup.removeAll(cup);
-				rList.removeAll(notdncup);
-			}
-			System.out.println("[GRR]"+cList);
-			info.add(rList.toString().substring(1,rList.toString().length()-1)+";");			
-			info.add(pList.toString().substring(1,pList.toString().length()-1)+";");
-			info.add(cList.toString().substring(1,cList.toString().length()-1)+";");
-			info.add(dList.toString().substring(1,dList.toString().length()-1)+";");
+				info.add(workingCourseList[wcSpot][1]+";");
+				info.add(workingCourseList[wcSpot][2]+";");
+				info.add(workingCourseList[wcSpot][3]+";");
 
-			t.put(workingCourseList[i][0], ((ArrayList<String>)info.clone()));
-			info.clear();
+				TreeSet<String> pList=findRooms(workingCourseList[wcSpot][3],roomsAndProfessors);
+				String[] courseKeyParts=workingCourseList[wcSpot][0].split("-");
+				String courseKey=courseKeyParts[0]+"-"+courseKeyParts[1];
+				TreeSet<String> cList=findRooms(courseKey,roomsAndCourses);
+				System.out.println("[GRR]"+workingCourseList[wcSpot][0]);
+				//TODO: Handle dLists for Cross listed Courses
+				TreeSet<String> dList=findRooms(workingCourseList[wcSpot][0].substring(0,4),roomsAndDepartments);
+				boolean cSpec=(unionSpecs[i][2].trim().equals(""))?false:true;
+				boolean pSpec=(unionSpecs[i][3].trim().equals(""))?false:true;
+				boolean dSpec=(unionSpecs[i][4].trim().equals(""))?false:true;
+
+
+				TreeSet<String> cup =new TreeSet<String>();
+				cup.addAll(cList);
+				cup.addAll(pList);
+				TreeSet<String> notdncup = new TreeSet<String>();
+				TreeSet<String> rList = new TreeSet<String>();
+				notdncup.addAll(dList);
+				rList.addAll(dList);
+				if (!cup.isEmpty()){
+					notdncup.removeAll(cup);
+					rList.removeAll(notdncup);
+				}
+				//System.out.println("[GRR]"+cList);
+				info.add(rList.toString().substring(1,rList.toString().length()-1)+";");			
+				info.add(pList.toString().substring(1,pList.toString().length()-1)+";");
+				info.add(cList.toString().substring(1,cList.toString().length()-1)+";");
+				info.add(dList.toString().substring(1,dList.toString().length()-1)+";");
+
+				t.put(workingCourseList[wcSpot][0], ((ArrayList<String>)info.clone()));
+				info.clear();
+				wcSpot++;
+			}
 		}
 		return t;
 	}
@@ -588,7 +594,7 @@ public class FileManager {
 	private HashMap<String,ArrayList<String>> RND(Map<String,Node> nodeMap){
 		HashSet<Node> nodeSet=new HashSet<Node>(nodeMap.values());
 		return SequentialColoring(nodeSet);
-		
+
 	}
 
 	private HashMap<String,ArrayList<String>> LF(Map<String,Node> nodeMap){
@@ -604,7 +610,7 @@ public class FileManager {
 		for (Node blivit: col){
 			nodeSet.add(blivit);
 		}
-		
+
 
 		return SequentialColoring(nodeSet);
 	}
@@ -682,14 +688,14 @@ public class FileManager {
 			}
 		}
 		boolean overlapError=true;
-		
+
 		ArrayList<Course> haveDumbRooms = new ArrayList<Course>();
 		if (overlapError){
 
 			//System.out.println("[SCEnd]"+"overflow is "+overflow);
 			System.out.println("[SCEnd]"+"overflow is "+overflow.size()+" long");
 
-		
+
 			int countBad=0;
 			for (Node bad:overflow){
 
@@ -741,9 +747,9 @@ public class FileManager {
 						}//if
 						//System.out.println("]");
 					} //for
-					
+
 				}//if
-				
+
 				else {
 					countBad++;
 					System.out.println("[SCEnd]"+"(skipping) "+bad+":"+((Course)bad).getPreferredRooms());
@@ -762,32 +768,32 @@ public class FileManager {
                 	}
 				}*/
 			}
-	
-		
-	
-		for(ArrayList<Node> al:sol.values()){
-			ArrayList<String> room=new ArrayList<String>();
-			room.add(al.get(0).toString());
-			for(int i=1;i<al.size();i++){
-				hmsol.put(al.get(i).toString(), room);
-			}
-		
-		}
-		for(Course c:overflow){
-			ArrayList<String> room=new ArrayList<String>();
-			room.add("Overflow: No Room has been assigned to this course");
-			hmsol.put(c.toString(), room);
-		}
-		for(Course c:skipped){
-			ArrayList<String> room=new ArrayList<String>();
-			room.add("Skipped: This course can only be given a room by its department");
-			hmsol.put(c.toString(), room);
-		}
-		System.out.println("[SCEnd]"+"overflow is "+overflow.size()+" long");
-		System.out.println("[SCEnd]"+"skipped is "+skipped.size()+" long");
-		
 
-		
+
+
+			for(ArrayList<Node> al:sol.values()){
+				ArrayList<String> room=new ArrayList<String>();
+				room.add(al.get(0).toString());
+				for(int i=1;i<al.size();i++){
+					hmsol.put(al.get(i).toString(), room);
+				}
+
+			}
+			for(Course c:overflow){
+				ArrayList<String> room=new ArrayList<String>();
+				room.add("Overflow: No Room has been assigned to this course");
+				hmsol.put(c.toString(), room);
+			}
+			for(Course c:skipped){
+				ArrayList<String> room=new ArrayList<String>();
+				room.add("Skipped: This course can only be given a room by its department");
+				hmsol.put(c.toString(), room);
+			}
+			System.out.println("[SCEnd]"+"overflow is "+overflow.size()+" long");
+			System.out.println("[SCEnd]"+"skipped is "+skipped.size()+" long");
+
+
+
 		}
 		return hmsol;
 	}
@@ -1020,19 +1026,19 @@ public class FileManager {
 	// ================================================================================================
 	@SuppressWarnings("unchecked")
 	public void write(String[] names){
-		
+
 		for (String s:names){
-			
-			if(s.equals("LFsolutions")){
+			System.out.println("[W1]"+s);
+				if(data.get(s) instanceof HashMap<?,?>){
 				TreeMap<String,ArrayList<String>> tm=new TreeMap<String,ArrayList<String>>((HashMap<String,ArrayList<String>>)data.get(s));
 				File f = new File("gen-"+s+"list.csv");
-				writeHashToCSV(tm,f);
-			}
-			
-			File f = new File("gen-"+s+"list.csv");
-			
-			writeHashToCSV((TreeMap<String,ArrayList<String>>)data.get(s), f);
-			
+				writeHashToCSV(tm,f);}
+				else{
+
+					File f = new File("gen-"+s+"list.csv");
+
+					writeHashToCSV((TreeMap<String,ArrayList<String>>)data.get(s), f);
+				}
 		}
 	}
 
@@ -1059,10 +1065,10 @@ public class FileManager {
 					//System.out.println("[1]"+ts2);
 					//System.out.println(es.getKey()+";"+ts2+"\n");
 					ts2=ts2.replace(";, ", ";");
-					System.out.println("[1]"+es.getKey()+";"+ts2);
+					//System.out.println("[1]"+es.getKey()+";"+ts2);
 					bw.write(es.getKey()+";"+ts2+"\n");
 				}
-/*
+				/*
 			BufferedWriter bw=new BufferedWriter(new FileWriter(f));
 			for (Entry<String, ArrayList<String>> es :d.entrySet()){
 				String ts2=es.getValue().toString();
@@ -1072,7 +1078,7 @@ public class FileManager {
 				ts2=ts2.replace(";, ", ";");
 				System.out.println("[1]"+es.getKey()+";"+ts2);
 				bw.write(es.getKey()+";"+ts2+"\n");
-*/
+				 */
 			}
 			bw.close();
 			System.out.println("Done writing to file "+f.getName());
