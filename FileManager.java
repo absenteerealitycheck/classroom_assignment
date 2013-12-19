@@ -1,7 +1,15 @@
+// ====================================================================================================================================================================================
+// FileManager
+// againessmith13, jpham14, mmillian15, cbottum15
+// Fall 2013 
+// ====================================================================================================================================================================================
+
 import java.util.*;
 import java.util.Map.Entry;
 import java.io.*;
 
+//=====================================================================================================================================================================================
+//FileManager takes the information from the files given and distributes them amongst the rest of the code for operation
 public class FileManager {
 
 	private HashMap<String,File> files;
@@ -40,14 +48,6 @@ public class FileManager {
 			throw new IllegalArgumentException(f.getName()+" is the incorrect file type");
 		}
 		return addFile(f,name);
-	}
-	// ================================================================================================
-
-	// ================================================================================================
-	/**
-	 * TODO:Implement this?
-	 */
-	public void addAllCSVFiles(File f, String name){
 	}
 	// ================================================================================================
 
@@ -1006,24 +1006,13 @@ public class FileManager {
 
 		}
 	}
+	// ================================================================================================
 
 	// ================================================================================================
-	// ================================================================================================
-	public void colorNode(Course c){//Removes all of the edges to the course and assigns a color(room)
-
-	}
-	// ================================================================================================
-	// ================================================================================================
-	public Object makeU1(){
-		return null;
-	}
-	// ================================================================================================
-	// ================================================================================================
-	public Object makeU2(){
-		return null;
-	}
-	// ================================================================================================
-	// ================================================================================================
+	/**
+	 * Take in a list of names, and write the data extracted using the names to files
+	 * @param names - The names of data items which will be written to files
+	 */
 	@SuppressWarnings("unchecked")
 	public void write(String[] names){
 
@@ -1040,9 +1029,9 @@ public class FileManager {
 					writeHashToCSV((TreeMap<String,ArrayList<String>>)data.get(s), f);
 				}
 		}
-	}
-
+	}//Write
 	// ================================================================================================
+	
 	// ================================================================================================
 	/**
 	 * Writes Map d to File f as a .csv
@@ -1090,9 +1079,9 @@ public class FileManager {
 	// ================================================================================================
 	// ================================================================================================
 	/**
-	 * 
-	 * @param s
-	 * @return
+	 * Takes a 2-D array of type String and turns each row from the array into its own line in a very long String
+	 * @param s - A 2-D Array s
+	 * @return A String representation of the spreadsheet
 	 */
 	public String spreadsheetStringify(String[][] s){
 		String result="";
@@ -1104,8 +1093,9 @@ public class FileManager {
 			result+="\n";
 		}
 		return result;
-	}
+	}//Spreadsheet Stringified
 	// ================================================================================================
+	
 	// ================================================================================================
 	//TODO:Deprecate if never used
 	private <E> void typeCheck(Class<E> type, Object o){
@@ -1118,5 +1108,5 @@ public class FileManager {
 	private <E> String badElementMsg(Class<E> type, Object o){
 		return "Attempt to use "+o.getClass()+" element with element type "+type;
 	}
-}
+}//class FileManager
 //================================================================================================
