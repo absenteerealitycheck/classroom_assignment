@@ -170,7 +170,7 @@ public class Driver{
 	/**
 	 * Use reflection to sort the list of courses based on some field in courses in asc or desc order.
 	 * @param list The list of courses to sort
-	 * @param getter Name of the getter method for the field name to sort by
+	 * @param getterName - Name of the getter method for the field name to sort by
 	 * @param order Whether to sort in asc or desc order
 	 */
 	public <T> void sort(ArrayList<Course> list, String getterName, final int order){//help order makes no sense. please document how it works.

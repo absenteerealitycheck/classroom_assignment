@@ -197,10 +197,10 @@ public class FileManager {
 	// ================================================================================================
 	/**
 	 * Transforms the spreadsheet associated with the specified name into some number of data maps, and
-	 * returns the set of keys needed to access the newly created data maps.
-	 * @param name - the name associated with the spreadsheet to process
+	 * returns the set of keys needed to access the newly created data maps. Note: calls to data.put() are made directly inside process, not from the methods it calls
+	 * @param phase - the int denoting which phase to run
 	 * @return the set of keys needed to access the newly created data maps.
-	 * @respect calls to data.put() are made directly inside process, not from the methods it calls
+	 * 
 	 */
 	public Set<String> process(int phase){
 		//TODO:Use reflection on name
