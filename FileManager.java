@@ -232,7 +232,6 @@ public class FileManager {
 			System.out.println("[P  ]"+getFile("workingcourselist").getName());
 			data.put("workingcourselist",generateCourses(getSpreadsheet("workingcourselist")));
 			data.put("recommendedrooms", readRecs(getSpreadsheet("recommendedrooms")));
-
 			drawEdges("workingcourselist", "workingroomlist", "recommendedrooms", "times");
 
 			TreeMap<String,Course> courseMap = (TreeMap<String, Course>) data.get("workingcourselist"); 
@@ -262,18 +261,22 @@ public class FileManager {
 			TreeMap<String,Node> nodeMap = new TreeMap<String,Node>(roomMap);
 			nodeMap.putAll(courseMap);
 			System.out.println("[P3]"+"number of graph nodes is "+nodeMap.size());
-			HashMap<Course,Room> ansLF=LF((TreeMap<String,Node>)nodeMap.clone());
+			HashMap<String,ArrayList<String>> ansLF=LF((TreeMap<String,Node>)nodeMap.clone());
 			//HashMap<Course,Room> ansRND=RND((TreeMap<String,Node>)nodeMap.clone());
-			HashMap<Course,Room> ans=ansLF;
+			HashMap<String,ArrayList<String>> ans=ansLF;
 			//HashMap<Course,Room> ansAMIS=AMIS((TreeMap<String,Node>)nodeMap.clone());
 			System.out.println("Hello "+ans.size());
 				for (Entry e :ans.entrySet()){
 					System.out.println(e);
 				}	
 
-			System.out.println(ans);
-
-			return data.keySet();
+						System.out.println(ans);
+			data.put("LFsolutions", ans);
+			((Map<String,ArrayList<String>>)data.get("LFsolutions")).put("header", new ArrayList<String>(){{add("Course Name;Room Assigned");}});
+			System.out.println(data.keySet());
+			Set<String> sol=new TreeSet<String>();
+			sol.add("LFsolutions");
+			return  sol;
 		default:
 			break;
 		}
@@ -582,13 +585,13 @@ public class FileManager {
 		return recs;
 	}
 
-	private HashMap<Course,Room> RND(Map<String,Node> nodeMap){
+	private HashMap<String,ArrayList<String>> RND(Map<String,Node> nodeMap){
 		HashSet<Node> nodeSet=new HashSet<Node>(nodeMap.values());
-		SequentialColoring(nodeSet);
-		return null;
+		return SequentialColoring(nodeSet);
+		
 	}
 
-	private HashMap<Course,Room> LF(Map<String,Node> nodeMap){
+	private HashMap<String,ArrayList<String>> LF(Map<String,Node> nodeMap){
 		TreeSet<Node> nodeSet=new TreeSet<Node>(new Comparator<Node>(){
 			public int compare(Node a, Node b){
 				if (a.getNeighborCount()>b.getNeighborCount()){
@@ -601,16 +604,17 @@ public class FileManager {
 		for (Node blivit: col){
 			nodeSet.add(blivit);
 		}
-		SequentialColoring(nodeSet);
+		
 
-		return null;
+		return SequentialColoring(nodeSet);
 	}
 
 
 	// ================================================================================================
-	private HashMap<Course,Room> SequentialColoring(Set<Node> nodeSet){                                
+	private HashMap<String,ArrayList<String>> SequentialColoring(Set<Node> nodeSet){                                
 		int color=0;
 		int countLabs=0;
+		HashMap<String,ArrayList<String>> hmsol=new HashMap<String,ArrayList<String>>();
 		for(Node n:nodeSet){
 			//System.out.println("[SC1]"+"Looking at Node ("+n.getNeighborCount()+") "+n);
 			color=0;
@@ -709,10 +713,7 @@ public class FileManager {
 						else if (false){
 							System.out.print("X:"+waldo+"\n\t\t");
 						} else if (false){
-<<<<<<< HEAD
 
-=======
->>>>>>> 3218f487968f65702885c7547034d4637e3b60d3
 							System.out.print(waldo);
 							Room waldoRoom =roomMap.get(waldo); 
 							int rColor=waldoRoom.getColor();
@@ -761,13 +762,34 @@ public class FileManager {
                 	}
 				}*/
 			}
+	
 		
+	
+		for(ArrayList<Node> al:sol.values()){
+			ArrayList<String> room=new ArrayList<String>();
+			room.add(al.get(0).toString());
+			for(int i=1;i<al.size();i++){
+				hmsol.put(al.get(i).toString(), room);
+			}
+		
+		}
+		for(Course c:overflow){
+			ArrayList<String> room=new ArrayList<String>();
+			room.add("Overflow: No Room has been assigned to this course");
+			hmsol.put(c.toString(), room);
+		}
+		for(Course c:skipped){
+			ArrayList<String> room=new ArrayList<String>();
+			room.add("Skipped: This course can only be given a room by its department");
+			hmsol.put(c.toString(), room);
+		}
 		System.out.println("[SCEnd]"+"overflow is "+overflow.size()+" long");
 		System.out.println("[SCEnd]"+"skipped is "+skipped.size()+" long");
 		
 
-		return null;
+		
 		}
+		return hmsol;
 	}
 
 
@@ -878,10 +900,7 @@ public class FileManager {
 			for (Node n:rooms){
 				r.addNeighbor(n);
 			}
-<<<<<<< HEAD
-=======
 
->>>>>>> 3218f487968f65702885c7547034d4637e3b60d3
 		}
 
 		for (Course c:courseMap.values()){
@@ -1001,9 +1020,19 @@ public class FileManager {
 	// ================================================================================================
 	@SuppressWarnings("unchecked")
 	public void write(String[] names){
+		
 		for (String s:names){
+			
+			if(s.equals("LFsolutions")){
+				TreeMap<String,ArrayList<String>> tm=new TreeMap<String,ArrayList<String>>((HashMap<String,ArrayList<String>>)data.get(s));
+				File f = new File("gen-"+s+"list.csv");
+				writeHashToCSV(tm,f);
+			}
+			
 			File f = new File("gen-"+s+"list.csv");
+			
 			writeHashToCSV((TreeMap<String,ArrayList<String>>)data.get(s), f);
+			
 		}
 	}
 
@@ -1017,7 +1046,7 @@ public class FileManager {
 	 */
 	private boolean writeHashToCSV(Map<String,ArrayList<String>> d, File f){
 		try{
-<<<<<<< HEAD
+
 			System.out.println(f.getName());
 			BufferedWriter bw=new BufferedWriter(new FileWriter(f));
 			System.out.println(d.get("header"));
@@ -1033,7 +1062,7 @@ public class FileManager {
 					System.out.println("[1]"+es.getKey()+";"+ts2);
 					bw.write(es.getKey()+";"+ts2+"\n");
 				}
-=======
+/*
 			BufferedWriter bw=new BufferedWriter(new FileWriter(f));
 			for (Entry<String, ArrayList<String>> es :d.entrySet()){
 				String ts2=es.getValue().toString();
@@ -1043,7 +1072,7 @@ public class FileManager {
 				ts2=ts2.replace(";, ", ";");
 				System.out.println("[1]"+es.getKey()+";"+ts2);
 				bw.write(es.getKey()+";"+ts2+"\n");
->>>>>>> 3218f487968f65702885c7547034d4637e3b60d3
+*/
 			}
 			bw.close();
 			System.out.println("Done writing to file "+f.getName());
