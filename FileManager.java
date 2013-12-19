@@ -220,7 +220,7 @@ public class FileManager {
 			((Map<String,ArrayList<String>>)data.get("unionspecs")).put("header", new ArrayList<String>(){{add("Course Name;Professor;Course;Professor;Department");}});
 			return data.keySet();
 		case 2:
-			String spreadsheetNames="roomsandprofessors,roomsandcourses,roomsanddepartments,unionspecs,workingcourselist,workingroomlist";
+			String spreadsheetNames="roomsandprofessors,roomsandcourses,roomsanddepartments,unionspecs,workingcourselist";
 			data.put("recommendedrooms",generateRecommendedRooms(spreadsheetNames));
 			((Map<String,ArrayList<String>>)data.get("recommendedrooms")).put("header", new ArrayList<String>(){{add("Course Number;Course Title;Cross Listings;Professors;Recommended Rooms;Professor Rooms;Course Rooms;Department Rooms");}});
 			return data.keySet();
@@ -453,7 +453,7 @@ public class FileManager {
 		String[][] roomsAndDepartments=getSpreadsheet(names[2]);
 		String[][] unionSpecs=getSpreadsheet(names[3]);
 		String[][] workingCourseList=getSpreadsheet(names[4]);
-		String[][] workingRoomList=getSpreadsheet(names[5]);
+		
 
 		String[][] recommendedRoomList=new String[workingCourseList.length][8];
 

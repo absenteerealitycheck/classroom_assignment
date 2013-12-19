@@ -25,8 +25,8 @@ public class Tuple<F,S> {
 	// ====================================================
 	/**
 	 * Constructs a newly allocated Tuple object.
-	 * @param first
-	 * @param second
+	 * @param first - the object to set as First for this Tuple
+	 * @param second - the object to set as Second for this Tuple
 	 */
 	public Tuple(F first, S second) { 
 		this.first=first; 
@@ -37,7 +37,7 @@ public class Tuple<F,S> {
 	// ====================================================
 	/**
 	 * Returns the first element in this Tuple.
-	 * @return
+	 * @return the first half of this Tuple
 	 */
 	public F getFirst() {
 		return first;
@@ -48,7 +48,8 @@ public class Tuple<F,S> {
 	/**
 	 * Replaces the first element in this Tuple with the 
 	 * specified element.
-	 * @param first
+	 * @param first - the Object to set as the First Object of this Tuple
+	 * 
 	 */
 	public void setFirst(F first) {
 		this.first = first;
@@ -58,7 +59,7 @@ public class Tuple<F,S> {
 	//=====================================================
 	/**
 	 * Returns the second element in this Tuple.
-	 * @return
+	 * @return the second half of this Tuple
 	 */
 	public S getSecond() {
 		return second;
@@ -69,7 +70,7 @@ public class Tuple<F,S> {
 	/**
 	 * Replaces the second element in this Tuple with the 
 	 * specified element.
-	 * @param second
+	 * @param second - the Object to set as the Second of this Tuple
 	 */
 	public void setSecond(S second) {
 		this.second = second;

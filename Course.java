@@ -22,9 +22,10 @@ public class Course extends Node{
 	// ====================================================
 	/**
 	 * Constructs a Course from the specified list of parameters. The list of parameters is expected to 
-	 * have the following structure:
-	 * TODO:Define structure of spreadsheet row
-	 * @param parameters - the list of parameters from which to construct the Room
+	 * have the following structure: 
+	 * 		Course Number|Course Title|Crosslisted Courses|Professors|Course Type|Course Times|Course Capacity
+	 * 
+	 *  @param parameters - the list of parameters from which to construct the Course
 	 */
 	public Course(String[] parameters){
 		this.shortName.add(parameters[0]);
@@ -59,7 +60,7 @@ public class Course extends Node{
 		}
 		this.startTime=start;
 		this.endTime=end;
-		setCapacity(Integer.parseInt(parameters[8]));
+		setCapacity(Integer.parseInt(parameters[6]));//Changing Working Course List so that it has the correct number of Columns for this
 	}
 	// ====================================================
 
@@ -67,8 +68,8 @@ public class Course extends Node{
 	// ====================================================
 	/**
 	 * 
-	 * @param t
-	 * @return
+	 * @param t - the Time to added to the list of Times this Course covers
+	 * @return the Course 
 	 */
 	public Course addTime(Time t){
 		this.timeBlocks.add(t);
@@ -76,28 +77,28 @@ public class Course extends Node{
 	}
 	/**
 	 * 
-	 * @return
+	 * @return a Set containing the Time objects assigned to this Course
 	 */
 	public Set<Time> getTimes() {return this.timeBlocks;}
 	/**
 	 * 
-	 * @return
+	 * @return an ArrayList of the Integer forms for the Days of the Week this Course occurs
 	 */
 	public ArrayList<Integer> getDow() {return this.dow;}
 	/**
 	 * 
-	 * @return
+	 * @return the Time at which this Course begins
 	 */
 	public int getStartTime() {return this.startTime;}
 	/**
 	 * 
-	 * @return
+	 * @return the Time at which this Course ends
 	 */
 	public int getEndTime() {return this.endTime;}
 	/**
 	 * 
-	 * @param preferredRoom
-	 * @return
+	 * @param preferredRoom - the Room to be added the Courses preferredRooms
+	 * @return the Course
 	 */
 	public Course addPreferredRoom(String preferredRoom) {
 		this.preferredRooms.add(preferredRoom);
@@ -120,7 +121,7 @@ public class Course extends Node{
 	 */
 	public Set<String> getShortName() {return this.shortName;}
 	/**
-	 * 
+	 * @return String version of the Course object which is in the format "Course Title (Course Numbers)"
 	 */
 	public String toString(){return this.getName()+" ("+this.shortName+")";}
 	// ====================================================
