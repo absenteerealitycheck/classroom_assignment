@@ -40,17 +40,19 @@ public class Driver{
 	public void go() throws IOException{
 		boolean testing=false;
 		FileManager fm=new FileManager();
-		int phase=3;
+		int phase=2;
 		String qux ="";
+		long begin=0;
 		switch(phase){
 		case 1:
 			System.out.println("Starting phase 1");
+			begin=System.currentTimeMillis();
 			qux=qux.concat(fm.addCSVFile(new File("proto-coursehistory.csv"), "historical")+",");
 			qux=qux.concat(fm.addCSVFile(new File("workingCourseList.csv"), "workingcourselist"));
 			break;
 		case 2:
 			System.out.println("Starting phase 2");
-
+			begin=System.currentTimeMillis();
 			qux=qux.concat(fm.addCSVFile(new File("proto-roomsandprofslist.csv"), "roomsandprofessors")+",");
 			qux=qux.concat(fm.addCSVFile(new File("proto-roomsanddeptslist.csv"), "roomsanddepartments")+",");
 			qux=qux.concat(fm.addCSVFile(new File("proto-roomsandcourseslist.csv"), "roomsandcourses")+",");
@@ -58,14 +60,17 @@ public class Driver{
 
 			qux=qux.concat(fm.addCSVFile(new File("workingCourseList.csv"), "workingcourselist")+",");
 			qux=qux.concat(fm.addCSVFile(new File("proto-roomslist.csv"), "workingroomslist"));
+			
 			break;
 		case 3:
-
+			System.out.println("Starting phased 3");
+			begin=System.currentTimeMillis();
 			qux=qux.concat(fm.addCSVFile(new File("proto-recommendedroomslistlist.csv"), "recommendedrooms")+",");
 
 			qux=qux.concat(fm.addCSVFile(new File("workingCourseList.csv"), "workingcourselist")+",");
 			qux=qux.concat(fm.addCSVFile(new File("proto-roomslist.csv"), "workingroomslist"));
 			fm.addData("times", generateTimes());
+
 			break;
 		default:
 			System.out.println(phase+ " is not a valid phase");
@@ -81,7 +86,7 @@ public class Driver{
 		fm.write(keys.toArray(new String[0]));
 		System.out.println("[DR3]"+"Done!");
 		
-
+		System.out.println("Run time of phase "+phase+" is: "+(System.currentTimeMillis()-begin));
 		boolean giveUp=true;
 		if (giveUp){
 			return;
